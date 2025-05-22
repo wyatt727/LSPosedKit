@@ -1,0 +1,20 @@
+rootProject.name = 'LSPosedKit'
+
+// Framework modules
+include ':framework:core'
+include ':framework:processor'
+include ':framework:hot'
+include ':framework:settings'
+include ':framework:service'
+include ':framework'
+
+// libxposed-api
+include ':libxposed-api:api'
+
+// Find all modules in modules directory (if it exists and has subdirectories)
+def modulesDir = file('modules')
+if (modulesDir.exists() && modulesDir.isDirectory()) {
+    modulesDir.eachDir { dir ->
+        include ":modules:${dir.name}"
+    }
+} 

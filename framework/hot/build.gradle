@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.wobbz.framework.hot'
+    compileSdk rootProject.ext.compileSdk
+    
+    defaultConfig {
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+    
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion.toString()
+    }
+}
+
+dependencies {
+    implementation project(':framework:core')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
+    
+    // Coroutines for async operations
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    
+    // Network for hot-reload client
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+} 
