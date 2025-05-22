@@ -1,16 +1,8 @@
 ---
-description: Helpful to understand the Build system & configuration
+description: Comprehensive guide to LSPosedKit's multi-module Gradle build system, configuration, and dependencies. Use this rule when dealing with build issues, Gradle configuration, module setup, dependency management, annotation processing, or compilation problems.
 globs: 
 alwaysApply: false
 ---
----
-name: LSPosedKit Build System & Configuration
-description: Comprehensive guide to LSPosedKit's multi-module Gradle build system, configuration, and dependencies. Use this rule when dealing with build issues, Gradle configuration, module setup, dependency management, annotation processing, or compilation problems.
-keywords: [gradle, build system, configuration, dependencies, modules, annotation processing, compilation, SDK versions, ProGuard, build tasks]
-triggers: [gradle build, build.gradle, settings.gradle, compilation error, dependency issues, module configuration, annotation processor, build tasks, SDK configuration]
-scope: build-configuration
----
-
 # LSPosedKit Build System & Configuration
 
 ## Multi-Module Gradle Structure

@@ -1,7 +1,7 @@
 ---
-description: 
+description: Helpful when developing modules and when there's uncertainty regarding what device architecture this project was built for. 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # Test Device Specifications
 

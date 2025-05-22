@@ -1,11 +1,8 @@
 ---
-name: LSPosedKit Project Architecture
 description: Comprehensive guide to the LSPosedKit project structure, component organization, and implementation roadmap. Use this rule when discussing project architecture, component relationships, directory structure, framework layers, or planning implementation sequence.
-keywords: [architecture, project structure, framework, components, implementation, roadmap, directories, modules, libxposed-api, build system]
-triggers: [project structure, architecture, components, framework layers, implementation order, directory layout, module organization]
-scope: project-wide
+globs: 
+alwaysApply: false
 ---
-
 # LSPosedKit Project Architecture
 
 ## Overview

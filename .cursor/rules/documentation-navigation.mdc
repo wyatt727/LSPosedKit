@@ -1,16 +1,8 @@
 ---
-description: Helpful to use as a Documentation Navigation Guide
+description: Complete navigation guide for LSPosedKit documentation structure and implementation guides. Use this rule when looking for specific documentation, understanding the docs organization, finding implementation guides, or needing quick reference links to relevant files.
 globs: 
 alwaysApply: false
 ---
----
-name: LSPosedKit Documentation Navigation Guide
-description: Complete navigation guide for LSPosedKit documentation structure and implementation guides. Use this rule when looking for specific documentation, understanding the docs organization, finding implementation guides, or needing quick reference links to relevant files.
-keywords: [documentation, guides, navigation, implementation guides, API reference, troubleshooting, getting started, schemas, examples]
-triggers: [find documentation, implementation guide, API docs, troubleshooting, getting started, schema reference, examples, how to implement, where to find]
-scope: documentation-reference
----
-
 # LSPosedKit Documentation Navigation Guide
 
 ## Documentation Structure Overview
