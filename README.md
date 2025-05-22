@@ -36,8 +36,8 @@
 ## Features
 
 * **Annotation‑Driven Modules**: Define ID, version, scope, description, author in code. (See [Docs/02-annotations.md](Docs/02-annotations.md))
-* **True Hot‑Reload**: Incremental DEX patching via ART 15's DexPatch. (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
-* **Declarative Settings**: `settings.json` → fully typed PreferenceScreen. (See [Docs/03-settings-schema.md](Docs/03-settings-schema.md))
+* **True Hot‑Reload**: Aims for incremental DEX patching (e.g., using ART 15's DexPatch where available). Implementation details and considerations for robustness across Android versions are discussed in [Docs/06-hot-reload.md](Docs/06-hot-reload.md).
+* **Declarative Settings**: `settings.json` → fully typed PreferenceScreen. Modules can also implement custom settings activities for more complex UIs. (See [Docs/03-settings-schema.md](Docs/03-settings-schema.md))
 * **Module Dependency Graph**: `module-info.json` with SemVer checks. (See [Docs/04-module-info-schema.md](Docs/04-module-info-schema.md))
 * **Built‑In CI/CD**: GitHub Actions & GitLab templates under `Docs/`. (Templates and setup discussed in [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
 * **First‑Class Testing**: JUnit + Robolectric unit tests and connected‑device tests. (See [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
@@ -167,6 +167,35 @@ graph TD
 | Gradle              | 8.4+                                                          | Required for Android 15 support        |
 | Android Gradle Plugin | 8.3+                                                          | Required for proper DEX generation     |
 | LSPosed Manager     | v1.9.0+                                                       | Required for module management         |
+
+---
+
+## Primary Test Device Specifications
+
+These are the specifications of the primary device used for testing LSPosedKit during development.
+
+### Device Information
+- **Model**: OnePlus 12 (CPH2583)
+- **Operating System**: OxygenOS 15.0
+- **Root Status**: Rooted
+- **Environment**: Kali NetHunter chroot installed
+
+### Hardware Specifications
+- **Processor**: Snapdragon 8 Gen 3 Mobile Platform
+- **RAM**: 16 GB (expandable +12 GB via RAM expansion)
+- **Storage**: 512 GB (154 GB used)
+- **Battery**: 5,400 mAh
+- **Display**: 6.82-inch
+
+### Camera System
+- **Rear Cameras**:
+  - Main: 50 MP
+  - Ultra-wide: 48 MP
+  - Telephoto: 64 MP
+- **Front Camera**: 32 MP
+
+### Software Features
+- **Performance**: Trinity Engine performance suite
 
 ---
 

@@ -21,15 +21,15 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 | ⬜ Releasable | Pending | `framework/core/src/main/java/com/wobbz/framework/core/Releasable.kt` | Resource cleanup interface |
 | ⬜ PackageLoadedParam | Pending | `framework/core/src/main/java/com/wobbz/framework/core/PackageLoadedParam.kt` | Package info wrapper |
 | ⬜ XposedInterface | Pending | `framework/core/src/main/java/com/wobbz/framework/core/XposedInterface.kt` | Xposed API abstraction |
-| ⬜ XposedInterfaceImpl | Pending | `framework/core/src/main/java/com/wobbz/framework/core/XposedInterfaceImpl.kt` | Implementation of Xposed API |
+| ⬜ XposedInterfaceImpl | Pending | `framework/core/src/main/java/com/wobbz/framework/core/XposedInterfaceImpl.kt` | Implementation of Xposed API with robust error logging |
 | ⬜ Hooker | Pending | `framework/core/src/main/java/com/wobbz/framework/core/Hooker.kt` | Hook implementation interface |
 | ⬜ HookParam | Pending | `framework/core/src/main/java/com/wobbz/framework/core/HookParam.kt` | Hook parameters interface |
 | ⬜ HookParamImpl | Pending | `framework/core/src/main/java/com/wobbz/framework/core/HookParamImpl.kt` | Implementation of hook parameters |
 | ⬜ MethodUnhooker | Pending | `framework/core/src/main/java/com/wobbz/framework/core/MethodUnhooker.kt` | Unhook mechanism interface |
 | ⬜ MethodUnhookerImpl | Pending | `framework/core/src/main/java/com/wobbz/framework/core/MethodUnhookerImpl.kt` | Implementation of unhook mechanism |
 | ⬜ LogLevel | Pending | `framework/core/src/main/java/com/wobbz/framework/core/LogLevel.kt` | Log level enum |
-| ⬜ LogUtil | Pending | `framework/core/src/main/java/com/wobbz/framework/core/LogUtil.kt` | Logging utility class |
-| ⬜ Exception classes | Pending | `framework/core/src/main/java/com/wobbz/framework/core/exceptions/` | Hook and initialization exceptions |
+| ⬜ LogUtil | Pending | `framework/core/src/main/java/com/wobbz/framework/core/LogUtil.kt` | Unified logging utility class providing clear and consistent log messages across the framework and modules. |
+| ⬜ Exception classes | Pending | `framework/core/src/main/java/com/wobbz/framework/core/exceptions/` | Custom exception classes for clear error reporting during hook application, initialization, and other framework operations. |
 
 ## Annotation Processor (`framework/processor/`)
 
@@ -49,7 +49,7 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 |-----------|--------|-----------------|-------------|
 | ⬜ IHotReloadable | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/IHotReloadable.kt` | Hot-reload capable module interface |
 | ⬜ HotReloadManager | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/HotReloadManager.kt` | Hot-reload orchestration with lifecycle callbacks |
-| ⬜ DexPatcher | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt` | DEX patching implementation |
+| ⬜ DexPatcher | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt` | DEX patching implementation. (Note: Reflection-based approaches can be fragile. Implementation requires thorough testing across Android versions and continuous improvement for robustness. See [Hot-Reload-Implementation.md](Hot-Reload-Implementation.md) for details.) |
 | ⬜ Development server | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/server/` | Dev server for hot-reload |
 | ⬜ Hot-reload client | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/client/` | Client for receiving updates |
 | ⬜ ART utilities | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/utils/` | Android Runtime utilities |
@@ -65,8 +65,8 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 | ⬜ SettingsSchema | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/SettingsSchema.kt` | Schema model classes |
 | ⬜ SettingsStorage | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/SettingsStorage.kt` | Storage implementation |
 | ⬜ SettingsBinding | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/SettingsBinding.kt` | Annotation binding utilities |
-| ⬜ SettingsUIGenerator | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/SettingsUIGenerator.kt` | UI generation utilities |
-| ⬜ Schema validation | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/validation/` | Schema validation components |
+| ⬜ SettingsUIGenerator | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/SettingsUIGenerator.kt` | Utilities for automatically generating basic preference UIs from `settings.json`. Modules can also provide a custom settings activity for more complex UIs. |
+| ⬜ Schema validation | Pending | `framework/settings/src/main/java/com/wobbz/framework/settings/validation/` | Schema validation components. (Note: Consider allowing extension points for custom validation logic if complex UI/validation is needed beyond schema.) |
 | ⬜ Settings key processor | Pending | `framework/processor/src/main/java/com/wobbz/framework/processor/SettingsKeyProcessor.kt` | @SettingsKey processor |
 | ⬜ Schema processor | Pending | `framework/processor/src/main/java/com/wobbz/framework/processor/SettingsSchemaProcessor.kt` | Schema validation processor |
 

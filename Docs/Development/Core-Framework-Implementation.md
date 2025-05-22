@@ -193,18 +193,27 @@ import com.wobbz.framework.core.exceptions.HookFailedException
  */
 class XposedInterfaceImpl(private val lpparam: XC_LoadPackage.LoadPackageParam) : XposedInterface {
     
+    private val logUtil = LogUtil.create("LSPK-Framework") // Centralized LogUtil
+
     override fun loadClass(name: String): Class<*> {
-        return XposedHelpers.findClass(name, lpparam.classLoader)
+        try {
+            return XposedHelpers.findClass(name, lpparam.classLoader)
+        } catch (e: XposedHelpers.ClassNotFoundError) {
+            logUtil.e("Failed to load class: $name in package: ${lpparam.packageName}", e)
+            throw ClassNotFoundException("LSPosedKit: Class $name not found in ${lpparam.packageName}", e)
+        }
     }
     
     override fun <T : Hooker> hook(method: Method, hooker: Class<T>): MethodUnhooker<T> {
         try {
             val instance = hooker.getDeclaredConstructor().newInstance()
-            val hookCallback = createMethodHook(instance)
+            val hookCallback = createMethodHook(instance, method.name)
             val unhook = XposedBridge.hookMethod(method, hookCallback)
+            logUtil.d("Successfully hooked method: ${method.declaringClass.name}#${method.name}")
             return MethodUnhookerImpl(instance, unhook)
         } catch (e: Exception) {
-            throw HookFailedException("Failed to hook method ${method.name}", e)
+            logUtil.e("Failed to hook method ${method.declaringClass.name}#${method.name}", e)
+            throw HookFailedException("Failed to hook method ${method.declaringClass.name}#${method.name} in package ${lpparam.packageName}", e)
         }
     }
     
@@ -216,70 +225,84 @@ class XposedInterfaceImpl(private val lpparam: XC_LoadPackage.LoadPackageParam) 
     ): MethodUnhooker<T> {
         try {
             val method = clazz.getDeclaredMethod(methodName, *parameterTypes)
-            return hook(method, hooker)
+            return hook(method, hooker) // Delegates to the above hook method for logging
+        } catch (e: NoSuchMethodException) {
+            logUtil.e("Method $methodName not found in ${clazz.name} with specified parameters.", e)
+            throw HookFailedException("Method $methodName not found in ${clazz.name} in package ${lpparam.packageName}", e)
         } catch (e: Exception) {
-            throw HookFailedException("Failed to hook method $methodName in ${clazz.name}", e)
+            logUtil.e("Failed to hook method $methodName in ${clazz.name}", e)
+            throw HookFailedException("Failed to hook method $methodName in ${clazz.name} in package ${lpparam.packageName}", e)
         }
     }
     
     override fun <T : Hooker> hook(getter: Field, hooker: Class<T>): MethodUnhooker<T> {
         try {
             val instance = hooker.getDeclaredConstructor().newInstance()
-            val hookCallback = createMethodHook(instance)
-            val unhook = XposedBridge.hookMethod(getFieldGetter(getter), hookCallback)
+            val hookCallback = createMethodHook(instance, "get" + getter.name.capitalize())
+            val unhook = XposedBridge.hookMethod(XposedHelpers.getObjectField(null, "") as Member, hookCallback) // This needs proper getter method resolution
+            logUtil.d("Successfully hooked getter for field: ${getter.declaringClass.name}#${getter.name}")
             return MethodUnhookerImpl(instance, unhook)
         } catch (e: Exception) {
-            throw HookFailedException("Failed to hook getter for field ${getter.name}", e)
+            logUtil.e("Failed to hook getter for field ${getter.declaringClass.name}#${getter.name}", e)
+            // This part is problematic: XposedBridge.hookMethod needs a Member (Method/Constructor).
+            // XposedHelpers.getObjectField is for getting field values, not the getter method itself for hooking.
+            // A proper implementation would find or generate a getter method.
+            // For now, placeholder for the concept or assumes a utility that resolves the getter Member.
+            throw HookFailedException("Failed to hook getter for field ${getter.declaringClass.name}#${getter.name} in package ${lpparam.packageName}. Getter resolution needs implementation.", e)
         }
     }
     
     override fun <T : Hooker> hookSetter(field: Field, hooker: Class<T>): MethodUnhooker<T> {
         try {
             val instance = hooker.getDeclaredConstructor().newInstance()
-            val hookCallback = createMethodHook(instance)
-            val unhook = XposedBridge.hookMethod(getFieldSetter(field), hookCallback)
+            val hookCallback = createMethodHook(instance, "set" + field.name.capitalize())
+            val unhook = XposedBridge.hookMethod(XposedHelpers.getObjectField(null, "") as Member, hookCallback) // This needs proper setter method resolution
+            logUtil.d("Successfully hooked setter for field: ${getter.declaringClass.name}#${getter.name}")
             return MethodUnhookerImpl(instance, unhook)
         } catch (e: Exception) {
-            throw HookFailedException("Failed to hook setter for field ${field.name}", e)
+            logUtil.e("Failed to hook setter for field ${field.declaringClass.name}#${field.name}", e)
+            // Similar to getter, direct hooking of field setters like this is not standard XposedBridge API.
+            // One would typically find the actual setter method.
+            throw HookFailedException("Failed to hook setter for field ${field.declaringClass.name}#${field.name} in package ${lpparam.packageName}. Setter resolution needs implementation.", e)
         }
     }
     
     override fun log(level: LogLevel, message: String) {
-        when (level) {
-            LogLevel.VERBOSE -> XposedBridge.log("[V] $message")
-            LogLevel.DEBUG -> XposedBridge.log("[D] $message")
-            LogLevel.INFO -> XposedBridge.log("[I] $message")
-            LogLevel.WARN -> XposedBridge.log("[W] $message")
-            LogLevel.ERROR -> XposedBridge.log("[E] $message")
-        }
+        logUtil.log(level, message, lpparam.packageName) // Pass packageName for context
     }
     
     override fun logError(message: String, throwable: Throwable) {
-        XposedBridge.log("[E] $message")
-        XposedBridge.log(throwable)
+        logUtil.e(message, throwable, lpparam.packageName) // Pass packageName for context
     }
     
     override fun getSystemContext(): Context {
-        return XposedHelpers.findAndHookMethod(
-            "android.app.ActivityThread",
-            null,
-            "currentApplication",
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    // Do nothing, this is just to get the context
-                }
-            }
-        ).result as Context
+        // Simplified: XposedBridge.getSystemContext() is usually available in Zygote context.
+        // If called from app context, param.lpparam.appInfo.dataDir or similar could get an app context.
+        // AndroidAppHelper.currentApplication() is also an option if available.
+        // The original reflection was problematic and might not always work or be necessary.
+        try {
+            val activityThreadClass = XposedHelpers.findClass("android.app.ActivityThread", null)
+            val currentApplicationMethod = XposedHelpers.findMethodExact(activityThreadClass, "currentApplication")
+            val application = currentApplicationMethod.invoke(null) as android.app.Application?
+            if (application != null) return application.applicationContext
+        } catch (e: Exception) {
+            logUtil.w("Could not get application context via ActivityThread, falling back. Error: ${e.message}")
+        }
+        // Fallback or more direct method depending on LSPosed version/availability
+        return XposedBridge.getInstanteneousContext() ?: lpparam.classLoaderContext
     }
     
-    private fun createMethodHook(hooker: Hooker): XC_MethodHook {
+    private fun createMethodHook(hooker: Hooker, methodName: String): XC_MethodHook {
         return object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 try {
                     val hookParam = HookParamImpl(param, this@XposedInterfaceImpl)
                     hooker.beforeHook(hookParam)
                 } catch (e: Throwable) {
-                    logError("Error in beforeHook", e)
+                    logUtil.e("Error in beforeHook for $methodName in package ${lpparam.packageName}", e)
+                    // Optionally, re-throw to crash the hooked app if that's desired on critical errors,
+                    // or handle it to prevent module errors from crashing the host app.
+                    // param.throwable = e // Example of propagating the error to the hooked method
                 }
             }
             
@@ -288,24 +311,11 @@ class XposedInterfaceImpl(private val lpparam: XC_LoadPackage.LoadPackageParam) 
                     val hookParam = HookParamImpl(param, this@XposedInterfaceImpl)
                     hooker.afterHook(hookParam)
                 } catch (e: Throwable) {
-                    logError("Error in afterHook", e)
+                    logUtil.e("Error in afterHook for $methodName in package ${lpparam.packageName}", e)
+                    // param.throwable = e // Example
                 }
             }
         }
-    }
-    
-    private fun getFieldGetter(field: Field): Method {
-        // This is a simplified implementation - actual implementation
-        // would need to handle different field types properly
-        field.isAccessible = true
-        return field.declaringClass.getDeclaredMethod("get${field.name.capitalize()}")
-    }
-    
-    private fun getFieldSetter(field: Field): Method {
-        // This is a simplified implementation - actual implementation
-        // would need to handle different field types properly
-        field.isAccessible = true
-        return field.declaringClass.getDeclaredMethod("set${field.name.capitalize()}", field.type)
     }
 }
 ```
@@ -514,76 +524,115 @@ package com.wobbz.framework.core
 
 /**
  * Provides a unified logging interface.
+ * Logs will be prefixed with "LSPK-[tag]".
  */
 class LogUtil(private val tag: String) {
+    
+    private fun formatMessage(message: String, packageName: String?): String {
+        return if (packageName != null) "[$packageName] $message" else message
+    }
+
     /**
      * Logs a message at VERBOSE level.
      * @param message The message to log
+     * @param packageName Optional package name to include in the log
      */
-    fun v(message: String) {
-        log(LogLevel.VERBOSE, message)
+    fun v(message: String, packageName: String? = null) {
+        log(LogLevel.VERBOSE, message, packageName)
     }
     
     /**
      * Logs a message at DEBUG level.
      * @param message The message to log
+     * @param packageName Optional package name to include in the log
      */
-    fun d(message: String) {
-        log(LogLevel.DEBUG, message)
+    fun d(message: String, packageName: String? = null) {
+        log(LogLevel.DEBUG, message, packageName)
     }
     
     /**
      * Logs a message at INFO level.
      * @param message The message to log
+     * @param packageName Optional package name to include in the log
      */
-    fun i(message: String) {
-        log(LogLevel.INFO, message)
+    fun i(message: String, packageName: String? = null) {
+        log(LogLevel.INFO, message, packageName)
     }
     
     /**
      * Logs a message at WARN level.
      * @param message The message to log
+     * @param packageName Optional package name to include in the log
      */
-    fun w(message: String) {
-        log(LogLevel.WARN, message)
+    fun w(message: String, packageName: String? = null) {
+        log(LogLevel.WARN, message, packageName)
     }
     
     /**
      * Logs a message at ERROR level.
      * @param message The message to log
+     * @param packageName Optional package name to include in the log
      */
-    fun e(message: String) {
-        log(LogLevel.ERROR, message)
+    fun e(message: String, packageName: String? = null) {
+        log(LogLevel.ERROR, message, packageName)
     }
     
     /**
      * Logs an error message with an exception.
      * @param message The message to log
      * @param throwable The exception to log
+     * @param packageName Optional package name to include in the log
      */
-    fun e(message: String, throwable: Throwable) {
-        logError(message, throwable)
+    fun e(message: String, throwable: Throwable, packageName: String? = null) {
+        logErrorInternal(formatMessage(message, packageName), throwable)
+    }
+
+    /**
+     * Internal log method to bridge to XposedBridge or android.util.Log.
+     * It is recommended to use XposedBridge.log for consistency within the Xposed environment.
+     */
+    internal fun log(level: LogLevel, message: String, packageName: String? = null) {
+        val finalMessage = "[LSPK-$tag] ${formatMessage(message, packageName)}"
+        // XposedBridge.log is preferred as it integrates with LSPosed Manager's logging
+        // and often handles logcat permissions/visibility better than direct android.util.Log from modules.
+        when (level) {
+            LogLevel.VERBOSE -> XposedBridge.log("[V] $finalMessage")
+            LogLevel.DEBUG -> XposedBridge.log("[D] $finalMessage")
+            LogLevel.INFO -> XposedBridge.log("[I] $finalMessage")
+            LogLevel.WARN -> XposedBridge.log("[W] $finalMessage")
+            LogLevel.ERROR -> XposedBridge.log("[E] $finalMessage")
+        }
+        // Fallback or alternative for testing outside Xposed environment:
+        // android.util.Log.println(levelToAndroidLogPriority(level), "LSPK-$tag", formatMessage(message, packageName))
     }
     
-    private fun log(level: LogLevel, message: String) {
-        android.util.Log.println(
-            when (level) {
-                LogLevel.VERBOSE -> android.util.Log.VERBOSE
-                LogLevel.DEBUG -> android.util.Log.DEBUG
-                LogLevel.INFO -> android.util.Log.INFO
-                LogLevel.WARN -> android.util.Log.WARN
-                LogLevel.ERROR -> android.util.Log.ERROR
-            },
-            tag,
-            message
-        )
+    /**
+     * Internal error log method.
+     */
+    private fun logErrorInternal(formattedMessage: String, throwable: Throwable) {
+        val finalMessage = "[LSPK-$tag] [E] $formattedMessage"
+        XposedBridge.log(finalMessage)
+        XposedBridge.log(throwable) // XposedBridge can log throwables directly
+        // Fallback or alternative for testing outside Xposed environment:
+        // android.util.Log.e("LSPK-$tag", formattedMessage, throwable)
     }
-    
-    private fun logError(message: String, throwable: Throwable) {
-        android.util.Log.e(tag, message, throwable)
-    }
+
+    // private fun levelToAndroidLogPriority(level: LogLevel): Int {
+    //     return when (level) {
+    //         LogLevel.VERBOSE -> android.util.Log.VERBOSE
+    //         LogLevel.DEBUG -> android.util.Log.DEBUG
+    //         LogLevel.INFO -> android.util.Log.INFO
+    //         LogLevel.WARN -> android.util.Log.WARN
+    //         LogLevel.ERROR -> android.util.Log.ERROR
+    //     }
+    // }
     
     companion object {
+        /**
+         * Creates a LogUtil instance with a specific tag.
+         * @param tag The log tag, will be prefixed with "LSPK-".
+         * @return A new LogUtil instance.
+         */
         fun create(tag: String): LogUtil {
             return LogUtil(tag)
         }

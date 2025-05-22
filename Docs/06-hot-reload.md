@@ -27,23 +27,27 @@ This guide explains how this system works, how to use it effectively, and how to
 
 ### Technical Foundation
 
-LSPosedKit's hot-reload system leverages Android 15's new ART (Android Runtime) capabilities, specifically the DexPatch API, which allows for incremental DEX code updates without full application restarts.
+LSPosedKit's hot-reload system leverages Android's ART (Android Runtime) capabilities, aiming to use the most stable methods available, such as the DexPatch API on newer Android versions (Android 15+), for incremental DEX code updates without full application restarts.
+
+**Note on DEX Patching:** The underlying mechanisms for DEX patching, especially on older Android versions or if relying on reflection into ART internals (as might be conceptualized in a `DexPatcher.kt`), can be inherently fragile and device-dependent. LSPosedKit aims to use official APIs like `DexFile.defineClass` where feasible or implement robust fallbacks. Thorough testing across different Android versions and devices is critical. Future improvements will focus on increasing the robustness of this process, potentially including configuration options for different patching strategies and detailed logging for diagnostics.
 
 ```mermaid
 sequenceDiagram
-    participant Dev as Developer
-    participant IDE as Android Studio/IDE
-    participant LSPK as LSPosedKit Daemon
-    participant OS as Android Runtime
-    participant App as Target Application
-
-    Dev->>IDE: Edit module code
-    IDE->>LSPK: Build & push DEX patch
-    LSPK->>LSPK: Verify patch validity
-    LSPK->>OS: Apply DexPatch to runtime
-    OS->>App: Update class definitions
-    LSPK->>App: Trigger unhook/rehook cycle
-    App->>Dev: Reflect changes immediately
+    autonumber
+    participant Developer
+    participant Device
+    participant LSPK as "LSPosedKit Host"
+    participant Module as "YourModule"
+    participant Target as "Target Application"
+    
+    Note over Developer, LSPK: Developer changes module code
+    Developer->>Device: ./gradlew installDebug or runDevServer
+    Device->>LSPK: Push updated DEX file
+    LSPK->>Module: onHotReload()
+    Module->>Module: unhook() all methods
+    Module->>Module: Clear hook references
+    Module->>Target: Install updated hooks
+    Note over Module, Target: <2 second reload, no reboot needed
 ```
 
 ### Core Components

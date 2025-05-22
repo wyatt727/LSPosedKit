@@ -615,20 +615,52 @@ android {
 
 ## Advanced Debugging Techniques
 
-### LSPosed Logs
+### LSPosed Logs & LSPosedKit Unified Logging
 
-LSPosed generates logs that can help diagnose issues:
+LSPosed generates its own logs, and LSPosedKit components use a unified logging scheme with specific tags. Understanding these logs is crucial for diagnosing issues.
+
+**Key Log Tags:**
+
+*   **LSPosed Framework Logs:**
+    *   `LSPosed`: General LSPosed framework messages.
+    *   `XSharedPreferences`: Logs related to Xposed's shared preferences implementation.
+    *   `LSPosed-Bridge`: Messages from the core Xposed bridge.
+*   **LSPosedKit Core Tags:**
+    *   `LSPK-Framework`: General logs from the LSPosedKit core framework (`XposedInterfaceImpl`, etc.).
+    *   `LSPK-HotReload`: Logs specific to the hot-reload mechanism (client and manager).
+    *   `LSPK-HotReload-Patcher`: Detailed logs from the `DexPatcher` component during DEX patching attempts.
+    *   `LSPK-Settings`: Logs from the `SettingsProvider` and related settings components.
+    *   `LSPK-ServiceBus`: Logs from the `FeatureManager` and service bus operations.
+    *   `LSPK-Processor`: Logs from annotation processors (though these usually appear at compile-time).
+*   **Module Specific Tags:**
+    *   Each module should use its own tag, ideally prefixed with `LSPK-` for consistency (e.g., `LSPK-DebugApp`, `LSPK-NetworkGuard`). This is typically configured in the module's `LogUtil` instantiation.
+
+**Viewing Logs:**
+
+Use `adb logcat` with appropriate filters. The `-s` option sets a silent filter for all tags and then you specify the tags you want to see with their desired log level (V, D, I, W, E).
 
 ```bash
-# View all LSPosed-related logs
-adb logcat -s LSPosed:V XSharedPreferences:V LSPosed-Bridge:V
+# View all LSPosed-related logs and general LSPK framework logs
+adb logcat -s LSPosed:V XSharedPreferences:V LSPosed-Bridge:V LSPK-Framework:D
 
-# View specific module logs
-adb logcat -s LSPK-DebugApp:V
+# View logs for a specific module (e.g., DebugApp) and Hot-Reload Patcher details
+adb logcat -s LSPK-DebugApp:V LSPK-HotReload-Patcher:V
 
-# View hot-reload logs
+# View only errors from LSPosedKit components and a specific module
+adb logcat -s LSPK-*:E LSPK-MyModule:E
+
+# Grep for all LSPK related messages (less precise but can be useful)
+adb logcat | grep "LSPK-"
+
+# View hot-reload specific logs (manager and client)
 adb logcat -s LSPK-HotReload:V
 ```
+
+**Interpreting Logs:**
+*   Look for Exception stack traces. These usually pinpoint the source of an error.
+*   Pay attention to log levels (Error, Warn, Info, Debug, Verbose).
+*   Correlate timestamps between different log messages to understand the sequence of events.
+*   `LSPK-HotReload-Patcher` logs are especially important for diagnosing hot-reload failures, as they will indicate issues with reflection or API availability for DEX patching.
 
 ### Framework Hooks Debugging
 

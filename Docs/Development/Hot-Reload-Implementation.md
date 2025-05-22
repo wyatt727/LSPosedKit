@@ -259,13 +259,21 @@ class HotReloadManager private constructor(private val context: Context) {
 
 Handles the DEX patching process:
 
+**Note on DEX Patching Robustness:** The described `DexPatcher.kt` (especially if heavily reliant on reflection into `dalvik.system.VMRuntime` or similar internal APIs) can be fragile and vary in behavior across different Android versions, OEM customizations, and ART updates. 
+Key considerations and improvements include:
+*   **Investigate Alternatives:** Explore more stable, official APIs for dynamic code loading or modification, such as `DexFile.defineClass` (though its capabilities for *replacing* existing classes are limited).
+*   **Fallback Mechanisms:** If internal APIs are used, implement robust fallback strategies for different Android versions or when specific reflective calls fail.
+*   **Detailed Logging:** Implement comprehensive logging within `DexPatcher.kt` to track the success or failure of each step of the patching process. This is crucial for diagnosing issues on different devices. Use specific `LSPK-HotReload-Patcher` tags.
+*   **Configuration Options:** Consider adding a development-time configuration option (e.g., in a local properties file or via a Gradle property) to select different DEX patching strategies (e.g., "stable", "experimental") or to disable certain advanced patching attempts if they cause issues on a particular test device.
+*   **Thorough Testing:** Extensive testing across a wide range of Android versions (12-15+) and devices is paramount to ensure the reliability of this component.
+
 ```kotlin
 package com.wobbz.framework.hot
 
 import android.os.Build
 import com.wobbz.framework.hot.exceptions.HotReloadException
-import com.wobbz.framework.hot.utils.ArtUtils
-import dalvik.system.DexClassLoader
+// import com.wobbz.framework.hot.utils.ArtUtils // ArtUtils might be deprecated if DexPatcher handles all checks
+// import dalvik.system.DexClassLoader // Not directly used in the provided patchDexAndroid12Plus
 import java.io.File
 import java.lang.reflect.Method
 
@@ -274,22 +282,30 @@ import java.lang.reflect.Method
  */
 object DexPatcher {
     
+    private const val TAG = "LSPK-HotReload-Patcher" // Added for specific logging
+
     /**
      * Checks if DEX patching is supported on this device.
      * @return true if supported
      */
     fun isSupported(): Boolean {
         // Check Android version - minimum API 31 (Android 12)
+        // More sophisticated checks might be needed if relying on internal APIs
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            android.util.Log.w(TAG, "DEX Patching not supported on API < 31")
             return false
         }
         
-        // Check if we can access the runtime patching API
         return try {
-            Class.forName("dalvik.system.DexFile")
-            Class.forName("dalvik.system.VMRuntime")
+            // Example: Check for a known class/method essential for the chosen patching strategy
+            Class.forName("dalvik.system.VMRuntime") 
+            android.util.Log.i(TAG, "VMRuntime class found, assuming patching might be supported.")
             true
+        } catch (e: ClassNotFoundException) {
+            android.util.Log.e(TAG, "VMRuntime class not found, patching likely unsupported.", e)
+            false
         } catch (e: Exception) {
+            android.util.Log.e(TAG, "Error checking DexPatcher support", e)
             false
         }
     }
@@ -301,48 +317,67 @@ object DexPatcher {
      */
     fun patchDex(dexFile: File, classLoader: ClassLoader) {
         if (!isSupported()) {
+            android.util.Log.e(TAG, "Attempted to call patchDex on unsupported device.")
             throw HotReloadException("DEX patching is not supported on this device")
         }
         
         try {
             // For Android 12+, we can use a more direct approach
+            // Older versions might require different strategies or might not be supportable for robust hot-reload.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 patchDexAndroid12Plus(dexFile, classLoader)
             } else {
-                throw HotReloadException("Unsupported Android version")
+                android.util.Log.w(TAG, "patchDex called on pre-Android 12 device. This strategy might not be effective.")
+                // Potentially throw or log that this specific strategy is for S+
+                throw HotReloadException("Unsupported Android version for this patching strategy (requires API 31+)")
             }
         } catch (e: Exception) {
-            throw HotReloadException("Failed to patch DEX", e)
+            // Catching exception from patchDexAndroid12Plus or other strategy
+            android.util.Log.e(TAG, "Failed to patch DEX: ${dexFile.absolutePath}", e)
+            throw HotReloadException("Failed to patch DEX", e) // Re-throw with context
         }
     }
     
     /**
      * Patches a DEX file on Android 12 and newer.
+     * Warning: This relies on internal Android APIs and is subject to change/break.
      */
     private fun patchDexAndroid12Plus(dexFile: File, classLoader: ClassLoader) {
-        // Implementation would use ART's internal APIs for DEX patching
-        // This is a simplified representation - actual implementation would use
-        // reflection to access ART's DEX patching APIs
-        
+        android.util.Log.i(TAG, "Attempting DEX patch for ${dexFile.name} using Android 12+ strategy.")
         try {
             // Access ART runtime
             val vmRuntimeClass = Class.forName("dalvik.system.VMRuntime")
             val getRuntime = vmRuntimeClass.getDeclaredMethod("getRuntime")
             getRuntime.isAccessible = true
             val runtime = getRuntime.invoke(null)
-            
+            android.util.Log.d(TAG, "VMRuntime instance obtained.")
+
             // Get the DEX patching method
-            val patchDexMethod = vmRuntimeClass.getDeclaredMethod(
-                "patchDex",
+            // Note: The actual method name and signature might vary or not exist.
+            // This is a placeholder for the reflective call.
+            // E.g. some custom ROMs or ART versions might not have 'patchDex'.
+            // A more robust solution would involve multiple strategies or checks.
+            val patchDexMethod: Method = vmRuntimeClass.getDeclaredMethod(
+                "patchDex", // This method name is speculative and highly unstable.
+                            // Actual methods could be addDexPath, defineClass, etc., depending on what is being attempted.
                 File::class.java,
                 ClassLoader::class.java
             )
             patchDexMethod.isAccessible = true
+            android.util.Log.d(TAG, "Found potential patchDex method: $patchDexMethod")
             
             // Patch the DEX
             patchDexMethod.invoke(runtime, dexFile, classLoader)
+            android.util.Log.i(TAG, "DEX patch successful for ${dexFile.name}.")
+        } catch (e: ClassNotFoundException) {
+            android.util.Log.e(TAG, "ClassNotFoundException during DEX patch: ${e.message}", e)
+            throw HotReloadException("DEX patch failed: Essential class not found. ${e.message}", e)
+        } catch (e: NoSuchMethodException) {
+            android.util.Log.e(TAG, "NoSuchMethodException during DEX patch: ${e.message}", e)
+            throw HotReloadException("DEX patch failed: Essential method not found. ${e.message}", e)
         } catch (e: Exception) {
-            throw HotReloadException("Failed to patch DEX using Android 12+ API", e)
+            android.util.Log.e(TAG, "Generic exception during DEX patch for ${dexFile.name}", e)
+            throw HotReloadException("Failed to patch DEX using Android 12+ API. ${e.message}", e)
         }
     }
 }

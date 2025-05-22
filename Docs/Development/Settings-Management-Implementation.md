@@ -873,6 +873,9 @@ class MyModule : IModulePlugin {
 ## UI Generation Implementation
 
 To generate preference screens from settings.json:
+LSPosedKit offers automatic UI generation from `settings.json`. However, if a module specifies a `customSettingsActivity` in its `module-info.json`, the `SettingsUIGenerator` will typically be bypassed for that module. The module then becomes responsible for presenting its own settings interface using the provided `SettingsProvider` to load and save values.
+
+The `SettingsFragment` shown below is an example of how the **automatic generation** would be invoked. If a custom activity is defined, the LSPosed Manager or a similar host application would directly launch that activity instead of this fragment.
 
 ```kotlin
 class ModuleSettingsActivity : AppCompatActivity() {
@@ -882,8 +885,26 @@ class ModuleSettingsActivity : AppCompatActivity() {
         
         // Get module ID from intent
         val moduleId = intent.getStringExtra("module_id") ?: return
+        val customActivityClassName = intent.getStringExtra("custom_settings_activity") // Optional: Passed by host
+
+        if (customActivityClassName != null && customActivityClassName.isNotEmpty()) {
+            try {
+                // Attempt to launch the custom settings activity
+                val customIntent = Intent()
+                customIntent.setClassName(this, customActivityClassName)
+                // Potentially pass module ID or other necessary info
+                customIntent.putExtra("module_id", moduleId) 
+                startActivity(customIntent)
+                finish() // Close this placeholder activity
+                return
+            } catch (e: Exception) {
+                // Log error, fall back to default UI or show error
+                Log.e("SettingsLauncher", "Failed to launch custom settings activity: $customActivityClassName for module $moduleId", e)
+                // Fallback to generated UI below
+            }
+        }
         
-        // Set up preference fragment
+        // Default: Set up preference fragment for automatic UI generation or as fallback
         supportFragmentManager.beginTransaction()
             .replace(R.id.settings_container, SettingsFragment.newInstance(moduleId))
             .commit()
@@ -893,19 +914,49 @@ class ModuleSettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             val context = preferenceManager.context
             val screen = preferenceManager.createPreferenceScreen(context)
+            preferenceScreen = screen // Set it early
             
             // Get module ID from arguments
             val moduleId = arguments?.getString("module_id") ?: return
             
-            // Create settings provider for the module
-            val settingsProvider = SettingsProvider.of(context)
+            // Create settings provider for the module context
+            // This might require getting the module's specific context if not already correct
+            val moduleContext = context // Placeholder: actual module context might be needed
+            val settingsProvider = SettingsProvider.of(moduleContext) 
             
-            // Generate preferences from schema
-            SettingsUIGenerator.generatePreferences(context, settingsProvider, screen)
-            
-            // Set the preference screen
-            preferenceScreen = screen
+            // Logic to decide whether to generate UI or if custom activity is primary
+            // This check might also live in the code that decides to show this fragment.
+            // For this example, we assume this fragment is shown if custom activity is not set or failed.
+            // val moduleInfo = loadModuleInfoFromAssets(context, moduleId) // Needs a real implementation
+            // if (moduleInfo?.customSettingsActivity == null || moduleInfo.customSettingsActivity.isEmpty()) {
+            //    Log.i("SettingsFragment", "Generating settings UI for module $moduleId")
+            //    SettingsUIGenerator.generatePreferences(context, settingsProvider, preferenceScreen)
+            // } else {
+            //    Log.i("SettingsFragment", "Module $moduleId uses a custom settings activity. This fragment might be a fallback or show a message.")
+            //    // Optionally, add a preference here indicating that a custom activity is defined
+            //    // or if the custom activity launch failed from ModuleSettingsActivity.
+            //    val customActivityFailedPref = Preference(context)
+            //    customActivityFailedPref.title = "Custom Settings Note"
+            //    customActivityFailedPref.summary = "This module uses a custom settings screen. If it didn't launch, please check module configuration."
+            //    preferenceScreen.addPreference(customActivityFailedPref)
+            // }
+
+            // Simplified: Assume if this fragment is loaded, we attempt generation
+            // The decision to launch custom activity vs this fragment should be made by the caller (e.g., LSPosed Manager)
+            Log.i("SettingsFragment", "Attempting to generate settings UI for module $moduleId")
+            SettingsUIGenerator.generatePreferences(context, settingsProvider, preferenceScreen)
         }
+
+        // Placeholder for actually loading module-info.json data from module's assets
+        // private fun loadModuleInfoFromAssets(context: Context, moduleId: String): ModuleInfo? { 
+        //     // In a real scenario, this would involve finding the module's APK,
+        //     // creating a context for it, and reading its assets/module-info.json.
+        //     // This is complex and usually handled by the LSPosed Manager.
+        //     return null 
+        // }
+
+        // Placeholder data class for module-info.json content
+        // data class ModuleInfo(val id: String, val customSettingsActivity: String?)
         
         companion object {
             fun newInstance(moduleId: String): SettingsFragment {

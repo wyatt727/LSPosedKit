@@ -61,7 +61,7 @@ modules/
 | `dependencies`           | Array    | List of required or optional module dependencies      | (see Dependencies section)       |
 | `features`               | Array    | Capabilities provided by this module                  | `["network.inspection"]`         |
 | `extensions`             | Object   | Extension points with implementation classes          | (see Extensions section)         |
-| `customSettingsActivity` | String   | Fully qualified class name for custom settings UI     | `"com.example.MySettingsActivity"` |
+| `customSettingsActivity` | String   | Fully qualified class name for a custom settings UI. If provided, LSPosed Manager will launch this activity instead of generating one from `settings.json`. | `"com.example.MySettingsActivity"` |
 | `minHostVersion`         | String   | Minimum required LSPosedKit host version              | `"1.0.0"`                       |
 | `maxHostVersion`         | String   | Maximum compatible LSPosedKit host version            | `"2.0.0"`                       |
 
@@ -232,16 +232,19 @@ This can prevent loading on future potentially incompatible host versions.
 
 ## Custom Settings UI
 
-To provide a custom settings UI instead of the auto-generated one:
+To provide a custom settings UI instead of the auto-generated one from `settings.json`:
 
 ```json
 "customSettingsActivity": "com.example.debugapp.SettingsActivity"
 ```
 
 The specified activity must:
-1. Be declared in your module's AndroidManifest.xml
-2. Extend `AppCompatActivity` or `PreferenceActivity`
-3. Be accessible (public)
+1. Be declared in your module's `AndroidManifest.xml`.
+2. Typically extend `androidx.appcompat.app.AppCompatActivity` or `android.preference.PreferenceActivity`.
+3. Be public and accessible (exported, if necessary, depending on how LSPosed Manager launches it).
+4. Use `SettingsProvider.of(context)` to load and save preferences defined in your `settings.json` or other storage managed by your module.
+
+If this field is present and valid, LSPosed Manager (or a similar host application integrating LSPosedKit modules) will attempt to launch this activity when the user tries to configure the module. If it's not specified, or if the activity fails to launch, the system will fall back to generating a UI from `settings.json` if that file exists.
 
 ## Complete Example
 

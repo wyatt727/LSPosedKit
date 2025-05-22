@@ -398,31 +398,81 @@ fun migrateSettings(settings: SettingsProvider) {
 
 ## Advanced: Custom Settings UI
 
-While LSPosedKit automatically generates UI from your schema, you can provide a custom settings activity:
+While LSPosedKit automatically generates a functional UI from your `settings.json` schema, you can provide a fully custom settings activity for more complex needs or a unique look and feel. This allows for richer interactions, custom UI elements, and dynamic content that goes beyond what the schema-based generation can offer.
 
-1. Create a custom `PreferenceActivity`
-2. Register it in your module's AndroidManifest.xml
-3. Set the `customSettingsActivity` field in module-info.json
+To use a custom settings UI:
+
+1.  **Create a Custom Activity**: Develop an Android `Activity` (typically extending `androidx.appcompat.app.AppCompatActivity` or `android.preference.PreferenceActivity` if using traditional preference frameworks) that will serve as your module's settings screen.
+    *   Within this activity, you will use `SettingsProvider.of(this)` to get an instance of the settings provider.
+    *   Load current settings values using the provider's getter methods (e.g., `settings.bool("myKey")`).
+    *   Save changes using `settings.edit().putBoolean("myKey", newValue).apply()` or `.commit()`.
+
+2.  **Declare in `AndroidManifest.xml`**: Ensure your custom settings activity is properly declared in your module's `AndroidManifest.xml`.
+    ```xml
+    <activity
+        android:name=".ui.MyCustomSettingsActivity"
+        android:label="@string/module_settings_title"
+        android:exported="true">
+        <!-- For LSPosed Manager to find it, it might need a specific intent filter
+             or rely on the direct class name launch. Check LSPosed documentation
+             for specifics if direct integration is desired beyond LSPosedKit handling. -->
+    </activity>
+    ```
+
+3.  **Specify in `module-info.json`**: Set the `customSettingsActivity` field in your module's `module-info.json` file to the fully qualified class name of your custom activity.
+    ```json
+    {
+      // ... other module info fields ...
+      "customSettingsActivity": "com.example.mymodule.ui.MyCustomSettingsActivity"
+    }
+    ```
+
+4.  **(Optional) Pass Data to Custom Activity**: The LSPosed Manager (or the entity launching your settings) might pass the `moduleId` or other relevant data via the `Intent` that starts your custom activity. Your activity should check for these extras in `onCreate`.
+
+**When to Use a Custom UI:**
+*   You need UI elements not supported by standard Android preferences (e.g., complex graphs, custom pickers).
+*   Settings have intricate dependencies or require dynamic updates based on other system states.
+*   You want a very specific branding or user experience for your module's settings.
+*   You need to perform actions beyond just changing a preference value (e.g., triggering a system scan, clearing caches from the settings screen).
+
+**Considerations:**
+*   **Complexity**: Building a custom UI is more work than relying on the automatic generation.
+*   **Consistency**: Your custom UI might differ from the standard LSPosed Manager look and feel. Strive for a clean and intuitive design.
+*   **Maintenance**: You are responsible for maintaining the UI and its interaction with `SettingsProvider`.
+*   **Accessibility**: Ensure your custom UI adheres to Android accessibility guidelines.
+
+If `customSettingsActivity` is specified, LSPosedKit (and the LSPosed Manager) will typically attempt to launch this activity directly instead of generating one from `settings.json`. If the custom activity cannot be launched, the behavior might fall back to the generated UI or show an error, depending on the host environment.
 
 ```kotlin
 // Example custom settings activity
-class DebugAppSettingsActivity : AppCompatActivity() {
+package com.example.mymodule.ui // Ensure package matches module-info.json
+
+import android.os.Bundle
+import android.widget.Switch
+import androidx.appcompat.app.AppCompatActivity
+import com.wobbz.framework.settings.SettingsProvider // Assuming this is the correct import
+// Import your R file for layout, e.g., import com.example.mymodule.R
+
+class MyCustomSettingsActivity : AppCompatActivity() {
+    private lateinit var settingsProvider: SettingsProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
-        
-        // Get settings provider
-        val settings = SettingsProvider.of(this)
-        
-        // Set up UI elements
-        findViewById<Switch>(R.id.enableFeature).apply {
-            isChecked = settings.bool("enableFeature")
-            setOnCheckedChangeListener { _, isChecked ->
-                settings.edit().putBoolean("enableFeature", isChecked).apply()
-            }
-        }
+        // setContentView(R.layout.activity_custom_settings) // Your custom layout
+
+        // It's good practice to get the module's specific context if possible,
+        // though `this` (the Activity context) often works for SharedPreferences.
+        settingsProvider = SettingsProvider.of(this)
+
+        // Example: Setup for a Switch preference
+        // val enableFeatureSwitch: Switch = findViewById(R.id.enable_feature_switch)
+        // enableFeatureSwitch.isChecked = settingsProvider.bool("enableFeature", true) // Load with default
+
+        // enableFeatureSwitch.setOnCheckedChangeListener { _, isChecked ->
+        //    settingsProvider.edit().putBoolean("enableFeature", isChecked).apply()
+        // }
         
         // Other UI setup...
+        // Load other settings, set up listeners to save them back using settingsProvider.edit()...
     }
-}
-``` 
+} 
