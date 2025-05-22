@@ -1,0 +1,104 @@
+---
+description: Helpful to use as a Documentation Navigation Guide
+globs: 
+alwaysApply: false
+---
+---
+name: LSPosedKit Documentation Navigation Guide
+description: Complete navigation guide for LSPosedKit documentation structure and implementation guides. Use this rule when looking for specific documentation, understanding the docs organization, finding implementation guides, or needing quick reference links to relevant files.
+keywords: [documentation, guides, navigation, implementation guides, API reference, troubleshooting, getting started, schemas, examples]
+triggers: [find documentation, implementation guide, API docs, troubleshooting, getting started, schema reference, examples, how to implement, where to find]
+scope: documentation-reference
+---
+
+# LSPosedKit Documentation Navigation Guide
+
+## Documentation Structure Overview
+
+The LSPosedKit documentation is organized into general docs and detailed implementation guides for developers.
+
+## Core Documentation (`Docs/`)
+
+### Getting Started
+- [README.md](mdc:README.md) - Project overview, quick start, and feature summary
+- [Project Blueprint](mdc:Docs/00-blueprint.md) - High-level architecture and design goals  
+- [Getting Started Guide](mdc:Docs/01-getting-started.md) - Installation and first module
+
+### API & Reference
+- [API Reference](mdc:Docs/08-api-reference.md) - Complete API documentation
+- [Feature Manager](mdc:Docs/09-feature-manager.md) - Service bus and feature discovery
+- [Examples](mdc:Docs/10-examples.md) - Code examples and patterns
+
+### Configuration & Schemas
+- [Annotations](mdc:Docs/02-annotations.md) - @XposedPlugin and other annotations
+- [Settings Schema](mdc:Docs/03-settings-schema.md) - settings.json format and validation
+- [Module Info Schema](mdc:Docs/04-module-info-schema.md) - module-info.json structure
+
+### Advanced Features  
+- [Hot-Reload](mdc:Docs/06-hot-reload.md) - DEX patching and live updates
+- [Framework Internals](mdc:Docs/07-framework-internals.md) - Internal architecture
+- [CLI & Gradle](mdc:Docs/05-cli-gradle.md) - Build system and commands
+
+### Deployment & Maintenance
+- [Testing & CI](mdc:Docs/12-testing-ci.md) - Testing strategies and continuous integration
+- [Packaging](mdc:Docs/13-packaging.md) - Module bundle creation and distribution
+- [Migration Guide](mdc:Docs/14-migration.md) - Upgrading between versions
+- [Troubleshooting](mdc:Docs/15-troubleshooting.md) - Common issues and debugging
+
+## Implementation Guides (`Docs/Development/`)
+
+### Essential Implementation Guides
+- [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) - **START HERE** - Complete roadmap with status tracking
+- [Repository Setup](mdc:Docs/Development/Repository-Setup.md) - Initial project structure and configuration
+
+### Framework Component Implementation
+- [Core Framework Implementation](mdc:Docs/Development/Core-Framework-Implementation.md) - Base interfaces and hooking system
+- [Annotation Processor Implementation](mdc:Docs/Development/Annotation-Processor-Implementation.md) - Code generation and metadata processing
+- [Hot-Reload Implementation](mdc:Docs/Development/Hot-Reload-Implementation.md) - DEX patching and reload system
+- [Settings Management Implementation](mdc:Docs/Development/Settings-Management-Implementation.md) - Type-safe preferences system
+- [Service Bus Implementation](mdc:Docs/Development/Service-Bus-Implementation.md) - Cross-module communication
+
+### Module Development
+- [Sample Modules Implementation](mdc:Docs/Development/Sample-Modules-Implementation.md) - Reference implementations for DebugApp, NetworkGuard, etc.
+
+## Documentation Usage Patterns
+
+### For New Contributors
+1. Start with [README.md](mdc:README.md) for project overview
+2. Review [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) for current status
+3. Follow [Repository Setup](mdc:Docs/Development/Repository-Setup.md) for environment setup
+4. Implement components following the detailed guides in `Docs/Development/`
+
+### For Module Developers  
+1. Read [Getting Started Guide](mdc:Docs/01-getting-started.md) for basic concepts
+2. Study [Sample Modules Implementation](mdc:Docs/Development/Sample-Modules-Implementation.md) for patterns
+3. Reference [API Reference](mdc:Docs/08-api-reference.md) for available APIs
+4. Use [Troubleshooting](mdc:Docs/15-troubleshooting.md) for debugging
+
+### For Framework Contributors
+1. Review [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) for current priorities  
+2. Follow the specific implementation guide for your component
+3. Update the checklist when completing items
+4. Add tests and documentation as outlined in each guide
+
+### For Advanced Features
+- **Hot-Reload**: [Hot-Reload](mdc:Docs/06-hot-reload.md) + [Hot-Reload Implementation](mdc:Docs/Development/Hot-Reload-Implementation.md)
+- **Settings**: [Settings Schema](mdc:Docs/03-settings-schema.md) + [Settings Management Implementation](mdc:Docs/Development/Settings-Management-Implementation.md)  
+- **Services**: [Feature Manager](mdc:Docs/09-feature-manager.md) + [Service Bus Implementation](mdc:Docs/Development/Service-Bus-Implementation.md)
+
+## Quick Reference Links
+
+### Most Important Files
+- [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) - **Development roadmap and status**
+- [README.md](mdc:README.md) - **Project overview**
+- [Troubleshooting](mdc:Docs/15-troubleshooting.md) - **Problem solving**
+
+### Implementation Sequence
+Follow the order in [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md):
+1. [Repository Setup](mdc:Docs/Development/Repository-Setup.md)
+2. [Core Framework Implementation](mdc:Docs/Development/Core-Framework-Implementation.md)  
+3. [Annotation Processor Implementation](mdc:Docs/Development/Annotation-Processor-Implementation.md)
+4. [Settings Management Implementation](mdc:Docs/Development/Settings-Management-Implementation.md)
+5. [Hot-Reload Implementation](mdc:Docs/Development/Hot-Reload-Implementation.md)
+6. [Service Bus Implementation](mdc:Docs/Development/Service-Bus-Implementation.md)
+7. [Sample Modules Implementation](mdc:Docs/Development/Sample-Modules-Implementation.md)

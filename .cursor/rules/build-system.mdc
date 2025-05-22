@@ -1,0 +1,214 @@
+---
+description: Helpful to understand the Build system & configuration
+globs: 
+alwaysApply: false
+---
+---
+name: LSPosedKit Build System & Configuration
+description: Comprehensive guide to LSPosedKit's multi-module Gradle build system, configuration, and dependencies. Use this rule when dealing with build issues, Gradle configuration, module setup, dependency management, annotation processing, or compilation problems.
+keywords: [gradle, build system, configuration, dependencies, modules, annotation processing, compilation, SDK versions, ProGuard, build tasks]
+triggers: [gradle build, build.gradle, settings.gradle, compilation error, dependency issues, module configuration, annotation processor, build tasks, SDK configuration]
+scope: build-configuration
+---
+
+# LSPosedKit Build System & Configuration
+
+## Multi-Module Gradle Structure
+
+LSPosedKit uses a multi-module Gradle build with specific configuration for Android libraries and Kotlin compilation.
+
+## Root Configuration Files
+
+### Primary Build Files
+- [build.gradle](mdc:build.gradle) - Root project configuration with SDK versions and dependencies
+- [settings.gradle](mdc:settings.gradle) - Module inclusion and project structure
+- [gradle.properties](mdc:gradle.properties) - Project-wide Gradle settings and optimization flags
+
+### Key Configuration Values
+From [Repository Setup](mdc:Docs/Development/Repository-Setup.md):
+- **Compile SDK**: 35 (Android 15)
+- **Min SDK**: 31 (Android 12)
+- **Target SDK**: 35 (Android 15)
+- **Java Version**: 17
+- **Kotlin Version**: 1.9.0+
+- **AGP Version**: 8.3.0+
+
+## Framework Module Structure
+
+### Main Framework Module
+- [framework/build.gradle](mdc:framework/build.gradle) - Umbrella module that exposes all framework components
+- Depends on all sub-modules: core, processor, hot, settings, service
+
+### Framework Sub-Modules
+Each framework component has its own build.gradle:
+- **framework/core/** - Base interfaces and Xposed integration
+- **framework/processor/** - Annotation processors with AutoService
+- **framework/hot/** - Hot-reload system with coroutines
+- **framework/settings/** - Settings management with JSON schema
+- **framework/service/** - Service bus with concurrent collections
+
+### Common Framework Dependencies
+```groovy
+dependencies {
+    implementation project(':libxposed-api:api')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
+    implementation "androidx.annotation:annotation:1.5.0"
+}
+```
+
+## Module Development Build Pattern
+
+### Standard Module build.gradle
+Reference [Sample Modules Implementation](mdc:Docs/Development/Sample-Modules-Implementation.md):
+```groovy
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'  // For annotation processing
+}
+
+android {
+    namespace 'com.wobbz.module.<modulename>'
+    compileSdk rootProject.ext.compileSdk
+    
+    defaultConfig {
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+    }
+    
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+    
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion.toString()
+    }
+}
+
+dependencies {
+    implementation project(':framework')
+    kapt project(':framework:processor')  // Annotation processing
+}
+```
+
+### Module Registration
+Add to [settings.gradle](mdc:settings.gradle):
+```groovy
+// Auto-discovery of modules
+file('modules').eachDir { dir ->
+    include ":modules:${dir.name}"
+}
+```
+
+## Annotation Processing Setup
+
+### Processor Configuration
+For annotation processing in modules:
+- Include `kapt project(':framework:processor')` in dependencies
+- Processor generates module-info.json and xposed_init files
+- Uses @XposedPlugin annotation metadata
+
+### Generated Files
+The annotation processor creates:
+- `module.prop` - LSPosed module properties
+- `xposed_init` - Module entry point
+- `module-info.json` - Extended module metadata
+
+## LSPosed API Integration
+
+### Submodule Setup
+- [libxposed-api](mdc:libxposed-api) - Git submodule for LSPosed API
+- Initialize with: `git submodule update --init --recursive`
+- Referenced as `project(':libxposed-api:api')` in dependencies
+
+### API Usage
+Framework abstracts LSPosed API through:
+- `XposedInterface` - Main hooking interface
+- `PackageLoadedParam` - Package context wrapper
+- `HookParam` - Hook method parameters
+
+## Build Tasks & Commands
+
+### Development Workflow
+```bash
+# Build all modules
+./gradlew assembleDebug
+
+# Install specific module (during development)
+./gradlew :modules:DebugApp:installDebug
+
+# Run annotation processors
+./gradlew :modules:MyModule:kaptDebugKotlin
+
+# Create release bundles
+./gradlew publishBundle
+```
+
+### Hot-Reload Development
+```bash
+# Start development server for hot-reload
+./gradlew runDevServer
+
+# Build and deploy with hot-reload
+./gradlew assembleDebug installDebug
+```
+
+## Configuration Dependencies
+
+### Framework Dependencies
+- **Kotlin Stdlib** - Core Kotlin support
+- **AndroidX Annotations** - Annotation support
+- **LSPosed API** - Xposed framework integration
+
+### Module Dependencies  
+- **Framework** - Core LSPosedKit functionality
+- **Processor** - Annotation processing (kapt)
+- **Material Components** - UI libraries (if needed)
+- **Moshi/Gson** - JSON parsing (for settings)
+
+### Testing Dependencies
+```groovy
+testImplementation 'junit:junit:4.13.2'
+testImplementation 'org.mockito:mockito-core:4.0.0'
+testImplementation 'androidx.test:core:1.4.0'
+```
+
+## ProGuard/R8 Configuration
+
+### Module ProGuard Rules
+Keep LSPosedKit components from obfuscation:
+```proguard
+# Keep module classes
+-keep @com.wobbz.framework.processor.XposedPlugin class * {*;}
+-keep class * implements com.wobbz.framework.core.IModulePlugin {*;}
+
+# Keep hook classes
+-keep class * implements com.wobbz.framework.core.Hooker {*;}
+
+# Keep service interfaces
+-keep interface com.wobbz.framework.service.** {*;}
+```
+
+## Build System Troubleshooting
+
+### Common Issues
+- **Submodule not found**: Run `git submodule update --init --recursive`
+- **Annotation processor errors**: Check kapt configuration and dependencies
+- **SDK version conflicts**: Ensure all modules use same SDK versions from root
+- **Kotlin version issues**: Verify kotlinVersion is compatible across all modules
+
+### Build Performance
+From [gradle.properties](mdc:gradle.properties):
+- Enable parallel builds: `org.gradle.parallel=true`
+- Enable build caching: `org.gradle.caching=true`
+- Configure JVM args: `org.gradle.jvmargs=-Xmx2048m`
+
+## Module Creation Script
+
+Use scaffolding script for new modules:
+```bash
+./gradlew :scripts:newModule -Pname="MyModule" -Pid=my-module
+```
+
+This creates the standard module structure and configures build files automatically.

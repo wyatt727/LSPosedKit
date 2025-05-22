@@ -1,0 +1,52 @@
+---
+name: LSPosedKit Project Architecture
+description: Comprehensive guide to the LSPosedKit project structure, component organization, and implementation roadmap. Use this rule when discussing project architecture, component relationships, directory structure, framework layers, or planning implementation sequence.
+keywords: [architecture, project structure, framework, components, implementation, roadmap, directories, modules, libxposed-api, build system]
+triggers: [project structure, architecture, components, framework layers, implementation order, directory layout, module organization]
+scope: project-wide
+---
+
+# LSPosedKit Project Architecture
+
+## Overview
+LSPosedKit is a zero-boilerplate toolkit for building LSPosed modules with hot-reload capabilities. The project follows a modular architecture with clear separation of concerns.
+
+## Core Architecture Components
+
+### Framework Layer (`framework/`)
+- **Core** (`framework/core/`) - Base interfaces and hooking implementation
+- **Processor** (`framework/processor/`) - Annotation processors for code generation
+- **Hot-Reload** (`framework/hot/`) - DEX patching and live update system
+- **Settings** (`framework/settings/`) - Type-safe preferences management
+- **Service Bus** (`framework/service/`) - Cross-module communication
+
+### Key Framework Files
+- [IModulePlugin.kt](mdc:framework/core/src/main/java/com/wobbz/framework/core/IModulePlugin.kt) - Main module interface
+- [XposedInterface.kt](mdc:framework/core/src/main/java/com/wobbz/framework/core/XposedInterface.kt) - Xposed API abstraction
+- [FeatureManager.kt](mdc:framework/service/src/main/java/com/wobbz/framework/service/FeatureManager.kt) - Service registry
+
+### Sample Modules (`modules/`)
+Reference implementations demonstrating framework capabilities:
+- **DebugApp** - Simple hooking and hot-reload
+- **NetworkGuard** - Service integration and settings
+- **IntentInterceptor** - UI interactions and persistence
+
+## Documentation Structure
+- [README.md](mdc:README.md) - Project overview and quick start
+- [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) - Complete development roadmap
+- [Development Guides](mdc:Docs/Development) - Detailed implementation instructions
+
+## Build System
+- Root [build.gradle](mdc:build.gradle) - Project-wide configuration
+- [settings.gradle](mdc:settings.gradle) - Multi-module setup
+- [libxposed-api](mdc:libxposed-api) - LSPosed API submodule
+
+## Implementation Sequence
+Follow the implementation order defined in the [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md):
+1. Repository setup and Gradle configuration
+2. Core framework interfaces
+3. Annotation processor
+4. Settings management
+5. Hot-reload system
+6. Service bus
+7. Sample modules

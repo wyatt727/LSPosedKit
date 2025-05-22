@@ -1,0 +1,29 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Test Device Specifications
+
+## Device Information
+- **Model**: OnePlus 12 (CPH2583)
+- **Operating System**: OxygenOS 15.0
+- **Root Status**: Rooted
+- **Environment**: Kali NetHunter chroot installed
+
+## Hardware Specifications
+- **Processor**: Snapdragon 8 Gen 3 Mobile Platform
+- **RAM**: 16 GB (expandable +12 GB via RAM expansion)
+- **Storage**: 512 GB (154 GB used)
+- **Battery**: 5,400 mAh
+- **Display**: 6.82-inch
+
+## Camera System
+- **Rear Cameras**:
+  - Main: 50 MP
+  - Ultra-wide: 48 MP
+  - Telephoto: 64 MP
+- **Front Camera**: 32 MP
+
+## Software Features
+- **Performance**: Trinity Engine performance suite

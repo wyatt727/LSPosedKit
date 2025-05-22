@@ -1,0 +1,136 @@
+---
+description: Essential development patterns, coding conventions, and best practices for LSPosedKit module development. Use this rule when writing modules, implementing hooks, managing settings, handling services, debugging issues, or following LSPosedKit coding standards.
+globs: 
+alwaysApply: false
+---
+# LSPosedKit Development Patterns & Conventions
+
+## Module Development Pattern
+
+### Module Structure
+Every module follows this standard structure:
+```
+modules/<ModuleName>/
+├── src/main/java/com/wobbz/module/<package>/
+│   ├── <ModuleName>.kt              # Main module class with @XposedPlugin
+│   ├── hooks/                       # Hook implementations
+│   └── services/                    # Service implementations (optional)
+├── src/main/assets/
+│   ├── module-info.json             # Module metadata
+│   └── settings.json                # Settings schema (optional)
+└── build.gradle                     # Module build configuration
+```
+
+### Required Annotations
+- **@XposedPlugin** - Mark main module class with metadata
+- **@HotReloadable** - Enable hot-reload support
+- **@SettingsKey** - Bind settings fields
+
+Example from [Sample Modules Implementation](mdc:Docs/Development/Sample-Modules-Implementation.md):
+```kotlin
+@XposedPlugin(
+    id = "debug-app",
+    name = "Debug App", 
+    version = "1.0.0",
+    scope = ["*"]
+)
+@HotReloadable
+class DebugApp : IModulePlugin, IHotReloadable
+```
+
+## Framework Implementation Patterns
+
+### Interface Implementations
+Follow these key interfaces as defined in [Core Framework Implementation](mdc:Docs/Development/Core-Framework-Implementation.md):
+- **IModulePlugin** - Core module functionality
+- **ModuleLifecycle** - Startup/shutdown handling
+- **IHotReloadable** - Hot-reload support
+- **Releasable** - Resource cleanup
+- **ReloadAware** - Service hot-reload awareness
+
+### Hook Management Pattern
+```kotlin
+private val hooks = mutableListOf<MethodUnhooker<*>>()
+
+override fun onPackageLoaded(param: PackageLoadedParam) {
+    // Store hook references for cleanup
+    hooks += param.xposed.hook(method, HookerClass::class.java)
+}
+
+override fun onHotReload() {
+    // Clean up hooks before reload
+    hooks.forEach { it.unhook() }
+    hooks.clear()
+}
+```
+
+### Service Registration Pattern
+As shown in [Service Bus Implementation](mdc:Docs/Development/Service-Bus-Implementation.md):
+```kotlin
+// Register service with version and lifecycle support
+FeatureManager.registerService(
+    IMyService::class,
+    MyServiceImpl(),
+    version = "1.0.0",
+    moduleId = "my-module"
+)
+```
+
+## Settings Management Pattern
+
+### Schema Definition
+Define settings in [settings.json](mdc:Docs/Development/Settings-Management-Implementation.md):
+```json
+{
+  "type": "object",
+  "properties": {
+    "enable_feature": {
+      "type": "boolean",
+      "title": "Enable Feature",
+      "default": true
+    }
+  }
+}
+```
+
+### Type-Safe Access
+```kotlin
+// Direct access
+val settings = SettingsProvider.of(context)
+val enabled = settings.bool("enable_feature", true)
+
+// Annotation binding
+class MySettings(
+    @SettingsKey("enable_feature") val enabled: Boolean = true
+)
+val settings = provider.bind(MySettings::class.java)
+```
+
+## Development Workflow
+
+### Implementation Order
+Follow [Implementation Checklist](mdc:Docs/Development/Implementation-Checklist.md) sequence:
+1. Setup repository structure per [Repository Setup](mdc:Docs/Development/Repository-Setup.md)
+2. Implement core interfaces
+3. Build annotation processor
+4. Add settings management
+5. Implement hot-reload system
+6. Create service bus
+7. Build sample modules
+
+### Testing Strategy
+Reference [Troubleshooting Guide](mdc:Docs/15-troubleshooting.md) for:
+- Unit testing with mocks
+- Integration testing
+- Hot-reload testing
+- Performance validation
+
+### Debugging Patterns
+Use structured logging with framework tags:
+```kotlin
+// Framework components use LSPK-* tags
+param.xposed.log(LogLevel.INFO, "Hook applied successfully")
+
+// View logs with specific filters
+adb logcat -s LSPK-Framework:D LSPK-MyModule:V
+```
