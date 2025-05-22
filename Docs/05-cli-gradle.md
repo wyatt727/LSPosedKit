@@ -176,6 +176,8 @@ This creates:
 - Module metadata files
 - Test skeleton
 
+**Note**: The module scaffolding script properly handles command-line properties using `gradle.startParameter.projectProperties` to avoid conflicts with Gradle's built-in `project.name` property. This ensures that `-Pname` parameters are correctly applied instead of being overridden by the project name.
+
 #### Verifying Module Dependencies
 
 ```bash

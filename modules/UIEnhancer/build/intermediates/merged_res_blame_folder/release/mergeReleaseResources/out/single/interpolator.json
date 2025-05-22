@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/mtrl_linear.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-material-1.8.0-19:/interpolator/mtrl_linear.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_radio_to_off_mtrl_animation_interpolator_0.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_radio_to_off_mtrl_animation_interpolator_0.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_radio_to_on_mtrl_animation_interpolator_0.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_radio_to_on_mtrl_animation_interpolator_0.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_checkbox_unchecked_mtrl_animation_interpolator_0.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_checkbox_unchecked_mtrl_animation_interpolator_0.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_checkbox_checked_mtrl_animation_interpolator_0.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_checkbox_checked_mtrl_animation_interpolator_0.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_checkbox_unchecked_mtrl_animation_interpolator_1.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_checkbox_unchecked_mtrl_animation_interpolator_1.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/fast_out_slow_in.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/fast_out_slow_in.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/interpolator/btn_checkbox_checked_mtrl_animation_interpolator_1.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/interpolator/btn_checkbox_checked_mtrl_animation_interpolator_1.xml"
+    }
+]

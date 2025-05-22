@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "id": "ui-enhancer",
+  "version": "1.0.0",
+  "name": "UI Enhancer",
+  "description": "Enhance UI elements with custom styling and theming capabilities",
+  "author": "LSPosedKit Team",
+  "features": [
+    "ui.enhancement",
+    "ui.theming",
+    "ui.styling",
+    "color.management",
+    "view.customization"
+  ],
+  "services": {
+    "com.wobbz.module.uienhancer.services.IUIThemeService": {
+      "version": "1.0.0",
+      "description": "Provides UI theming capabilities to other modules",
+      "capabilities": [
+        "theme.configuration",
+        "color.management",
+        "view.styling",
+        "contrast.calculation"
+      ]
+    }
+  },
+  "capabilities": {
+    "ui.enhancement": {
+      "description": "Enhance UI elements with custom styling",
+      "version": "1.0.0"
+    },
+    "theming.service": {
+      "description": "Cross-module theming service",
+      "version": "1.0.0"
+    }
+  },
+  "permissions": [
+    "view.modification",
+    "background.styling",
+    "text.styling",
+    "color.application"
+  ],
+  "dependencies": {
+    "framework.core": "^1.0.0",
+    "framework.settings": "^1.0.0",
+    "framework.service": "^1.0.0",
+    "framework.hot": "^1.0.0"
+  },
+  "targets": {
+    "packages": [
+      "com.android.settings",
+      "com.android.systemui"
+    ],
+    "androidVersions": {
+      "min": 31,
+      "target": 35
+    }
+  },
+  "metadata": {
+    "category": "ui",
+    "tags": ["theming", "customization", "ui", "styling"],
+    "documentation": "https://github.com/wobbz/LSPosedKit/docs/modules/ui-enhancer",
+    "repository": "https://github.com/wobbz/LSPosedKit"
+  }
+} 

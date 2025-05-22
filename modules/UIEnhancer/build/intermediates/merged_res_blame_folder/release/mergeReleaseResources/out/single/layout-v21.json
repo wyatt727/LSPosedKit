@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v21/notification_action_tombstone.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-core-1.9.0-2:/layout-v21/notification_action_tombstone.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v21/notification_template_icon_group.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-core-1.9.0-2:/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v21/notification_action.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-core-1.9.0-2:/layout-v21/notification_action.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v21/notification_template_custom_big.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-core-1.9.0-2:/layout-v21/notification_template_custom_big.xml"
+    }
+]

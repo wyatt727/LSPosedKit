@@ -26,11 +26,16 @@ android {
 
 dependencies {
     implementation project(':framework:core')
+    implementation project(':framework:processor')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
     implementation 'androidx.annotation:annotation:1.5.0'
     
     // JSON parsing
     implementation 'org.json:json:20230227'
+    
+    // UI components for settings generation
+    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
     
     // Testing
     testImplementation 'junit:junit:4.13.2'

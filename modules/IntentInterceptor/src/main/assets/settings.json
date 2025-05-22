@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Intent Interceptor Settings",
+  "properties": {
+    "monitor_all_apps": {
+      "type": "boolean",
+      "title": "Monitor all apps",
+      "description": "Monitor Intent activities for all apps (except excluded apps)",
+      "default": true
+    },
+    "excluded_packages": {
+      "type": "array",
+      "title": "Excluded packages",
+      "description": "Packages to exclude from Intent monitoring",
+      "items": {
+        "type": "string"
+      },
+      "default": ["com.android.systemui", "com.android.settings", "android"]
+    },
+    "included_packages": {
+      "type": "array",
+      "title": "Included packages",
+      "description": "Packages to monitor when 'Monitor all apps' is off",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "enabled_intent_types": {
+      "type": "array",
+      "title": "Enabled Intent types",
+      "description": "Types of Intent operations to monitor",
+      "items": {
+        "type": "string",
+        "enum": [
+          "activity_start",
+          "activity_start_for_result", 
+          "broadcast",
+          "broadcast_receive",
+          "service_start",
+          "service_bind",
+          "service_command",
+          "intent_modification"
+        ]
+      },
+      "default": ["activity_start", "broadcast", "service_start"]
+    },
+    "log_intent_extras": {
+      "type": "boolean",
+      "title": "Log Intent extras",
+      "description": "Include Intent extras in log output (may contain sensitive data)",
+      "default": false
+    },
+    "log_statistics": {
+      "type": "boolean", 
+      "title": "Log statistics",
+      "description": "Periodically log Intent statistics",
+      "default": false
+    },
+    "enable_intent_blocking": {
+      "type": "boolean",
+      "title": "Enable Intent blocking",
+      "description": "Allow blocking of Intents based on filter rules",
+      "default": false
+    },
+    "enable_intent_modification": {
+      "type": "boolean",
+      "title": "Enable Intent modification",
+      "description": "Allow modification of Intents based on filter rules",
+      "default": false
+    },
+    "enable_intent_history": {
+      "type": "boolean",
+      "title": "Enable Intent history",
+      "description": "Record Intent history for analysis",
+      "default": true
+    },
+    "max_history_size": {
+      "type": "integer",
+      "title": "Maximum history size",
+      "description": "Maximum number of Intent records to keep in history",
+      "minimum": 100,
+      "maximum": 10000,
+      "default": 1000
+    },
+    "export_logs": {
+      "type": "boolean",
+      "title": "Export logs to file",
+      "description": "Save Intent logs to external file for analysis",
+      "default": false
+    },
+    "log_sensitive_intents": {
+      "type": "boolean",
+      "title": "Log sensitive Intents",
+      "description": "Include potentially sensitive Intent actions in logs",
+      "default": false
+    },
+    "block_malicious_intents": {
+      "type": "boolean",
+      "title": "Block malicious Intents",
+      "description": "Automatically block known malicious Intent patterns",
+      "default": false
+    }
+  }
+}

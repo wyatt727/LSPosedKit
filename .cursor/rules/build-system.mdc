@@ -204,3 +204,20 @@ Use scaffolding script for new modules:
 ```
 
 This creates the standard module structure and configures build files automatically.
+
+### Property Resolution Best Practice
+
+The module creation script uses `gradle.startParameter.projectProperties` to properly handle command-line properties, avoiding conflicts with Gradle's built-in `project.name` property:
+
+```groovy
+// ❌ WRONG - conflicts with built-in project.name
+def moduleName = project.findProperty('name')
+
+// ✅ CORRECT - accesses command-line properties directly  
+def projectProperties = gradle.startParameter.projectProperties
+if (projectProperties.containsKey('name')) {
+    moduleName = projectProperties.get('name')
+}
+```
+
+This pattern should be used in any custom Gradle scripts that need to access `-P` command-line parameters to avoid property conflicts.

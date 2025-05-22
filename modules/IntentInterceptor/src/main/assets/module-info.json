@@ -1,0 +1,45 @@
+{
+  "id": "intent-interceptor",
+  "name": "Intent Interceptor",
+  "version": "1.0.0",
+  "description": "Monitors and intercepts Intent communications between apps and components",
+  "author": "LSPosedKit",
+  "features": [
+    "intent.monitoring",
+    "intent.interception", 
+    "intent.history",
+    "intent.filtering",
+    "intent.modification"
+  ],
+  "providedServices": {
+    "com.wobbz.module.intentinterceptor.services.IIntentHistoryService": "1.0.0"
+  },
+  "serviceDependencies": [
+    {
+      "service": "com.wobbz.framework.logging.ILoggingService", 
+      "version": "^1.0.0",
+      "optional": true
+    }
+  ],
+  "capabilities": {
+    "hotReload": true,
+    "intentFiltering": true,
+    "intentHistory": true,
+    "intentModification": true
+  },
+  "permissions": [
+    "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "extensions": {
+    "intent.filter.provider": "com.wobbz.module.intentinterceptor.filters.IntentFilterManager",
+    "intent.monitor.provider": "com.wobbz.module.intentinterceptor.monitor.IntentMonitor"
+  },
+  "metadata": {
+    "targetAndroidVersion": "31+",
+    "category": "Security",
+    "tags": ["intent", "monitoring", "security", "analysis"],
+    "license": "WOBBZ License",
+    "homepage": "https://github.com/wobbz/LSPosedKit",
+    "repository": "https://github.com/wobbz/LSPosedKit"
+  }
+}

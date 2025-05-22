@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:framework:service*projectDir}/build.gradle"
+            line="29"
+            column="20"
+            startOffset="666"
+            endLine="29"
+            endColumn="89"
+            endOffset="735"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-reflect than 1.9.0 is available: 1.9.24">
+        <location
+            file="${:framework:service*projectDir}/build.gradle"
+            line="30"
+            column="20"
+            startOffset="755"
+            endLine="30"
+            endColumn="90"
+            endOffset="825"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:framework:service*projectDir}/build.gradle"
+            line="31"
+            column="20"
+            startOffset="845"
+            endLine="31"
+            endColumn="58"
+            endOffset="883"/>
+    </incident>
+
+</incidents>

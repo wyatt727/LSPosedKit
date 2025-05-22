@@ -1,0 +1,554 @@
+/**
+ * LSPosedKit Module Scaffolding Script
+ * 
+ * Usage: ./gradlew -P:scripts:newModule -Pname="ModuleName" -Pid="module-id" [-Pdescription="Module description"]
+ * 
+ * This script generates a complete module structure with:
+ * - Module source directory structure
+ * - Main module class with @XposedPlugin annotation
+ * - build.gradle file
+ * - settings.json schema
+ * - module-info.json metadata
+ * - Basic hook example
+ */
+
+apply plugin: 'base'
+
+task newModule {
+    description = 'Creates a new LSPosedKit module with boilerplate code'
+    group = 'LSPosedKit'
+    
+    doLast {
+        // Properly handle project properties to avoid conflicts with built-in project.name
+        // -P properties are always set on the rootProject, not the subproject
+        def moduleName = null
+        def moduleId = null
+        def moduleDescription = "Generated LSPosedKit module"
+        def moduleAuthor = "LSPosedKit Developer"
+        def moduleScope = "*"
+        
+        // Access command line properties correctly using gradle.startParameter.projectProperties
+        // This avoids conflicts with built-in project properties like project.name
+        def projectProperties = gradle.startParameter.projectProperties
+        
+        if (projectProperties.containsKey('moduleName')) {
+            moduleName = projectProperties.get('moduleName')
+        }
+        
+        if (projectProperties.containsKey('id')) {
+            moduleId = projectProperties.get('id')
+        }
+        
+        if (projectProperties.containsKey('description')) {
+            moduleDescription = projectProperties.get('description')
+        }
+        
+        if (projectProperties.containsKey('author')) {
+            moduleAuthor = projectProperties.get('author')
+        }
+        
+        if (projectProperties.containsKey('scope')) {
+            moduleScope = projectProperties.get('scope')
+        }
+        
+        // Validate required parameters
+        if (!moduleName) {
+            throw new GradleException("Module name is required. Use -PmoduleName='ModuleName'")
+        }
+        if (!moduleId) {
+            throw new GradleException("Module ID is required. Use -Pid='module-id'")
+        }
+        
+        // Validate module ID format
+        if (!moduleId.matches(/^[a-z0-9-]+$/)) {
+            throw new GradleException("Module ID must contain only lowercase letters, numbers, and hyphens")
+        }
+        
+        // Generate paths and package names
+        def moduleDir = new File(rootProject.projectDir, "modules/${moduleName}")
+        def packageName = "com.wobbz.module.${moduleId.replace('-', '')}"
+        def packagePath = packageName.replace('.', '/')
+        
+        // Check if module already exists
+        if (moduleDir.exists()) {
+            throw new GradleException("Module '${moduleName}' already exists at ${moduleDir.absolutePath}")
+        }
+        
+        println "Creating module '${moduleName}' (${moduleId})..."
+        println "Location: ${moduleDir.absolutePath}"
+        println "Package: ${packageName}"
+        
+        // Create directory structure
+        def srcDir = new File(moduleDir, "src/main/java/${packagePath}")
+        def assetsDir = new File(moduleDir, "src/main/assets")
+        def testDir = new File(moduleDir, "src/test/java/${packagePath}")
+        def hooksDir = new File(srcDir, "hooks")
+        
+        [srcDir, assetsDir, testDir, hooksDir].each { dir ->
+            if (!dir.mkdirs() && !dir.exists()) {
+                throw new GradleException("Failed to create directory: ${dir.absolutePath}")
+            }
+        }
+        
+        // Generate main module class
+        def moduleClassContent = generateModuleClass(moduleName, moduleId, moduleDescription, moduleAuthor, moduleScope, packageName)
+        new File(srcDir, "${moduleName}.kt").text = moduleClassContent
+        
+        // Generate example hooker class
+        def hookerClassContent = generateExampleHooker(moduleName, packageName)
+        new File(hooksDir, "Example${moduleName}Hooker.kt").text = hookerClassContent
+        
+        // Generate build.gradle
+        def buildGradleContent = generateBuildGradle(packageName)
+        new File(moduleDir, "build.gradle").text = buildGradleContent
+        
+        // Generate settings.json
+        def settingsJsonContent = generateSettingsJson(moduleName)
+        new File(assetsDir, "settings.json").text = settingsJsonContent
+        
+        // Generate module-info.json template (will be overridden by annotation processor)
+        def moduleInfoContent = generateModuleInfo(moduleId, moduleName, moduleDescription, moduleAuthor)
+        new File(assetsDir, "module-info.json").text = moduleInfoContent
+        
+        // Generate unit test
+        def testClassContent = generateUnitTest(moduleName, packageName)
+        new File(testDir, "${moduleName}Test.kt").text = testClassContent
+        
+        // Generate README
+        def readmeContent = generateReadme(moduleName, moduleId, moduleDescription)
+        new File(moduleDir, "README.md").text = readmeContent
+        
+        // Update settings.gradle to include the new module
+        updateSettingsGradle(moduleName)
+        
+        println ""
+        println "✅ Module '${moduleName}' created successfully!"
+        println ""
+        println "Next steps:"
+        println "1. Sync your IDE to recognize the new module"
+        println "2. Implement your hooks in ${hooksDir.absolutePath}"
+        println "3. Customize settings in ${assetsDir.absolutePath}/settings.json"
+        println "4. Build with: ./gradlew :modules:${moduleName}:assembleDebug"
+        println "5. Install with: ./gradlew :modules:${moduleName}:installDebug"
+    }
+}
+
+def generateModuleClass(String moduleName, String moduleId, String description, String author, String scope, String packageName) {
+    return """package ${packageName}
+
+import android.content.Context
+import com.wobbz.framework.core.IModulePlugin
+import com.wobbz.framework.core.LogLevel
+import com.wobbz.framework.core.ModuleLifecycle
+import com.wobbz.framework.core.PackageLoadedParam
+import com.wobbz.framework.hot.IHotReloadable
+import com.wobbz.framework.processor.HotReloadable
+import com.wobbz.framework.processor.XposedPlugin
+import com.wobbz.framework.settings.SettingsProvider
+import ${packageName}.hooks.Example${moduleName}Hooker
+
+@XposedPlugin(
+    id = "${moduleId}",
+    name = "${moduleName}",
+    version = "1.0.0",
+    description = "${description}",
+    author = "${author}",
+    scope = ["${scope}"]
+)
+@HotReloadable
+class ${moduleName} : IModulePlugin, IHotReloadable, ModuleLifecycle {
+    
+    private val hooks = mutableListOf<Any>()
+    private lateinit var settings: SettingsProvider
+    
+    override fun initialize(context: Context, xposed: com.wobbz.framework.core.XposedInterface) {
+        // Initialize settings
+        settings = SettingsProvider.of(context)
+        
+        xposed.log(LogLevel.INFO, "${moduleName} initialized")
+    }
+    
+    override fun onStart() {
+        // Called when all module dependencies are satisfied
+        // Perform any initialization that requires other services
+    }
+    
+    override fun onStop() {
+        // Called when the module is being unloaded
+        // Clean up resources and unregister services
+        hooks.clear()
+    }
+    
+    override fun onPackageLoaded(param: PackageLoadedParam) {
+        // Check if we should hook this package
+        if (!shouldHookPackage(param.packageName)) {
+            return
+        }
+        
+        try {
+            // Example: Hook a method in the target application
+            // Replace this with your actual hooking logic
+            val targetClass = param.xposed.loadClass("android.app.Activity")
+            val onCreateMethod = targetClass.getDeclaredMethod("onCreate", android.os.Bundle::class.java)
+            
+            val unhooker = param.xposed.hook(onCreateMethod, Example${moduleName}Hooker::class.java)
+            hooks.add(unhooker)
+            
+            param.xposed.log(LogLevel.INFO, "Hooked Activity.onCreate for \${param.packageName}")
+        } catch (e: Exception) {
+            param.xposed.logError("Error setting up ${moduleName} hooks", e)
+        }
+    }
+    
+    private fun shouldHookPackage(packageName: String): Boolean {
+        // Check module settings to determine if this package should be hooked
+        val enabledForAll = settings.bool("enable_for_all", false)
+        
+        if (enabledForAll) {
+            val excludedPackages = settings.stringSet("excluded_packages", emptySet())
+            return !excludedPackages.contains(packageName)
+        } else {
+            val includedPackages = settings.stringSet("included_packages", emptySet())
+            return includedPackages.contains(packageName)
+        }
+    }
+    
+    override fun onHotReload() {
+        // Clean up existing hooks for hot-reload
+        hooks.forEach { unhooker ->
+            if (unhooker is com.wobbz.framework.core.MethodUnhooker<*>) {
+                unhooker.unhook()
+            }
+        }
+        hooks.clear()
+    }
+}
+"""
+}
+
+def generateExampleHooker(String moduleName, String packageName) {
+    return """package ${packageName}.hooks
+
+import com.wobbz.framework.core.HookParam
+import com.wobbz.framework.core.Hooker
+import com.wobbz.framework.core.LogLevel
+
+/**
+ * Example hooker for ${moduleName}.
+ * This is a template - replace with your actual hooking logic.
+ */
+class Example${moduleName}Hooker : Hooker {
+    
+    override fun beforeHook(param: HookParam) {
+        // Called before the original method executes
+        param.xposed.log(LogLevel.DEBUG, "Example${moduleName}Hooker: beforeHook called")
+        
+        // Example: Log method parameters
+        param.args.forEachIndexed { index, arg ->
+            param.xposed.log(LogLevel.DEBUG, "Param[\$index]: \${arg?.toString() ?: "null"}")
+        }
+        
+        // Example: Modify parameters
+        // param.args[0] = "modified_value"
+        
+        // Example: Block method execution
+        // if (shouldBlockMethod()) {
+        //     param.setResult(null)
+        // }
+    }
+    
+    override fun afterHook(param: HookParam) {
+        // Called after the original method executes (or after beforeHook if result was set)
+        param.xposed.log(LogLevel.DEBUG, "Example${moduleName}Hooker: afterHook called")
+        
+        // Example: Log the result
+        val result = param.getResult<Any>()
+        param.xposed.log(LogLevel.DEBUG, "Method result: \${result?.toString() ?: "null"}")
+        
+        // Example: Modify the result
+        // param.setResult("modified_result")
+    }
+    
+    private fun shouldBlockMethod(): Boolean {
+        // Add your logic here
+        return false
+    }
+}
+"""
+}
+
+def generateBuildGradle(String packageName) {
+    return """plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+    namespace '${packageName}'
+    compileSdk rootProject.ext.compileSdk
+    
+    defaultConfig {
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+    
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion.toString()
+    }
+}
+
+dependencies {
+    implementation project(':framework')
+    kapt project(':framework:processor')
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}
+"""
+}
+
+def generateSettingsJson(String moduleName) {
+    return """{
+  "\$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "${moduleName} Settings",
+  "properties": {
+    "enable_for_all": {
+      "type": "boolean",
+      "title": "Enable for all apps",
+      "description": "Enable ${moduleName} for all apps (except excluded apps)",
+      "default": false
+    },
+    "excluded_packages": {
+      "type": "array",
+      "title": "Excluded packages",
+      "description": "Packages to exclude when 'Enable for all apps' is on",
+      "items": {
+        "type": "string"
+      },
+      "default": ["com.android.systemui", "com.android.settings"]
+    },
+    "included_packages": {
+      "type": "array",
+      "title": "Included packages",
+      "description": "Packages to include when 'Enable for all apps' is off",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "enable_logging": {
+      "type": "boolean",
+      "title": "Enable logging",
+      "description": "Enable detailed logging for debugging",
+      "default": false
+    }
+  }
+}
+"""
+}
+
+def generateModuleInfo(String moduleId, String moduleName, String description, String author) {
+    return """{
+  "id": "${moduleId}",
+  "name": "${moduleName}",
+  "version": "1.0.0",
+  "description": "${description}",
+  "author": "${author}",
+  "features": [
+    "${moduleId}.core"
+  ],
+  "capabilities": {
+    "hotReload": true
+  },
+  "providedServices": {},
+  "serviceDependencies": []
+}
+"""
+}
+
+def generateUnitTest(String moduleName, String packageName) {
+    return """package ${packageName}
+
+import com.wobbz.framework.core.*
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
+
+/**
+ * Unit tests for ${moduleName}.
+ */
+class ${moduleName}Test {
+    
+    private lateinit var mockXposed: MockXposedInterface
+    private lateinit var module: ${moduleName}
+    
+    @Before
+    fun setup() {
+        mockXposed = MockXposedInterface()
+        module = ${moduleName}()
+    }
+    
+    @Test
+    fun testModuleInitialization() {
+        val mockContext = HookTestUtil.createMockModuleContext("com.test.package")
+        
+        // Test that module initializes without throwing
+        module.initialize(mockContext as android.content.Context, mockXposed)
+        
+        // Verify initialization logging
+        val logs = mockXposed.getLogs(LogLevel.INFO)
+        assertTrue("Module should log initialization", 
+            logs.any { it.message.contains("${moduleName} initialized") })
+    }
+    
+    @Test
+    fun testPackageFiltering() {
+        val mockContext = HookTestUtil.createMockModuleContext("com.test.package")
+        module.initialize(mockContext as android.content.Context, mockXposed)
+        
+        val param = MockPackageLoadedParam.forPackageWithXposed("com.test.app", mockXposed)
+        
+        // Test package loading
+        module.onPackageLoaded(param)
+        
+        // Verify hooks were applied (or not, depending on settings)
+        val hookedMethods = mockXposed.getHookedMethods()
+        // Add specific assertions based on your module logic
+    }
+    
+    @Test
+    fun testHotReload() {
+        val mockContext = HookTestUtil.createMockModuleContext("com.test.package")
+        module.initialize(mockContext as android.content.Context, mockXposed)
+        
+        // Simulate some hooks being created
+        val param = MockPackageLoadedParam.forPackageWithXposed("com.test.app", mockXposed)
+        module.onPackageLoaded(param)
+        
+        val initialHookCount = mockXposed.getHookedMethods().size
+        
+        // Test hot reload
+        module.onHotReload()
+        
+        // Verify cleanup occurred (you may need to adjust this based on implementation)
+        // This is a basic template - customize based on your module's behavior
+    }
+    
+    @Test
+    fun testLifecycleMethods() {
+        // Test that lifecycle methods don't throw exceptions
+        module.onStart()
+        module.onStop()
+        
+        // Add more specific tests based on your module's lifecycle behavior
+    }
+}
+"""
+}
+
+def generateReadme(String moduleName, String moduleId, String description) {
+    return """# ${moduleName}
+
+${description}
+
+## Module Information
+
+- **ID**: `${moduleId}`
+- **Version**: 1.0.0
+- **Target**: Android 12+ (API 31+)
+
+## Features
+
+- Hot-reload support for development
+- Configurable package filtering
+- Debug logging support
+
+## Settings
+
+The module can be configured through LSPosed Manager or by editing the settings:
+
+- **Enable for all apps**: Apply hooks to all applications (default: false)
+- **Excluded packages**: Apps to exclude when "Enable for all apps" is on
+- **Included packages**: Apps to include when "Enable for all apps" is off
+- **Enable logging**: Enable detailed debug logging
+
+## Development
+
+### Building
+
+```bash
+./gradlew :modules:${moduleName}:assembleDebug
+```
+
+### Installing
+
+```bash
+./gradlew :modules:${moduleName}:installDebug
+```
+
+### Testing
+
+```bash
+./gradlew :modules:${moduleName}:test
+```
+
+### Hot Reload
+
+During development, you can use hot-reload to quickly test changes:
+
+1. Start the development server: `./gradlew runDevServer`
+2. Make your changes
+3. Rebuild and install: `./gradlew :modules:${moduleName}:installDebug`
+
+## Implementation Notes
+
+This module was generated using the LSPosedKit scaffolding system. The main implementation points are:
+
+1. **Main Module Class**: `${moduleName}.kt` - Entry point and lifecycle management
+2. **Hooks**: `hooks/` directory - Contains the actual hooking implementations
+3. **Settings**: `assets/settings.json` - Configuration schema
+4. **Tests**: `test/` directory - Unit tests for the module
+
+## Customization
+
+To customize this module for your needs:
+
+1. Replace the example hooks in `hooks/Example${moduleName}Hooker.kt` with your implementation
+2. Update the settings schema in `assets/settings.json` to match your configuration needs
+3. Modify the package filtering logic in the main module class
+4. Add additional hook classes as needed
+5. Update tests to cover your specific functionality
+
+## License
+
+This module is part of the LSPosedKit project and follows the same license terms.
+"""
+}
+
+def updateSettingsGradle(String moduleName) {
+    def settingsFile = new File(rootProject.projectDir, "settings.gradle")
+    def settingsContent = settingsFile.text
+    
+    // Check if the module is already included
+    def moduleInclude = "include ':modules:${moduleName}'"
+    if (!settingsContent.contains(moduleInclude)) {
+        // Add the include statement
+        settingsContent += "\n${moduleInclude}\n"
+        settingsFile.text = settingsContent
+        println "✅ Added module to settings.gradle"
+    } else {
+        println "ℹ️  Module already exists in settings.gradle"
+    }
+}

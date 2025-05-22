@@ -1,0 +1,10 @@
+plugins {
+    id 'base'
+}
+
+// Apply the newModule script
+apply from: 'newModule.gradle'
+
+// Additional scripts can be added here
+// apply from: 'publishBundle.gradle'
+// apply from: 'signing.gradle' 

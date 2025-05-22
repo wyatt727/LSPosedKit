@@ -71,6 +71,39 @@ dependencies {
 }
 ```
 
+#### Error: "Module created with wrong name (using project name instead of -Pname parameter)"
+
+**Cause**: Gradle property conflicts where built-in project properties override command-line `-P` parameters.
+
+**Symptoms**:
+- Running `./gradlew :scripts:newModule -Pname="MyModule"` creates a module named "scripts" or "LSPosedKit"
+- The `-Pname` parameter appears to be ignored
+
+**Debug Steps**:
+1. Check if you're using `project.findProperty('name')` in Gradle scripts
+2. Verify that `gradle.startParameter.projectProperties` contains your parameters
+3. Look for conflicts with built-in Gradle properties like `project.name`
+
+**Root Cause**: 
+Gradle's built-in `project.name` property (which equals the project/subproject name) conflicts with command-line properties. When using `project.findProperty('name')` or `rootProject.hasProperty('name')`, Gradle finds the built-in property instead of the `-P` parameter.
+
+**Solution**:
+Use `gradle.startParameter.projectProperties` to access command-line properties directly:
+
+```groovy
+// ❌ WRONG - conflicts with built-in project.name
+def moduleName = project.findProperty('name') ?: rootProject.findProperty('name')
+
+// ✅ CORRECT - accesses command-line properties directly
+def projectProperties = gradle.startParameter.projectProperties
+def moduleName = null
+if (projectProperties.containsKey('name')) {
+    moduleName = projectProperties.get('name')
+}
+```
+
+This approach avoids conflicts with Gradle's built-in project properties and ensures `-P` parameters are handled correctly.
+
 #### Error: "Execution failed for task ':modules:mymodule:generateModuleInfo'"
 
 **Cause**: Invalid configuration for the module info generation task.
@@ -828,4 +861,60 @@ Remember these key debugging principles:
 5. **Read the logs**: Most errors are explained in logcat
 6. **Handle gracefully**: Implement proper error handling for production modules
 
-By following these principles and using the techniques in this guide, you should be able to diagnose and fix most issues you encounter while developing LSPosedKit modules. 
+By following these principles and using the techniques in this guide, you should be able to diagnose and fix most issues you encounter while developing LSPosedKit modules.
+
+## Gradle Development Best Practices
+
+To avoid common Gradle scripting issues when extending LSPosedKit's build system:
+
+### Command-Line Property Handling
+
+When writing custom Gradle tasks that need to accept `-P` parameters:
+
+```groovy
+// ❌ AVOID - Can conflict with built-in project properties
+task myTask {
+    doLast {
+        def myValue = project.findProperty('myParam')
+        // This may return project.name instead of -PmyParam value
+    }
+}
+
+// ✅ RECOMMENDED - Direct access to command-line properties
+task myTask {
+    doLast {
+        def cmdProps = gradle.startParameter.projectProperties
+        def myValue = cmdProps.containsKey('myParam') ? cmdProps.get('myParam') : null
+        // This always gets the actual -PmyParam value
+    }
+}
+```
+
+### Property Validation
+
+Always validate that required parameters were actually provided:
+
+```groovy
+task myTask {
+    doLast {
+        def cmdProps = gradle.startParameter.projectProperties
+        def requiredParam = cmdProps.get('required')
+        
+        if (!requiredParam) {
+            throw new GradleException("Required parameter missing. Use -Prequired='value'")
+        }
+    }
+}
+```
+
+### Common Property Conflicts
+
+Be aware of these built-in Gradle properties that can cause conflicts:
+- `name` (project name)
+- `version` (project version) 
+- `group` (project group)
+- `description` (project description)
+
+Use specific parameter names or prefixes to avoid conflicts:
+- Instead of `-Pname`, use `-PmoduleName`
+- Instead of `-Pversion`, use `-PmoduleVersion` 

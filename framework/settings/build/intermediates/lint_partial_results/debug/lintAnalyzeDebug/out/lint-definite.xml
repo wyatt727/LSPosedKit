@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="30"
+            column="20"
+            startOffset="718"
+            endLine="30"
+            endColumn="89"
+            endOffset="787"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="31"
+            column="20"
+            startOffset="807"
+            endLine="31"
+            endColumn="58"
+            endOffset="845"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.json:json than 20230227 is available: 20231013">
+        <fix-replace
+            description="Change to 20231013"
+            family="Update versions"
+            oldString="20230227"
+            replacement="20231013"/>
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="34"
+            column="20"
+            startOffset="890"
+            endLine="34"
+            endColumn="44"
+            endOffset="914"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.preference:preference-ktx than 1.2.0 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.2.0"
+            replacement="1.2.1"/>
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="37"
+            column="20"
+            startOffset="984"
+            endLine="37"
+            endColumn="62"
+            endOffset="1026"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.fragment:fragment-ktx than 1.5.5 is available: 1.8.7">
+        <fix-replace
+            description="Change to 1.8.7"
+            family="Update versions"
+            oldString="1.5.5"
+            replacement="1.8.7"/>
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="38"
+            column="20"
+            startOffset="1046"
+            endLine="38"
+            endColumn="58"
+            endOffset="1084"/>
+    </incident>
+
+</incidents>

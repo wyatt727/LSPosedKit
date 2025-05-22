@@ -11,6 +11,9 @@ include ':framework'
 // libxposed-api
 include ':libxposed-api:api'
 
+// Scripts
+include ':scripts'
+
 // Find all modules in modules directory (if it exists and has subdirectories)
 def modulesDir = file('modules')
 if (modulesDir.exists() && modulesDir.isDirectory()) {
@@ -18,3 +21,12 @@ if (modulesDir.exists() && modulesDir.isDirectory()) {
         include ":modules:${dir.name}"
     }
 } 
+include ':modules:scripts'
+
+include ':modules:LSPosedKit'
+
+include ':modules:TestModule'
+
+include ':modules:DocumentationTest'
+
+include ':modules:IntentInterceptor'

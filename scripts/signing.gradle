@@ -1,0 +1,411 @@
+/**
+ * Signing Configuration Script for LSPosedKit
+ * 
+ * This script provides standardized signing configuration for modules.
+ * It supports multiple signing strategies and environments.
+ * 
+ * Usage:
+ *   Apply this script in module build.gradle files:
+ *   apply from: "${rootProject.projectDir}/scripts/signing.gradle"
+ * 
+ * Environment Variables:
+ *   LSPK_STORE_FILE     - Path to keystore file
+ *   LSPK_STORE_PASSWORD - Keystore password
+ *   LSPK_KEY_ALIAS      - Key alias
+ *   LSPK_KEY_PASSWORD   - Key password
+ *   LSPK_SIGNING_MODE   - 'debug', 'release', or 'auto' (default: auto)
+ */
+
+// Check if this is being applied to an Android module
+if (!project.plugins.hasPlugin('com.android.library') && !project.plugins.hasPlugin('com.android.application')) {
+    logger.warn("Signing configuration only applies to Android modules")
+    return
+}
+
+/**
+ * Signing configuration setup
+ */
+ext {
+    // Default signing configuration
+    signingConfig = [
+        storeFile: null,
+        storePassword: null,
+        keyAlias: null,
+        keyPassword: null,
+        mode: 'auto'
+    ]
+    
+    // Initialize signing configuration
+    setupSigning = this.&setupSigning
+    hasValidSigningConfig = this.&hasValidSigningConfig
+    shouldUseReleaseSigning = this.&shouldUseReleaseSigning
+}
+
+/**
+ * Sets up signing configuration based on environment and properties
+ */
+def setupSigning() {
+    logger.info("Setting up signing configuration for ${project.name}")
+    
+    // Get signing mode
+    def signingMode = getSigningMode()
+    logger.info("Signing mode: ${signingMode}")
+    
+    // Configure signing based on mode
+    switch (signingMode) {
+        case 'debug':
+            setupDebugSigning()
+            break
+        case 'release':
+            setupReleaseSigning()
+            break
+        case 'auto':
+            if (hasValidReleaseSigningConfig()) {
+                setupReleaseSigning()
+            } else {
+                logger.info("No valid release signing config found, using debug signing")
+                setupDebugSigning()
+            }
+            break
+        default:
+            logger.warn("Unknown signing mode: ${signingMode}, using debug")
+            setupDebugSigning()
+    }
+}
+
+/**
+ * Gets the signing mode from environment or properties
+ */
+def getSigningMode() {
+    // Check environment variable first
+    def envMode = System.getenv('LSPK_SIGNING_MODE')
+    if (envMode) {
+        return envMode.toLowerCase()
+    }
+    
+    // Check project properties
+    def propMode = project.findProperty('lspk.signing.mode')
+    if (propMode) {
+        return propMode.toLowerCase()
+    }
+    
+    // Check if we're building for release
+    def taskNames = gradle.startParameter.taskNames
+    if (taskNames.any { it.contains('Release') || it.contains('release') }) {
+        return 'release'
+    }
+    
+    // Default to auto
+    return 'auto'
+}
+
+/**
+ * Sets up debug signing configuration
+ */
+def setupDebugSigning() {
+    android {
+        signingConfigs {
+            debug {
+                // Use default debug keystore
+                // This is automatically configured by Android Gradle Plugin
+            }
+        }
+        
+        buildTypes {
+            debug {
+                signingConfig signingConfigs.debug
+            }
+            release {
+                // Use debug signing for release if no proper config
+                signingConfig signingConfigs.debug
+                logger.info("Using debug signing for release builds")
+            }
+        }
+    }
+    
+    logger.info("Configured debug signing for ${project.name}")
+}
+
+/**
+ * Sets up release signing configuration
+ */
+def setupReleaseSigning() {
+    def storeFile = getReleaseStoreFile()
+    def storePassword = getReleaseStorePassword()
+    def keyAlias = getReleaseKeyAlias()
+    def keyPassword = getReleaseKeyPassword()
+    
+    if (!storeFile || !storePassword || !keyAlias || !keyPassword) {
+        logger.error("Incomplete release signing configuration")
+        throw new GradleException("Release signing requires: storeFile, storePassword, keyAlias, keyPassword")
+    }
+    
+    android {
+        signingConfigs {
+            release {
+                storeFile file(storeFile)
+                storePassword storePassword
+                keyAlias keyAlias
+                keyPassword keyPassword
+                
+                // Enable v1 and v2 signing
+                v1SigningEnabled true
+                v2SigningEnabled true
+                
+                // Enable v3 and v4 signing if available (Android 9+)
+                try {
+                    v3SigningEnabled true
+                    v4SigningEnabled true
+                } catch (Exception e) {
+                    // v3/v4 signing not available in this AGP version
+                    logger.info("v3/v4 signing not available, using v1/v2")
+                }
+            }
+        }
+        
+        buildTypes {
+            debug {
+                signingConfig signingConfigs.debug
+            }
+            release {
+                signingConfig signingConfigs.release
+                logger.info("Using release signing for release builds")
+            }
+        }
+    }
+    
+    logger.info("Configured release signing for ${project.name}")
+    logger.info("Keystore: ${storeFile}")
+    logger.info("Key alias: ${keyAlias}")
+}
+
+/**
+ * Checks if valid release signing configuration is available
+ */
+def hasValidReleaseSigningConfig() {
+    def storeFile = getReleaseStoreFile()
+    def storePassword = getReleaseStorePassword()
+    def keyAlias = getReleaseKeyAlias()
+    def keyPassword = getReleaseKeyPassword()
+    
+    if (!storeFile || !storePassword || !keyAlias || !keyPassword) {
+        return false
+    }
+    
+    // Check if keystore file exists
+    def keystoreFile = file(storeFile)
+    if (!keystoreFile.exists()) {
+        logger.warn("Keystore file does not exist: ${storeFile}")
+        return false
+    }
+    
+    return true
+}
+
+/**
+ * Gets the release keystore file path
+ */
+def getReleaseStoreFile() {
+    // Environment variable
+    def envStore = System.getenv('LSPK_STORE_FILE')
+    if (envStore) return envStore
+    
+    // Project property
+    def propStore = project.findProperty('lspk.signing.storeFile')
+    if (propStore) return propStore
+    
+    // Look for common keystore locations
+    def commonLocations = [
+        "${rootProject.projectDir}/keystore.jks",
+        "${rootProject.projectDir}/release.keystore",
+        "${rootProject.projectDir}/signing/release.jks",
+        "${System.getProperty('user.home')}/.android/lspkit.keystore"
+    ]
+    
+    for (location in commonLocations) {
+        if (file(location).exists()) {
+            logger.info("Found keystore at: ${location}")
+            return location
+        }
+    }
+    
+    return null
+}
+
+/**
+ * Gets the release keystore password
+ */
+def getReleaseStorePassword() {
+    // Environment variable
+    def envPassword = System.getenv('LSPK_STORE_PASSWORD')
+    if (envPassword) return envPassword
+    
+    // Project property
+    def propPassword = project.findProperty('lspk.signing.storePassword')
+    if (propPassword) return propPassword
+    
+    return null
+}
+
+/**
+ * Gets the release key alias
+ */
+def getReleaseKeyAlias() {
+    // Environment variable
+    def envAlias = System.getenv('LSPK_KEY_ALIAS')
+    if (envAlias) return envAlias
+    
+    // Project property
+    def propAlias = project.findProperty('lspk.signing.keyAlias')
+    if (propAlias) return propAlias
+    
+    // Default alias
+    return "lspkit"
+}
+
+/**
+ * Gets the release key password
+ */
+def getReleaseKeyPassword() {
+    // Environment variable
+    def envPassword = System.getenv('LSPK_KEY_PASSWORD')
+    if (envPassword) return envPassword
+    
+    // Project property
+    def propPassword = project.findProperty('lspk.signing.keyPassword')
+    if (propPassword) return propPassword
+    
+    // Use same as store password if available
+    return getReleaseStorePassword()
+}
+
+/**
+ * Validates signing configuration
+ */
+def validateSigningConfig() {
+    def hasRelease = hasValidReleaseSigningConfig()
+    
+    if (!hasRelease && getSigningMode() == 'release') {
+        throw new GradleException("Release signing mode requested but no valid release signing configuration found")
+    }
+    
+    logger.info("Signing configuration validation passed")
+}
+
+/**
+ * Task to show current signing configuration
+ */
+task showSigningConfig {
+    group 'help'
+    description 'Shows the current signing configuration'
+    
+    doLast {
+        logger.lifecycle("Signing Configuration for ${project.name}:")
+        logger.lifecycle("  Mode: ${getSigningMode()}")
+        logger.lifecycle("  Has valid release config: ${hasValidReleaseSigningConfig()}")
+        
+        if (hasValidReleaseSigningConfig()) {
+            logger.lifecycle("  Store file: ${getReleaseStoreFile()}")
+            logger.lifecycle("  Key alias: ${getReleaseKeyAlias()}")
+            logger.lifecycle("  Store password: ${'*' * getReleaseStorePassword()?.length()}")
+            logger.lifecycle("  Key password: ${'*' * getReleaseKeyPassword()?.length()}")
+        } else {
+            logger.lifecycle("  Release signing not configured, using debug keystore")
+        }
+    }
+}
+
+/**
+ * Task to generate a new keystore for development
+ */
+task generateKeystore {
+    group 'setup'
+    description 'Generates a new keystore for module signing'
+    
+    doLast {
+        def keystoreDir = file("${rootProject.projectDir}/signing")
+        def keystoreFile = file("${keystoreDir}/lspkit-dev.jks")
+        def alias = "lspkit-dev"
+        def password = "lspkit123"
+        
+        // Create signing directory
+        keystoreDir.mkdirs()
+        
+        // Generate keystore
+        def command = [
+            'keytool',
+            '-genkey',
+            '-v',
+            '-keystore', keystoreFile.absolutePath,
+            '-alias', alias,
+            '-keyalg', 'RSA',
+            '-keysize', '2048',
+            '-validity', '10000',
+            '-storepass', password,
+            '-keypass', password,
+            '-dname', 'CN=LSPosedKit Development, O=LSPosedKit, C=US'
+        ]
+        
+        try {
+            project.exec {
+                commandLine command
+            }
+            
+            logger.lifecycle("Keystore generated successfully:")
+            logger.lifecycle("  Location: ${keystoreFile}")
+            logger.lifecycle("  Alias: ${alias}")
+            logger.lifecycle("  Password: ${password}")
+            logger.lifecycle("")
+            logger.lifecycle("To use this keystore, set these environment variables:")
+            logger.lifecycle("  export LSPK_STORE_FILE='${keystoreFile}'")
+            logger.lifecycle("  export LSPK_STORE_PASSWORD='${password}'")
+            logger.lifecycle("  export LSPK_KEY_ALIAS='${alias}'")
+            logger.lifecycle("  export LSPK_KEY_PASSWORD='${password}'")
+            
+        } catch (Exception e) {
+            logger.error("Failed to generate keystore: ${e.message}")
+            logger.lifecycle("Make sure keytool is available in your PATH")
+        }
+    }
+}
+
+/**
+ * Task to verify keystore
+ */
+task verifyKeystore {
+    group 'verification'
+    description 'Verifies the configured keystore'
+    
+    doLast {
+        if (!hasValidReleaseSigningConfig()) {
+            logger.lifecycle("No release signing configuration found")
+            return
+        }
+        
+        def storeFile = getReleaseStoreFile()
+        def storePassword = getReleaseStorePassword()
+        def keyAlias = getReleaseKeyAlias()
+        
+        try {
+            // List keystore contents
+            project.exec {
+                commandLine 'keytool', '-list', '-v', 
+                           '-keystore', storeFile,
+                           '-storepass', storePassword,
+                           '-alias', keyAlias
+            }
+            
+            logger.lifecycle("Keystore verification successful")
+            
+        } catch (Exception e) {
+            logger.error("Keystore verification failed: ${e.message}")
+            throw new GradleException("Invalid keystore configuration")
+        }
+    }
+}
+
+// Apply signing configuration when this script is included
+afterEvaluate {
+    setupSigning()
+    validateSigningConfig()
+} 

@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation project(':framework:core')
+    implementation project(':framework:service')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
     implementation 'androidx.annotation:annotation:1.5.0'
     

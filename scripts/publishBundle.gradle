@@ -1,0 +1,414 @@
+/**
+ * Module Bundle Publishing Script for LSPosedKit
+ * 
+ * This script creates deployable .lspkmod bundles from module projects.
+ * The bundles include the module APK, metadata, and required assets.
+ * 
+ * Usage:
+ *   ./gradlew publishBundle -PmoduleName=DebugApp
+ *   ./gradlew publishBundle -PmoduleName=NetworkGuard -PoutputDir=/path/to/output
+ */
+
+// Get command-line properties
+def cmdProps = gradle.startParameter.projectProperties
+def targetModuleName = null
+if (cmdProps.containsKey('moduleName')) {
+    targetModuleName = cmdProps.get('moduleName')
+}
+
+def outputDirectory = null
+if (cmdProps.containsKey('outputDir')) {
+    outputDirectory = cmdProps.get('outputDir')
+} else {
+    outputDirectory = "${rootProject.buildDir}/bundles"
+}
+
+// Validate inputs
+if (!targetModuleName) {
+    throw new org.gradle.api.GradleException("Module name required. Use -PmoduleName=<module-name>")
+}
+
+// Find the target module
+def moduleProject = null
+rootProject.subprojects.each { subproject ->
+    if (subproject.name == targetModuleName && subproject.path.startsWith(':modules:')) {
+        moduleProject = subproject
+    }
+}
+
+if (!moduleProject) {
+    throw new org.gradle.api.GradleException("Module '${targetModuleName}' not found in modules directory")
+}
+
+/**
+ * Task to publish a module bundle
+ */
+task publishBundle {
+    group 'publishing'
+    description "Creates a deployable .lspkmod bundle for the specified module"
+    
+    // Depend on the module being built
+    dependsOn "${moduleProject.path}:assembleRelease"
+    
+    doLast {
+        def moduleName = moduleProject.name
+        def moduleVersion = getModuleVersion(moduleProject)
+        def bundleName = "${moduleName}-${moduleVersion}.lspkmod"
+        def bundleFile = file("${outputDirectory}/${bundleName}")
+        def tempDir = file("${project.buildDir}/tmp/bundle-${moduleName}")
+        
+        logger.info("Creating bundle for module: ${moduleName}")
+        logger.info("Module version: ${moduleVersion}")
+        logger.info("Output bundle: ${bundleFile}")
+        
+        // Clean and create temporary directory
+        delete tempDir
+        tempDir.mkdirs()
+        
+        // Ensure output directory exists
+        file(outputDirectory).mkdirs()
+        
+        // Copy module APK
+        copyModuleApk(moduleProject, tempDir)
+        
+        // Copy and validate metadata files
+        copyMetadataFiles(moduleProject, tempDir)
+        
+        // Copy additional assets if present
+        copyAdditionalAssets(moduleProject, tempDir)
+        
+        // Create manifest file
+        createBundleManifest(moduleProject, tempDir, moduleVersion)
+        
+        // Create the bundle zip
+        createBundleZip(tempDir, bundleFile)
+        
+        // Validate the created bundle
+        validateBundle(bundleFile)
+        
+        // Cleanup temporary directory
+        delete tempDir
+        
+        logger.lifecycle("Bundle created successfully: ${bundleFile}")
+        logger.lifecycle("Bundle size: ${bundleFile.length()} bytes")
+    }
+}
+
+/**
+ * Gets the module version from various sources
+ */
+def getModuleVersion(moduleProject) {
+    // Try to get version from module-info.json
+    def moduleInfoFile = file("${moduleProject.projectDir}/src/main/assets/module-info.json")
+    if (moduleInfoFile.exists()) {
+        try {
+            def moduleInfo = new groovy.json.JsonSlurper().parseText(moduleInfoFile.text)
+            return moduleInfo.version ?: "1.0.0"
+        } catch (Exception e) {
+            logger.warn("Failed to parse module-info.json for version: ${e.message}")
+        }
+    }
+    
+    // Fallback to project version or default
+    return moduleProject.version != 'unspecified' ? moduleProject.version : "1.0.0"
+}
+
+/**
+ * Copies the module APK to the bundle directory
+ */
+def copyModuleApk(moduleProject, bundleDir) {
+    def apkDir = file("${moduleProject.buildDir}/outputs/apk/release")
+    def apkFiles = apkDir.listFiles()?.findAll { it.name.endsWith('.apk') && !it.name.contains('unsigned') }
+    
+    if (!apkFiles || apkFiles.isEmpty()) {
+        throw new GradleException("No release APK found for module ${moduleProject.name}. Run '${moduleProject.path}:assembleRelease' first.")
+    }
+    
+    def apkFile = apkFiles[0] // Take the first (hopefully only) APK
+    def targetApk = file("${bundleDir}/module.apk")
+    
+    copy {
+        from apkFile
+        into bundleDir
+        rename { "module.apk" }
+    }
+    
+    logger.info("Copied APK: ${apkFile.name} -> module.apk (${targetApk.length()} bytes)")
+}
+
+/**
+ * Copies and validates required metadata files
+ */
+def copyMetadataFiles(moduleProject, bundleDir) {
+    def assetsDir = file("${moduleProject.projectDir}/src/main/assets")
+    
+    // Copy module-info.json (required)
+    def moduleInfoFile = file("${assetsDir}/module-info.json")
+    if (!moduleInfoFile.exists()) {
+        throw new GradleException("Missing required file: module-info.json in ${moduleProject.name}")
+    }
+    
+    copy {
+        from moduleInfoFile
+        into bundleDir
+    }
+    
+    // Validate module-info.json
+    validateModuleInfo(moduleInfoFile)
+    
+    // Copy settings.json if present
+    def settingsFile = file("${assetsDir}/settings.json")
+    if (settingsFile.exists()) {
+        copy {
+            from settingsFile
+            into bundleDir
+        }
+        logger.info("Copied optional settings.json")
+        
+        // Validate settings.json
+        validateSettingsJson(settingsFile)
+    }
+    
+    logger.info("Copied metadata files")
+}
+
+/**
+ * Copies additional assets that might be needed
+ */
+def copyAdditionalAssets(moduleProject, bundleDir) {
+    def assetsDir = file("${moduleProject.projectDir}/src/main/assets")
+    def additionalFiles = []
+    
+    // Look for other important files
+    if (assetsDir.exists()) {
+        assetsDir.listFiles()?.each { file ->
+            if (file.isFile() && !file.name.in(['module-info.json', 'settings.json'])) {
+                // Include readme, license, changelog, etc.
+                if (file.name.toLowerCase().matches(/^(readme|license|changelog|notice).*\.(txt|md)$/)) {
+                    additionalFiles << file
+                }
+            }
+        }
+    }
+    
+    if (!additionalFiles.isEmpty()) {
+        def assetsBundle = file("${bundleDir}/assets")
+        assetsBundle.mkdirs()
+        
+        additionalFiles.each { file ->
+            copy {
+                from file
+                into assetsBundle
+            }
+        }
+        
+        logger.info("Copied ${additionalFiles.size()} additional asset files")
+    }
+}
+
+/**
+ * Creates a manifest file for the bundle
+ */
+def createBundleManifest(moduleProject, bundleDir, moduleVersion) {
+    def manifestFile = file("${bundleDir}/MANIFEST.MF")
+    def timestamp = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))
+    
+    def manifest = """Manifest-Version: 1.0
+Bundle-Type: LSPosedKit-Module
+Bundle-Version: 1.0
+Module-Name: ${moduleProject.name}
+Module-Version: ${moduleVersion}
+Created-By: LSPosedKit Build System
+Created-Date: ${timestamp}
+LSPosedKit-Version: ${rootProject.version ?: '1.0.0'}
+Bundle-Generator: publishBundle.gradle
+"""
+
+    // Add additional metadata if available
+    def moduleInfoFile = file("${moduleProject.projectDir}/src/main/assets/module-info.json")
+    if (moduleInfoFile.exists()) {
+        try {
+            def moduleInfo = new groovy.json.JsonSlurper().parseText(moduleInfoFile.text)
+            if (moduleInfo.author) {
+                manifest += "Module-Author: ${moduleInfo.author}\n"
+            }
+            if (moduleInfo.description) {
+                manifest += "Module-Description: ${moduleInfo.description}\n"
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to read additional module info: ${e.message}")
+        }
+    }
+    
+    manifestFile.text = manifest
+    logger.info("Created bundle manifest")
+}
+
+/**
+ * Creates the final bundle zip file
+ */
+def createBundleZip(bundleDir, bundleFile) {
+    // Delete existing bundle if it exists
+    delete bundleFile
+    
+    // Create zip
+    ant.zip(destfile: bundleFile, basedir: bundleDir)
+    
+    if (!bundleFile.exists()) {
+        throw new GradleException("Failed to create bundle file: ${bundleFile}")
+    }
+}
+
+/**
+ * Validates the created bundle
+ */
+def validateBundle(bundleFile) {
+    if (!bundleFile.exists()) {
+        throw new GradleException("Bundle file does not exist: ${bundleFile}")
+    }
+    
+    def zipFile = new java.util.zip.ZipFile(bundleFile)
+    def requiredFiles = ['module.apk', 'module-info.json', 'MANIFEST.MF']
+    def foundFiles = []
+    
+    try {
+        zipFile.entries().each { entry ->
+            if (!entry.isDirectory()) {
+                foundFiles << entry.name
+            }
+        }
+        
+        // Check required files
+        requiredFiles.each { required ->
+            if (!foundFiles.contains(required)) {
+                throw new GradleException("Bundle validation failed: missing required file '${required}'")
+            }
+        }
+        
+        logger.info("Bundle validation passed - contains ${foundFiles.size()} files")
+        logger.debug("Bundle contents: ${foundFiles.join(', ')}")
+        
+    } finally {
+        zipFile.close()
+    }
+}
+
+/**
+ * Validates module-info.json structure
+ */
+def validateModuleInfo(moduleInfoFile) {
+    try {
+        def moduleInfo = new groovy.json.JsonSlurper().parseText(moduleInfoFile.text)
+        
+        // Required fields
+        def requiredFields = ['id', 'name', 'version', 'description']
+        requiredFields.each { field ->
+            if (!moduleInfo[field]) {
+                throw new GradleException("module-info.json missing required field: ${field}")
+            }
+        }
+        
+        // Validate ID format
+        if (!moduleInfo.id.matches(/^[a-z][a-z0-9-]*[a-z0-9]$/)) {
+            throw new GradleException("module-info.json 'id' field has invalid format. Use lowercase with hyphens.")
+        }
+        
+        logger.info("module-info.json validation passed")
+        
+    } catch (groovy.json.JsonException e) {
+        throw new GradleException("Invalid module-info.json: ${e.message}")
+    }
+}
+
+/**
+ * Validates settings.json structure
+ */
+def validateSettingsJson(settingsFile) {
+    try {
+        def settings = new groovy.json.JsonSlurper().parseText(settingsFile.text)
+        
+        // Basic structure validation
+        if (settings.type != 'object') {
+            logger.warn("settings.json should have type 'object'")
+        }
+        
+        if (!settings.properties) {
+            logger.warn("settings.json should have 'properties' object")
+        }
+        
+        logger.info("settings.json validation passed")
+        
+    } catch (groovy.json.JsonException e) {
+        throw new GradleException("Invalid settings.json: ${e.message}")
+    }
+}
+
+/**
+ * Task to publish all modules
+ */
+task publishAllBundles {
+    group 'publishing'
+    description "Creates bundles for all modules in the project"
+    
+    doLast {
+        def moduleProjects = rootProject.subprojects.findAll { 
+            it.path.startsWith(':modules:') 
+        }
+        
+        if (moduleProjects.isEmpty()) {
+            logger.lifecycle("No modules found to bundle")
+            return
+        }
+        
+        logger.lifecycle("Publishing bundles for ${moduleProjects.size()} modules...")
+        
+        moduleProjects.each { mod ->
+            logger.lifecycle("Creating bundle for ${mod.name}...")
+            
+            // Execute publishBundle for each module
+            project.exec {
+                commandLine './gradlew', 'publishBundle', "-PmoduleName=${mod.name}", "-PoutputDir=${outputDirectory}"
+            }
+        }
+        
+        logger.lifecycle("All bundles published to: ${outputDirectory}")
+    }
+}
+
+/**
+ * Task to clean bundle outputs
+ */
+task cleanBundles {
+    group 'publishing'
+    description "Cleans generated bundle files"
+    
+    doLast {
+        delete "${rootProject.buildDir}/bundles"
+        logger.lifecycle("Cleaned bundle outputs")
+    }
+}
+
+/**
+ * Helper task to list available modules
+ */
+task listModules {
+    group 'help'
+    description "Lists all available modules that can be bundled"
+    
+    doLast {
+        def moduleProjects = rootProject.subprojects.findAll { 
+            it.path.startsWith(':modules:') 
+        }
+        
+        if (moduleProjects.isEmpty()) {
+            logger.lifecycle("No modules found")
+            return
+        }
+        
+        logger.lifecycle("Available modules:")
+        moduleProjects.each { mod ->
+            def version = getModuleVersion(mod)
+            logger.lifecycle("  - ${mod.name} (version: ${version})")
+        }
+    }
+} 

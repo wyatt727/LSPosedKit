@@ -1,0 +1,3 @@
+com.wobbz.framework.processor.SettingsKeyProcessor
+com.wobbz.framework.processor.SettingsSchemaProcessor
+com.wobbz.framework.processor.XposedPluginProcessor

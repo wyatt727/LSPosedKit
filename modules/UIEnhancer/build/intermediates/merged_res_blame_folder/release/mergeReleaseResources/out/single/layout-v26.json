@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v26/mtrl_calendar_month.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-material-1.8.0-19:/layout-v26/mtrl_calendar_month.xml"
+    },
+    {
+        "merged": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/layout-v26/abc_screen_toolbar.xml",
+        "source": "com.wobbz.module.uienhancer.UIEnhancer-appcompat-1.5.0-17:/layout-v26/abc_screen_toolbar.xml"
+    }
+]
