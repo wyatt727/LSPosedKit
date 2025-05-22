@@ -110,6 +110,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.wobbz.framework.core.IModulePlugin
 import com.wobbz.framework.core.LogLevel
+import com.wobbz.framework.core.ModuleLifecycle
 import com.wobbz.framework.core.PackageLoadedParam
 import com.wobbz.framework.hot.IHotReloadable
 import com.wobbz.framework.processor.HotReloadable
@@ -127,7 +128,7 @@ import com.wobbz.module.debugapp.hooks.DebugPropertiesHooker
     scope = ["*"]
 )
 @HotReloadable
-class DebugApp : IModulePlugin, IHotReloadable {
+class DebugApp : IModulePlugin, IHotReloadable, ModuleLifecycle {
     
     private val hooks = mutableListOf<Any>()
     private lateinit var settings: SettingsProvider
@@ -137,6 +138,17 @@ class DebugApp : IModulePlugin, IHotReloadable {
         settings = SettingsProvider.of(context)
         
         xposed.log(LogLevel.INFO, "DebugApp initialized")
+    }
+    
+    override fun onStart() {
+        // This module doesn't need to do much at startup
+        // It could potentially check for other services it might use
+    }
+    
+    override fun onStop() {
+        // Release any resources or perform cleanup
+        // This module doesn't register services, so mainly cleanup hooks
+        hooks.clear()
     }
     
     override fun onPackageLoaded(param: PackageLoadedParam) {
@@ -334,7 +346,9 @@ Create the module metadata:
   ],
   "capabilities": {
     "hotReload": true
-  }
+  },
+  "providedServices": {},
+  "serviceDependencies": []
 }
 ```
 
@@ -418,6 +432,7 @@ package com.wobbz.module.networkguard
 import android.content.Context
 import com.wobbz.framework.core.IModulePlugin
 import com.wobbz.framework.core.LogLevel
+import com.wobbz.framework.core.ModuleLifecycle
 import com.wobbz.framework.core.PackageLoadedParam
 import com.wobbz.framework.hot.IHotReloadable
 import com.wobbz.framework.processor.HotReloadable
@@ -438,11 +453,12 @@ import com.wobbz.module.networkguard.services.INetworkRuleService
     scope = ["*"]
 )
 @HotReloadable
-class NetworkGuard : IModulePlugin, IHotReloadable {
+class NetworkGuard : IModulePlugin, IHotReloadable, ModuleLifecycle {
     
     private val hooks = mutableListOf<Any>()
     private lateinit var settings: SettingsProvider
     private lateinit var ruleManager: RuleManager
+    private lateinit var networkRuleService: NetworkRuleProvider
     
     override fun initialize(context: Context, xposed: com.wobbz.framework.core.XposedInterface) {
         // Initialize settings
@@ -451,15 +467,55 @@ class NetworkGuard : IModulePlugin, IHotReloadable {
         // Initialize rule manager
         ruleManager = RuleManager(context)
         
-        // Register network rule service
-        val networkRuleService = NetworkRuleProvider(ruleManager)
-        FeatureManager.register(INetworkRuleService::class, networkRuleService)
+        // Initialize network rule service
+        networkRuleService = NetworkRuleProvider(ruleManager)
+        
+        // Register network rule service with version and dependencies
+        // Note: We now use registerService instead of register
+        FeatureManager.registerService(
+            INetworkRuleService::class, 
+            networkRuleService,
+            version = "1.0.0", // Service version
+            moduleId = "network-guard" // Module ID for lifecycle management
+        )
         
         // Declare features
         FeatureManager.declareFeature("network.inspection")
         FeatureManager.declareFeature("network.blocking")
         
         xposed.log(LogLevel.INFO, "NetworkGuard initialized")
+    }
+    
+    override fun onStart() {
+        // Called when all module dependencies are satisfied and it's fully operational
+        // This is a good place for tasks that require other modules' services
+        
+        // For example, initialize monitors that may depend on other services
+        try {
+            // Initialize any components that depend on external services
+            // For example, a traffic analyzer that uses a logging service:
+            val loggingService = FeatureManager.get(ILoggingService::class.java)
+            if (loggingService != null) {
+                loggingService.log(LogLevel.INFO, "NetworkGuard started")
+            }
+        } catch (e: Exception) {
+            // Handle initialization errors
+        }
+    }
+    
+    override fun onStop() {
+        // Called when the module is being unloaded or the application is shutting down
+        // This is where we unregister our services and release resources
+        
+        // Unregister our service
+        try {
+            FeatureManager.unregisterService(INetworkRuleService::class)
+        } catch (e: Exception) {
+            // Log any errors during service unregistration
+        }
+        
+        // Clear any other resources
+        hooks.clear()
     }
     
     override fun onPackageLoaded(param: PackageLoadedParam) {
@@ -513,6 +569,9 @@ class NetworkGuard : IModulePlugin, IHotReloadable {
             }
         }
         hooks.clear()
+        
+        // Note: We don't need to unregister/re-register services on hot-reload
+        // That's handled by the ReloadAware interface implementation on NetworkRuleProvider
     }
 }
 ```
@@ -669,11 +728,17 @@ interface INetworkRuleService {
 // modules/NetworkGuard/src/main/java/com/wobbz/module/networkguard/rules/NetworkRuleProvider.kt
 package com.wobbz.module.networkguard.rules
 
+import com.wobbz.framework.core.Releasable
+import com.wobbz.framework.service.ReloadAware
 import com.wobbz.module.networkguard.services.INetworkRuleService
 
-class NetworkRuleProvider(private val ruleManager: RuleManager) : INetworkRuleService {
+class NetworkRuleProvider(private val ruleManager: RuleManager) : INetworkRuleService, Releasable, ReloadAware {
+    // Cached data to improve performance
+    private var cachedRules: List<NetworkRule>? = null
+    
     override fun getRules(): List<NetworkRule> {
-        return ruleManager.getRules()
+        // Use cached rules if available, otherwise get from rule manager
+        return cachedRules ?: ruleManager.getRules().also { cachedRules = it }
     }
     
     override fun shouldAllowUrl(url: String): Boolean {
@@ -682,6 +747,30 @@ class NetworkRuleProvider(private val ruleManager: RuleManager) : INetworkRuleSe
     
     override fun getVersion(): String {
         return "1.0.0"
+    }
+    
+    override fun release() {
+        // Release resources held by this service
+        cachedRules = null
+        ruleManager.saveRules() // Ensure rules are persisted
+        
+        // Close any open connections, clear buffers, etc.
+    }
+    
+    override fun onBeforeReload() {
+        // Called before the module is hot-reloaded
+        // Save any state that needs to persist across reloads
+        ruleManager.saveRules()
+        
+        // Temporarily disable active features
+    }
+    
+    override fun onAfterReload() {
+        // Called after the module is hot-reloaded
+        // Restore state or re-initialize as needed
+        cachedRules = null // Force rules to be reloaded
+        
+        // Re-enable features that were disabled
     }
 }
 ```
@@ -849,9 +938,12 @@ Create the module metadata:
     "network.blocking",
     "network.rules"
   ],
-  "services": {
-    "INetworkRuleService": "com.wobbz.module.networkguard.services.INetworkRuleService"
+  "providedServices": {
+    "com.wobbz.module.networkguard.services.INetworkRuleService": "1.0.0"
   },
+  "serviceDependencies": [
+    {"service": "com.wobbz.framework.logging.ILoggingService", "version": "^1.0.0"}
+  ],
   "capabilities": {
     "hotReload": true
   }
@@ -926,19 +1018,19 @@ class ApplicationInfoHookerTest {
 
 ## Conclusion and Next Steps
 
-These sample modules demonstrate different aspects of the LSPosedKit framework:
+These sample modules demonstrate different aspects of the enhanced LSPosedKit framework:
 
-1. **DebugApp** shows a minimal module implementation with simple hooks
-2. **NetworkGuard** demonstrates service registration, rule management, and more complex hooks
+1. **DebugApp** shows a minimal module implementation with simple hooks and `ModuleLifecycle` support.
+2. **NetworkGuard** demonstrates:
+   - Service registration using versioning and dependencies
+   - Resource management via `Releasable` interface
+   - Hot-reload-aware services with `ReloadAware`
+   - Proper lifecycle with `ModuleLifecycle` for cleanup
+   - Module metadata with service declarations
 
-For the remaining modules (IntentInterceptor and UIEnhancer), follow similar patterns to implement them, focusing on their specific areas:
-
-- **IntentInterceptor** should focus on monitoring and analyzing Intent objects
-- **UIEnhancer** should demonstrate resource replacement and UI customization
-
-After implementing these modules, the next steps are:
+The next steps are:
 
 1. Test each module on actual devices
 2. Create thorough documentation for module developers
 3. Add detailed examples to the module README files
-4. Create integration tests that verify cross-module functionality 
+4. Create integration tests that verify cross-module functionality and lifecycle behavior

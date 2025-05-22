@@ -17,6 +17,8 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 | Component | Status | Reference Files | Description |
 |-----------|--------|-----------------|-------------|
 | ⬜ IModulePlugin | Pending | `framework/core/src/main/java/com/wobbz/framework/core/IModulePlugin.kt` | Primary module interface |
+| ⬜ ModuleLifecycle | Pending | `framework/core/src/main/java/com/wobbz/framework/core/ModuleLifecycle.kt` | Module lifecycle management interface |
+| ⬜ Releasable | Pending | `framework/core/src/main/java/com/wobbz/framework/core/Releasable.kt` | Resource cleanup interface |
 | ⬜ PackageLoadedParam | Pending | `framework/core/src/main/java/com/wobbz/framework/core/PackageLoadedParam.kt` | Package info wrapper |
 | ⬜ XposedInterface | Pending | `framework/core/src/main/java/com/wobbz/framework/core/XposedInterface.kt` | Xposed API abstraction |
 | ⬜ XposedInterfaceImpl | Pending | `framework/core/src/main/java/com/wobbz/framework/core/XposedInterfaceImpl.kt` | Implementation of Xposed API |
@@ -46,7 +48,7 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 | Component | Status | Reference Files | Description |
 |-----------|--------|-----------------|-------------|
 | ⬜ IHotReloadable | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/IHotReloadable.kt` | Hot-reload capable module interface |
-| ⬜ HotReloadManager | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/HotReloadManager.kt` | Hot-reload orchestration |
+| ⬜ HotReloadManager | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/HotReloadManager.kt` | Hot-reload orchestration with lifecycle callbacks |
 | ⬜ DexPatcher | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt` | DEX patching implementation |
 | ⬜ Development server | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/server/` | Dev server for hot-reload |
 | ⬜ Hot-reload client | Pending | `framework/hot/src/main/java/com/wobbz/framework/hot/client/` | Client for receiving updates |
@@ -74,8 +76,11 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 |-----------|--------|-----------------|-------------|
 | ⬜ FeatureManager | Pending | `framework/service/src/main/java/com/wobbz/framework/service/FeatureManager.kt` | Core service registry |
 | ⬜ ServiceDefinition | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceDefinition.kt` | Service metadata |
+| ⬜ ServiceDescriptor | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceDescriptor.kt` | Public service descriptor |
 | ⬜ ServiceListener | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceListener.kt` | Service availability listener |
 | ⬜ ServiceRegistry | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceRegistry.kt` | Thread-safe registry implementation |
+| ⬜ ReloadAware | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ReloadAware.kt` | Hot-reload lifecycle interface |
+| ⬜ AsyncService | Pending | `framework/service/src/main/java/com/wobbz/framework/service/AsyncService.kt` | Coroutine-based async service interface |
 | ⬜ FeatureFinder | Pending | `framework/service/src/main/java/com/wobbz/framework/service/FeatureFinder.kt` | Feature discovery utility |
 | ⬜ ServiceProvider | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceProvider.kt` | Service provider interface |
 | ⬜ ServiceBootstrap | Pending | `framework/service/src/main/java/com/wobbz/framework/service/ServiceBootstrap.kt` | Service initialization |
@@ -104,12 +109,13 @@ This comprehensive checklist tracks the implementation status of all LSPosedKit 
 
 | Component | Status | Reference Files | Description |
 |-----------|--------|-----------------|-------------|
-| ⬜ Module class | Pending | `modules/NetworkGuard/src/main/java/.../NetworkGuard.kt` | Main module implementation |
+| ⬜ Module class | Pending | `modules/NetworkGuard/src/main/java/.../NetworkGuard.kt` | Main module implementation with ModuleLifecycle |
 | ⬜ Network hooks | Pending | `modules/NetworkGuard/src/main/java/.../hooks/` | Network API hooks |
 | ⬜ Rule system | Pending | `modules/NetworkGuard/src/main/java/.../rules/` | Network filtering rules |
 | ⬜ Traffic monitor | Pending | `modules/NetworkGuard/src/main/java/.../monitor/` | Traffic monitoring implementation |
+| ⬜ Service provider | Pending | `modules/NetworkGuard/src/main/java/.../rules/NetworkRuleProvider.kt` | Releasable and ReloadAware service implementation |
 | ⬜ Settings schema | Pending | `modules/NetworkGuard/src/main/assets/settings.json` | Module settings definition |
-| ⬜ Module info | Pending | `modules/NetworkGuard/src/main/assets/module-info.json` | Module metadata |
+| ⬜ Module info | Pending | `modules/NetworkGuard/src/main/assets/module-info.json` | Module metadata with service info |
 | ⬜ Build configuration | Pending | `modules/NetworkGuard/build.gradle` | Module-specific build script |
 
 ### IntentInterceptor Module

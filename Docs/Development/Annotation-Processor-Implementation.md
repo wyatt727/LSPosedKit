@@ -410,10 +410,12 @@ object ModuleInfoGenerator {
             "author" to metadata.author,
             "scope" to metadata.scope,
             "mainClass" to metadata.mainClass,
-            "features" to listOf<String>(), // Empty by default, to be filled by the module
+            "features" to listOf<String>(), // Module declares features it offers
             "capabilities" to mapOf(
                 "hotReload" to supportsHotReload
-            )
+            ),
+            "providedServices" to mapOf<String, String>(), // Maps service interface name to its version, e.g., "com.example.IService" : "1.2.0"
+            "serviceDependencies" to listOf<Map<String, String>>() // List of maps, e.g., [{"service": "com.example.IOtherService", "version": "^1.0"}]
         )
         
         val moshi = Moshi.Builder()

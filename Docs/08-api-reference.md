@@ -428,18 +428,48 @@ Provides a service discovery mechanism for modules.
 ```kotlin
 object FeatureManager {
     /**
-     * Registers a service implementation.
+     * Registers a service implementation with version and dependencies.
      * @param serviceClass The service interface class
      * @param implementation The service implementation
+     * @param version The service version string
+     * @param dependencies List of service classes this service depends on (KClass)
+     * @param moduleId The ID of the module providing the service (optional)
      */
-    fun <T : Any> register(serviceClass: KClass<T>, implementation: T)
+    fun <T : Any> registerService(
+        serviceClass: KClass<T>,
+        implementation: T,
+        version: String,
+        dependencies: List<KClass<*>> = emptyList(),
+        moduleId: String? = null
+    )
     
     /**
-     * Registers a service implementation.
+     * Registers a service implementation with version and dependencies using Java class.
      * @param serviceClass The service interface class
      * @param implementation The service implementation
+     * @param version The service version string
+     * @param dependencies List of service classes this service depends on (Class)
+     * @param moduleId The ID of the module providing the service (optional)
      */
-    fun <T : Any> register(serviceClass: Class<T>, implementation: T)
+    fun <T : Any> registerService(
+        serviceClass: Class<T>,
+        implementation: T,
+        version: String,
+        dependencies: List<Class<*>> = emptyList(),
+        moduleId: String? = null
+    )
+
+    /**
+     * Unregisters a service implementation and cleans up its resources.
+     * @param serviceClass The service interface KClass to unregister
+     */
+    fun unregisterService(serviceClass: KClass<*>)
+
+    /**
+     * Unregisters a service implementation and cleans up its resources using Java class.
+     * @param serviceClass The service interface Class to unregister
+     */
+    fun unregisterService(serviceClass: Class<*>)
     
     /**
      * Gets a service implementation.
@@ -454,6 +484,20 @@ object FeatureManager {
      * @return The service implementation or null if not found
      */
     fun <T : Any> get(serviceClass: Class<T>): T?
+
+    /**
+     * Gets the descriptor for a registered service.
+     * @param serviceClass The service interface KClass
+     * @return The ServiceDescriptor or null if not found
+     */
+    fun getServiceDescriptor(serviceClass: KClass<*>): ServiceDescriptor?
+
+    /**
+     * Gets the descriptor for a registered service using Java class.
+     * @param serviceClass The service interface Class
+     * @return The ServiceDescriptor or null if not found
+     */
+    fun getServiceDescriptor(serviceClass: Class<*>): ServiceDescriptor?
     
     /**
      * Checks if a feature is available.
@@ -468,6 +512,60 @@ object FeatureManager {
      * @return A list of extension classes
      */
     fun getExtensions(extensionPoint: String): List<Class<*>>
+
+    /**
+     * Executes an asynchronous service call using a provided suspending function.
+     * @param serviceCall A suspend function representing the service call.
+     * @param callback A callback to handle the Result (success or failure).
+     */
+    fun <T: Any> executeAsyncServiceCall(serviceCall: suspend () -> T, callback: (Result<T>) -> Unit)
+
+    /**
+     * Notifies the FeatureManager that a module is about to be hot-reloaded.
+     * Should be called by the hot-reload mechanism.
+     * @param moduleId The ID of the module being reloaded.
+     */
+    fun onBeforeHotReload(moduleId: String)
+
+    /**
+     * Notifies the FeatureManager that a module has finished hot-reloading.
+     * Should be called by the hot-reload mechanism.
+     * @param moduleId The ID of the module that was reloaded.
+     */
+    fun onAfterHotReload(moduleId: String)
+}
+```
+
+### ReloadAware
+
+Interface for services that need to perform actions before and after a module hot-reload.
+
+```kotlin
+interface ReloadAware {
+    /**
+     * Called before the owning module (and its services) are reloaded.
+     */
+    fun onBeforeReload()
+
+    /**
+     * Called after the owning module (and its services) have been reloaded.
+     */
+    fun onAfterReload()
+}
+```
+
+### AsyncService
+
+Represents a contract for a service operation that executes asynchronously.
+
+```kotlin
+interface AsyncService<T: Any> {
+    /**
+     * Executes the asynchronous operation.
+     * @return The result of the operation of type T.
+     * @throws Exception if the operation fails.
+     */
+    suspend fun execute(): T
 }
 ```
 
@@ -732,6 +830,21 @@ data class ModuleInfo(
 )
 ```
 
+### ServiceDescriptor
+
+Describes a registered service, including its version and dependencies.
+
+```kotlin
+data class ServiceDescriptor(
+    val serviceClass: Class<*>, // The service interface class
+    val version: String, // The version of the service implementation
+    val dependencies: List<Class<*>>, // List of service classes this service depends on
+    val moduleId: String?, // The ID of the module providing this service
+    val isReleasable: Boolean, // Whether the service implements Releasable
+    val isReloadAware: Boolean // Whether the service implements ReloadAware
+)
+```
+
 ## Exception Classes
 
 ### HookFailedException
@@ -815,5 +928,37 @@ object IntentExtras {
      * Extra for specifying whether to use selective reload.
      */
     const val EXTRA_SELECTIVE = "selective"
+}
+```
+
+### ModuleLifecycle
+
+Provides extended lifecycle callbacks for modules.
+
+```kotlin
+interface ModuleLifecycle {
+    /**
+     * Called when the module is effectively started.
+     */
+    fun onStart()
+
+    /**
+     * Called when the module is being stopped or unloaded.
+     * Implementations should release resources and unregister services here.
+     */
+    fun onStop()
+}
+```
+
+### Releasable
+
+Interface for components that hold releasable resources.
+
+```kotlin
+interface Releasable {
+    /**
+     * Releases any resources held by this component.
+     */
+    fun release()
 }
 ``` 

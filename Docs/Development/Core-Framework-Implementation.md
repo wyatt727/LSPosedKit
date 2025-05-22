@@ -35,6 +35,7 @@ import android.content.Context
 /**
  * Primary interface that all modules must implement.
  * This interface defines the entry point for LSPosed modules.
+ * For more fine-grained lifecycle control, modules can also implement [ModuleLifecycle].
  */
 interface IModulePlugin {
     /**
@@ -635,6 +636,58 @@ class ModuleInitializationException(
      */
     cause: Throwable? = null
 ) : Exception("Failed to initialize module $moduleId: $message", cause)
+```
+
+### ModuleLifecycle.kt
+
+```kotlin
+package com.wobbz.framework.core
+
+/**
+ * Provides extended lifecycle callbacks for modules, complementing [IModulePlugin].
+ * This allows modules to manage resources and state more effectively during
+ * their operational lifetime, including startup and shutdown phases.
+ */
+interface ModuleLifecycle {
+    /**
+     * Called when the module is effectively started and its services (if any)
+     * are expected to be available or dependencies met. This is a good place
+     * for initial setup that depends on the module being fully operational.
+     */
+    fun onStart()
+
+    /**
+     * Called when the module is being stopped or unloaded.
+     * This is the designated place to release resources, unregister services,
+     * and perform any necessary cleanup to prevent resource leaks.
+     * Implementations should ensure this method is idempotent.
+     */
+    fun onStop()
+}
+```
+
+### Releasable.kt
+
+```kotlin
+package com.wobbz.framework.core
+
+/**
+ * Interface for components (typically services) that hold resources
+ * that need to be explicitly released when the component is no longer needed.
+ * This promotes better resource management within the framework.
+ *
+ * It is similar in purpose to [java.io.Closeable] or [java.lang.AutoCloseable]
+ * but is specifically intended for LSPosedKit components.
+ */
+interface Releasable {
+    /**
+     * Releases any resources held by this component.
+     * This method should be idempotent, meaning calling it multiple
+     * times should not cause errors.
+     * After calling release, the component may no longer be usable.
+     */
+    fun release()
+}
 ```
 
 ## Testing

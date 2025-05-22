@@ -104,6 +104,7 @@ import com.wobbz.framework.hot.client.DexReloader
 import com.wobbz.framework.hot.client.HotReloadClient
 import com.wobbz.framework.hot.exceptions.HotReloadException
 import com.wobbz.framework.hot.utils.NetworkUtils
+import com.wobbz.framework.service.FeatureManager
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -171,6 +172,9 @@ class HotReloadManager private constructor(private val context: Context) {
         }
         
         try {
+            // Notify FeatureManager before hot-reload
+            FeatureManager.onBeforeHotReload(moduleId)
+
             // Save DEX to temporary file
             val dexFile = File(context.cacheDir, "$moduleId.dex")
             dexFile.writeBytes(dexBytes)
@@ -188,6 +192,8 @@ class HotReloadManager private constructor(private val context: Context) {
                 } catch (e: Exception) {
                     logError("Failed to hot-reload module: $moduleId", e)
                 } finally {
+                    // Notify FeatureManager after hot-reload attempt (success or failure)
+                    FeatureManager.onAfterHotReload(moduleId)
                     // Clean up temporary file
                     dexFile.delete()
                 }

@@ -36,11 +36,15 @@
 ## Features
 
 * **Annotation‑Driven Modules**: Define ID, version, scope, description, author in code. (See [Docs/02-annotations.md](Docs/02-annotations.md))
-* **True Hot‑Reload**: Incremental DEX patching via ART 15's DexPatch. (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
+* **True Hot‑Reload**: Incremental DEX patching via ART 15's DexPatch. (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
 * **Declarative Settings**: `settings.json` → fully typed PreferenceScreen. (See [Docs/03-settings-schema.md](Docs/03-settings-schema.md))
 * **Module Dependency Graph**: `module-info.json` with SemVer checks. (See [Docs/04-module-info-schema.md](Docs/04-module-info-schema.md))
 * **Built‑In CI/CD**: GitHub Actions & GitLab templates under `Docs/`. (Templates and setup discussed in [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
-* **First‑Class Testing**: JUnit + Robolectric unit tests and connected‑device tests. (See [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
+* **First‑Class Testing**: JUnit + Robolectric unit tests and connected‑device tests. (See [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
+* **Complete Lifecycle Management**: Manage module and service lifecycles with `ModuleLifecycle` and clean resource handling with `Releasable`. (See [Docs/07-framework-internals.md](Docs/07-framework-internals.md))
+* **Dynamic Service Registry**: Register, unregister, and discover services with version checking and dependency validation. (See [Docs/09-feature-manager.md](Docs/09-feature-manager.md))
+* **Hot‑Reload Safety**: Services implement `ReloadAware` to maintain state during hot‑reload cycles. (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
+* **Structured Async Operations**: Coroutine‑based `AsyncService` for clean async code with proper error handling. (See [Docs/08-api-reference.md](Docs/08-api-reference.md))
 
 ---
 

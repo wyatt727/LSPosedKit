@@ -71,6 +71,10 @@ import androidx.annotation.GuardedBy
 import androidx.annotation.VisibleForTesting
 import kotlin.reflect.KClass
 import java.util.concurrent.ConcurrentHashMap
+import com.wobbz.framework.core.Releasable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Central service registry and feature discovery system for LSPosedKit.
@@ -79,72 +83,153 @@ import java.util.concurrent.ConcurrentHashMap
 object FeatureManager {
     
     private val serviceRegistry = ServiceRegistry()
+    private val serviceDescriptors = ConcurrentHashMap<Class<*>, ServiceDescriptor>()
     private val features = ConcurrentHashMap<String, Boolean>()
     private val extensionPoints = ConcurrentHashMap<String, MutableList<Class<*>>>()
+    private val hotReloadState = HotReloadState()
+    private val serviceScope = CoroutineScope(Dispatchers.Default)
     
     /**
-     * Registers a service implementation.
+     * Registers a service implementation with version and dependencies.
      * @param serviceClass The service interface class
      * @param implementation The service implementation
-     * @throws IllegalArgumentException if the implementation doesn't implement the service interface
+     * @param version The service version string
+     * @param dependencies List of service classes this service depends on
+     * @param moduleId The ID of the module providing the service (optional)
+     * @throws IllegalArgumentException if the implementation doesn't implement the service interface or if dependencies are not met
      */
     @JvmStatic
-    fun <T : Any> register(serviceClass: KClass<T>, implementation: T) {
-        register(serviceClass.java, implementation)
+    fun <T : Any> registerService(
+        serviceClass: KClass<T>,
+        implementation: T,
+        version: String,
+        dependencies: List<KClass<*>> = emptyList(),
+        moduleId: String? = null
+    ) {
+        registerService(serviceClass.java, implementation, version, dependencies.map { it.java }, moduleId)
     }
-    
+
     /**
-     * Registers a service implementation using Java class.
+     * Registers a service implementation with version and dependencies using Java class.
      * @param serviceClass The service interface class
      * @param implementation The service implementation
-     * @throws IllegalArgumentException if the implementation doesn't implement the service interface
+     * @param version The service version string
+     * @param dependencies List of service classes this service depends on
+     * @param moduleId The ID of the module providing the service (optional)
+     * @throws IllegalArgumentException if the implementation doesn't implement the service interface or if dependencies are not met
      */
     @JvmStatic
-    fun <T : Any> register(serviceClass: Class<T>, implementation: T) {
+    fun <T : Any> registerService(
+        serviceClass: Class<T>,
+        implementation: T,
+        version: String,
+        dependencies: List<Class<*>> = emptyList(),
+        moduleId: String? = null
+    ) {
         if (!serviceClass.isAssignableFrom(implementation.javaClass)) {
             throw IllegalArgumentException(
                 "Implementation ${implementation.javaClass.name} does not implement ${serviceClass.name}"
             )
         }
+
+        // Validate dependencies
+        for (depClass in dependencies) {
+            if (serviceRegistry.get(depClass) == null) {
+                throw IllegalArgumentException(
+                    "Dependency ${depClass.name} for service ${serviceClass.name} is not registered."
+                )
+            }
+            // TODO: Add version check for dependencies if versions are also registered for them
+        }
         
+        val descriptor = ServiceDescriptor(serviceClass, version, dependencies, moduleId, implementation is Releasable, implementation is ReloadAware)
+        serviceDescriptors[serviceClass] = descriptor
         serviceRegistry.register(serviceClass, implementation)
         
-        // Log successful registration
-        android.util.Log.d("FeatureManager", "Registered service: ${serviceClass.name}")
+        android.util.Log.d("FeatureManager", "Registered service: ${serviceClass.name} v$version, Module: $moduleId")
     }
-    
+
     /**
-     * Gets a service implementation.
-     * @param serviceClass The service interface class
-     * @return The service implementation or null if not found
+     * Unregisters a service implementation and cleans up its resources.
+     * @param serviceClass The service interface class to unregister
      */
     @JvmStatic
-    fun <T : Any> get(serviceClass: KClass<T>): T? {
-        return get(serviceClass.java)
+    fun unregisterService(serviceClass: KClass<*>) {
+        unregisterService(serviceClass.java)
+    }
+
+    /**
+     * Unregisters a service implementation and cleans up its resources using Java class.
+     * @param serviceClass The service interface class to unregister
+     */
+    @JvmStatic
+    fun unregisterService(serviceClass: Class<*>) {
+        val implementation = serviceRegistry.get(serviceClass)
+
+        if (implementation is ReloadAware) {
+            implementation.onBeforeReload() // Or a more generic onBeforeUnregister()
+        }
+
+        if (implementation is Releasable) {
+            try {
+                implementation.release()
+                android.util.Log.d("FeatureManager", "Released resources for service: ${serviceClass.name}")
+            } catch (e: Exception) {
+                android.util.Log.e("FeatureManager", "Error releasing resources for ${serviceClass.name}", e)
+            }
+        }
+        
+        serviceRegistry.remove(serviceClass)
+        serviceDescriptors.remove(serviceClass)
+        android.util.Log.d("FeatureManager", "Unregistered service: ${serviceClass.name}")
+
+        if (implementation is ReloadAware) {
+            implementation.onAfterReload() // Or a more generic onAfterUnregister()
+        }
     }
     
     /**
-     * Gets a service implementation using Java class.
-     * @param serviceClass The service interface class
-     * @return The service implementation or null if not found
+     * Gets a service implementation. Returns null if the service is not found or if hot-reload is in progress for that service.
      */
     @JvmStatic
     fun <T : Any> get(serviceClass: Class<T>): T? {
+        if (hotReloadState.isReloading(serviceRegistry.getModuleIdForService(serviceClass))) { // Check hot-reload state
+            android.util.Log.w("FeatureManager", "Access to service ${serviceClass.name} denied during hot-reload.")
+            return null // Or queue the request
+        }
         return serviceRegistry.get(serviceClass)
     }
     
     /**
      * Gets all registered services.
-     * @return A map of service class to implementation
      */
     @VisibleForTesting
     internal fun getAllServices(): Map<Class<*>, Any> {
         return serviceRegistry.getAll()
     }
+
+    /**
+     * Gets the descriptor for a registered service.
+     * @param serviceClass The service interface class
+     * @return The ServiceDescriptor or null if not found
+     */
+    @JvmStatic
+    fun getServiceDescriptor(serviceClass: KClass<*>): ServiceDescriptor? {
+        return getServiceDescriptor(serviceClass.java)
+    }
+
+    /**
+     * Gets the descriptor for a registered service using Java class.
+     * @param serviceClass The service interface class
+     * @return The ServiceDescriptor or null if not found
+     */
+    @JvmStatic
+    fun getServiceDescriptor(serviceClass: Class<*>): ServiceDescriptor? {
+        return serviceDescriptors[serviceClass]
+    }
     
     /**
      * Declares a feature as available.
-     * @param featureId The feature identifier
      */
     @JvmStatic
     fun declareFeature(featureId: String) {
@@ -198,8 +283,10 @@ object FeatureManager {
     @VisibleForTesting
     internal fun reset() {
         serviceRegistry.clear()
+        serviceDescriptors.clear()
         features.clear()
         extensionPoints.clear()
+        hotReloadState.clearAll() // Reset hot-reload states
     }
     
     /**
@@ -245,10 +332,107 @@ object FeatureManager {
      */
     @JvmStatic
     internal fun handleModuleUnload(moduleId: String) {
-        // Currently, services persist for the entire process lifetime
+        // Unregister services provided by this module
+        val servicesToUnregister = serviceDescriptors.filter { it.value.moduleId == moduleId }.map { it.key }
+        servicesToUnregister.forEach { serviceClass ->
+            unregisterService(serviceClass)
+        }
+        // TODO: Potentially unregister features declared by this module if they are exclusively from it.
+        // This requires tracking which module declared which feature.
+        android.util.Log.d("FeatureManager", "Handled unload for module: $moduleId. Unregistered ${servicesToUnregister.size} services.")
+    }
+
+    /**
+     * Executes an asynchronous service call using a provided suspending function.
+     * This uses the FeatureManager's CoroutineScope.
+     * @param serviceCall A suspend function representing the service call.
+     * @param T The return type of the service call.
+     * @param callback A callback to handle the result or exception.
+     */
+    @JvmStatic
+    fun <T: Any> executeAsyncServiceCall(serviceCall: suspend () -> T, callback: (Result<T>) -> Unit) {
+        serviceScope.launch {
+            try {
+                val result = serviceCall()
+                callback(Result.success(result))
+            } catch (e: Exception) {
+                android.util.Log.e("FeatureManager", "Async service call failed", e)
+                callback(Result.failure(e))
+            }
+        }
+    }
+
+    /**
+     * Notifies the FeatureManager that a module is about to be hot-reloaded.
+     * @param moduleId The ID of the module being reloaded.
+     */
+    @JvmStatic
+    fun onBeforeHotReload(moduleId: String) {
+        hotReloadState.setReloading(moduleId, true)
+        // Call onBeforeReload for all ReloadAware services provided by this module
+        serviceDescriptors.filter { it.value.moduleId == moduleId && it.value.isReloadAware }
+            .forEach { entry ->
+                (serviceRegistry.get(entry.key) as? ReloadAware)?.onBeforeReload()
+            }
+    }
+
+    /**
+     * Notifies the FeatureManager that a module has finished hot-reloading.
+     * @param moduleId The ID of the module that was reloaded.
+     */
+    @JvmStatic
+    fun onAfterHotReload(moduleId: String) {
+        hotReloadState.setReloading(moduleId, false)
+        // Call onAfterReload for all ReloadAware services provided by this module
+        serviceDescriptors.filter { it.value.moduleId == moduleId && it.value.isReloadAware }
+            .forEach { entry ->
+                (serviceRegistry.get(entry.key) as? ReloadAware)?.onAfterReload()
+            }
     }
 }
-```
+
+/**
+ * Interface for services that need to perform actions before and after a hot-reload.
+ */
+interface ReloadAware {
+    fun onBeforeReload()
+    fun onAfterReload()
+}
+
+/**
+ * Manages the hot-reload state for modules/services.
+ */
+internal class HotReloadState {
+    private val reloadingModules = ConcurrentHashMap<String?, Boolean>() // ModuleId or null for global
+
+    fun isReloading(moduleId: String?): Boolean {
+        return reloadingModules[moduleId] == true || reloadingModules[null] == true // Check specific module or global
+    }
+
+    fun setReloading(moduleId: String?, state: Boolean) {
+        if (moduleId == null) {
+            reloadingModules.keys.forEach { key -> reloadingModules[key] = state }
+        } else {
+            reloadingModules[moduleId] = state
+        }
+    }
+    fun clearAll() {
+        reloadingModules.clear()
+    }
+}
+
+/**
+ * Represents a contract for a service operation that executes asynchronously and returns a result of type T.
+ * Implementations should use coroutines for their asynchronous logic.
+ */
+interface AsyncService<T: Any> {
+    /**
+     * Executes the asynchronous operation.
+     * @return The result of the operation.
+     * @throws Exception if the operation fails.
+     */
+    suspend fun execute(): T
+}
 
 ### ServiceDefinition.kt
 
@@ -262,12 +446,32 @@ package com.wobbz.framework.service
  * @param serviceClass The service interface class
  * @param implementation The service implementation
  * @param moduleId The ID of the module providing this service
+ * @param version The version of the service implementation
+ * @param dependencies List of service classes this service depends on
+ * @param isReleasable Whether the service implements Releasable
+ * @param isReloadAware Whether the service implements ReloadAware
  */
 internal data class ServiceDefinition<T : Any>(
     val serviceClass: Class<T>,
-    val implementation: T,
+    var implementation: T, // Made var to allow update during hot-reload if necessary, though unregister/register is cleaner
     val moduleId: String? = null,
-    val version: String? = null
+    val version: String,
+    val dependencies: List<Class<*>> = emptyList(),
+    val isReleasable: Boolean = false,
+    val isReloadAware: Boolean = false
+)
+
+/**
+ * Describes a registered service, including its version and dependencies.
+ * This is for external query, ServiceDefinition is internal.
+ */
+data class ServiceDescriptor(
+    val serviceClass: Class<*>, // Changed from KClass to Class for Java compatibility
+    val version: String,
+    val dependencies: List<Class<*>>, // Changed from KClass to Class
+    val moduleId: String? = null,
+    val isReleasable: Boolean,
+    val isReloadAware: Boolean
 )
 ```
 
@@ -306,16 +510,21 @@ import java.util.concurrent.ConcurrentHashMap
  */
 internal class ServiceRegistry {
     private val services = ConcurrentHashMap<Class<*>, Any>()
+    private val serviceModuleMapping = ConcurrentHashMap<Class<*>, String?>() // Added to track module ID for services
     private val pendingListeners = ConcurrentHashMap<Class<*>, MutableSet<ServiceListenerRegistration<*>>>()
     
     /**
      * Registers a service implementation.
      * @param serviceClass The service interface class
      * @param implementation The service implementation
+     * @param moduleId The ID of the module providing the service (optional)
      */
-    fun <T : Any> register(serviceClass: Class<T>, implementation: T) {
+    fun <T : Any> register(serviceClass: Class<T>, implementation: T, moduleId: String? = null) {
         // Register the service
         services[serviceClass] = implementation
+        if (moduleId != null) {
+            serviceModuleMapping[serviceClass] = moduleId
+        }
         
         // Notify pending listeners
         notifyListeners(serviceClass, implementation)
@@ -345,6 +554,7 @@ internal class ServiceRegistry {
     fun clear() {
         services.clear()
         pendingListeners.clear()
+        serviceModuleMapping.clear()
     }
     
     /**
@@ -416,6 +626,24 @@ internal class ServiceRegistry {
         val listener: ServiceListener<Any>,
         val token: UUID = UUID.randomUUID()
     )
+
+    /**
+     * Removes a service implementation from the registry.
+     * @param serviceClass The service interface class to remove.
+     */
+    fun remove(serviceClass: Class<*>) {
+        services.remove(serviceClass)
+        serviceModuleMapping.remove(serviceClass)
+    }
+
+    /**
+     * Gets the module ID that provided a given service.
+     * @param serviceClass The service interface class
+     * @return The module ID, or null if not found or not module-provided.
+     */
+    fun getModuleIdForService(serviceClass: Class<*>?): String? {
+        return if (serviceClass == null) null else serviceModuleMapping[serviceClass]
+    }
 }
 ```
 
