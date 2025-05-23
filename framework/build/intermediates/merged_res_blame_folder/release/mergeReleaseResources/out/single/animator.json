@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_fade_enter.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_fade_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_close_exit.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_close_exit.xml"
+    },
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_open_exit.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_open_exit.xml"
+    },
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_close_enter.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_close_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_open_enter.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_open_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.framework-release-27:/animator/fragment_fade_exit.xml",
+        "source": "com.wobbz.framework-fragment-1.5.5-23:/animator/fragment_fade_exit.xml"
+    }
+]

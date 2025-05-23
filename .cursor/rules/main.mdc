@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Most important instructions
+- Always avoid hardcoding
+- Always target the OnePlus architecture and reference [Test-Device-Specs.md](mdc:Docs/Test-Device-Specs.md) to ensure the system file paths are correct

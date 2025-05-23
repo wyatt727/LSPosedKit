@@ -1,0 +1,6 @@
+[
+    {
+        "merged": "com.wobbz.framework.settings-release-28:/drawable-watch-v20/abc_dialog_material_background.xml",
+        "source": "com.wobbz.framework.settings-appcompat-1.1.0-18:/drawable-watch-v20/abc_dialog_material_background.xml"
+    }
+]

@@ -1,0 +1,15 @@
+{
+  "id": "test-generated",
+  "name": "TestGenerated",
+  "version": "1.0.0",
+  "description": "Test module to verify generation works",
+  "author": "LSPosedKit Developer",
+  "features": [
+    "test-generated.core"
+  ],
+  "capabilities": {
+    "hotReload": true
+  },
+  "providedServices": {},
+  "serviceDependencies": []
+}

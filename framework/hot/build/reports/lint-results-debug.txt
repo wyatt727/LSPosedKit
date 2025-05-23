@@ -1,0 +1,73 @@
+/Users/pentester/Tools/LSPosedKit/framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt:85: Warning: Reflective access to getRuntime, which is not part of the public SDK and therefore likely to change in future Android releases [DiscouragedPrivateApi]
+        val getRuntime = vmRuntimeClass.getDeclaredMethod("getRuntime")
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt:225: Warning: Reflective access to getRuntime, which is not part of the public SDK and therefore likely to change in future Android releases [DiscouragedPrivateApi]
+            val getRuntime = vmRuntimeClass.getDeclaredMethod("getRuntime")
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DiscouragedPrivateApi":
+   Usage of restricted non-SDK interface may throw an exception at runtime.
+   Accessing non-SDK methods or fields through reflection has a high
+   likelihood to break your app between versions, and is being restricted to
+   facilitate future app compatibility.
+
+   https://developer.android.com/preview/restrictions-non-sdk-interfaces
+
+/Users/pentester/Tools/LSPosedKit/framework/hot/build.gradle:30: Warning: A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0 [GradleDependency]
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/build.gradle:31: Warning: A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1 [GradleDependency]
+    implementation 'androidx.annotation:annotation:1.5.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/build.gradle:34: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.6.4 is available: 1.7.3 [GradleDependency]
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/build.gradle:37: Warning: A newer version of com.squareup.okhttp3:okhttp than 4.10.0 is available: 4.12.0 [GradleDependency]
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/build.gradle:41: Warning: A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0 [GradleDependency]
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/Users/pentester/Tools/LSPosedKit/framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt:26: Warning: Unnecessary; SDK_INT is never < 31 [ObsoleteSdkInt]
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/hot/src/main/java/com/wobbz/framework/hot/DexPatcher.kt:64: Warning: Unnecessary; SDK_INT is always >= 31 [ObsoleteSdkInt]
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+/Users/pentester/Tools/LSPosedKit/framework/hot/src/main/java/com/wobbz/framework/hot/HotReloadManager.kt:243: Warning: Do not place Android context classes in static fields (static reference to HotReloadManager which has field context pointing to Context); this is a memory leak [StaticFieldLeak]
+        @Volatile
+        ^
+
+   Explanation for issues of type "StaticFieldLeak":
+   A static field will leak contexts.
+
+   Non-static inner classes have an implicit reference to their outer class.
+   If that outer class is for example a Fragment or Activity, then this
+   reference means that the long-running handler/loader/task will hold a
+   reference to the activity which prevents it from getting garbage
+   collected.
+
+   Similarly, direct field references to activities and fragments from these
+   longer running instances can cause leaks.
+
+   ViewModel classes should never point to Views or non-application Contexts.
+
+0 errors, 10 warnings

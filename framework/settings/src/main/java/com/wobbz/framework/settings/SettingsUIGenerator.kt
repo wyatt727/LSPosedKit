@@ -28,13 +28,17 @@ object SettingsUIGenerator {
         preferenceScreen: PreferenceScreen
     ) {
         try {
+            Log.d(TAG, "Loading settings schema from assets...")
             // Load schema from assets
             val schema = context.assets.open("settings.json").use { input ->
                 SettingsSchema.parse(input.reader().readText())
             }
+            Log.d(TAG, "Schema loaded successfully with ${schema.properties.size} properties")
             
             // Generate preferences from schema
             for ((key, property) in schema.properties) {
+                Log.d(TAG, "Creating preference for key: $key, type: ${property.type}")
+                
                 val preference = when (property.type) {
                     SchemaPropertyType.BOOLEAN -> createSwitchPreference(context, key, property, settingsProvider)
                     SchemaPropertyType.INTEGER -> createSeekBarPreference(context, key, property, settingsProvider)
@@ -53,10 +57,13 @@ object SettingsUIGenerator {
                 
                 preference?.let {
                     preferenceScreen.addPreference(it)
-                }
+                    Log.d(TAG, "Added preference for key: $key")
+                } ?: Log.w(TAG, "Failed to create preference for key: $key")
             }
+            Log.d(TAG, "All preferences generated successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to generate preferences", e)
+            throw e // Re-throw to let caller handle it
         }
     }
     
@@ -73,7 +80,11 @@ object SettingsUIGenerator {
             this.key = key
             title = property.title
             summary = property.description
-            isChecked = provider.bool(key, property.default as? Boolean ?: false)
+            val defaultValue = when (val def = property.default) {
+                is Boolean -> def
+                else -> false
+            }
+            isChecked = provider.bool(key, defaultValue)
             
             setOnPreferenceChangeListener { _, newValue ->
                 provider.edit().putBoolean(key, newValue as Boolean).apply()
@@ -102,7 +113,11 @@ object SettingsUIGenerator {
             
             this.min = min
             this.max = max
-            value = provider.int(key, property.default as? Int ?: min)
+            val defaultValue = when (val def = property.default) {
+                is Number -> def.toInt()
+                else -> min
+            }
+            value = provider.int(key, defaultValue)
             
             setOnPreferenceChangeListener { _, newValue ->
                 provider.edit().putInt(key, newValue as Int).apply()
@@ -126,7 +141,11 @@ object SettingsUIGenerator {
             title = property.title
             summary = property.description
             text = if (isNumeric) {
-                provider.float(key, property.default as? Float ?: 0f).toString()
+                val defaultValue = when (val def = property.default) {
+                    is Number -> def.toFloat()
+                    else -> 0f
+                }
+                provider.float(key, defaultValue).toString()
             } else {
                 provider.string(key, property.default as? String ?: "")
             }
@@ -135,6 +154,12 @@ object SettingsUIGenerator {
                 if (isNumeric) {
                     try {
                         val floatValue = (newValue as String).toFloat()
+                        // Validate range if specified
+                        val min = getPropertyMinFloat(property)
+                        val max = getPropertyMaxFloat(property)
+                        if ((min != null && floatValue < min) || (max != null && floatValue > max)) {
+                            return@setOnPreferenceChangeListener false
+                        }
                         provider.edit().putFloat(key, floatValue).apply()
                     } catch (e: NumberFormatException) {
                         return@setOnPreferenceChangeListener false
@@ -222,27 +247,35 @@ object SettingsUIGenerator {
      * Checks if a property has enum values defined.
      */
     private fun hasEnumValues(property: SchemaProperty): Boolean {
-        // This would need to be extended to support enum definitions in the schema
-        // For now, we'll assume simple string properties without enums
-        return false
+        return property.enumValues?.isNotEmpty() == true
     }
     
     /**
      * Gets enum values from property schema.
      */
     private fun getEnumValues(property: SchemaProperty): List<String> {
-        // This would parse enum values from the schema
-        // For now, return empty list
-        return emptyList()
+        return property.enumValues ?: emptyList()
     }
     
     /**
      * Gets array values from property schema.
      */
     private fun getArrayValues(property: SchemaProperty): List<String> {
-        // This would parse possible array values from the schema
-        // For now, return empty list
-        return emptyList()
+        // For target_packages, provide common options including the important "*" wildcard
+        return listOf(
+            "*",  // All packages - most important option
+            "com.android.settings",
+            "com.android.systemui", 
+            "com.google.android.apps.messaging",
+            "com.whatsapp",
+            "com.facebook.katana",
+            "com.instagram.android",
+            "com.twitter.android",
+            "com.spotify.music",
+            "com.netflix.mediaclient",
+            "com.google.android.youtube",
+            "Custom package..."
+        )
     }
     
     /**
@@ -269,18 +302,36 @@ object SettingsUIGenerator {
      * Gets minimum value for numeric properties.
      */
     private fun getPropertyMin(property: SchemaProperty): Int {
-        // This would parse min value from schema
-        // For now, return default minimum
-        return 0
+        return getPropertyMinFloat(property)?.toInt() ?: 0
     }
     
     /**
      * Gets maximum value for numeric properties.
      */
     private fun getPropertyMax(property: SchemaProperty): Int {
-        // This would parse max value from schema
-        // For now, return default maximum
-        return 100
+        return getPropertyMaxFloat(property)?.toInt() ?: 100
+    }
+    
+    /**
+     * Gets minimum value for float properties from schema.
+     */
+    private fun getPropertyMinFloat(property: SchemaProperty): Float? {
+        return when (val min = property.minimum) {
+            is Number -> min.toFloat()
+            is String -> min.toFloatOrNull()
+            else -> null
+        }
+    }
+    
+    /**
+     * Gets maximum value for float properties from schema.
+     */
+    private fun getPropertyMaxFloat(property: SchemaProperty): Float? {
+        return when (val max = property.maximum) {
+            is Number -> max.toFloat()
+            is String -> max.toFloatOrNull()
+            else -> null
+        }
     }
     
     /**

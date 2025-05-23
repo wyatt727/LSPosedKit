@@ -160,7 +160,7 @@ class TestSettingsProviderTest {
     @Test
     fun testSimulateSettingsChange() {
         var changeCount = 0
-        val listener = { _: String -> changeCount++ }
+        val listener: (String) -> Unit = { _: String -> changeCount++ }
         
         provider.addOnSettingsChangedListener(listener)
         

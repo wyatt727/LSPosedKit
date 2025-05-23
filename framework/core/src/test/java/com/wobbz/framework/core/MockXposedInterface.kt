@@ -1,5 +1,7 @@
 package com.wobbz.framework.core
 
+import android.content.Context
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -12,7 +14,8 @@ class MockXposedInterface : XposedInterface {
     private val logs = mutableListOf<LogEntry>()
     private val loadedClasses = mutableMapOf<String, Class<*>>()
     private val hookedMethods = mutableListOf<HookInfo>()
-    private val systemContext: Any? = null
+    private val mockContext: Context? = null // For unit tests, Context can be null or mocked externally
+    private val classLoader = javaClass.classLoader!!
     
     data class LogEntry(
         val level: LogLevel,
@@ -44,22 +47,27 @@ class MockXposedInterface : XposedInterface {
         }
     }
     
-    override fun hook(method: Method, hookerClass: Class<out Hooker>): MethodUnhooker<Method> {
+    override fun <T : Hooker> hook(method: Method, hookerClass: Class<T>): MethodUnhooker<T> {
         hookedMethods.add(HookInfo(method, hookerClass))
-        return MockMethodUnhooker(method)
+        return MockMethodUnhooker(method, hookerClass)
     }
     
-    override fun hook(field: Field, hookerClass: Class<out Hooker>): MethodUnhooker<Field> {
+    override fun <T : Hooker> hook(constructor: Constructor<*>, hookerClass: Class<T>): MethodUnhooker<T> {
+        // For constructors, we simulate by treating them as methods
+        return MockMethodUnhooker(constructor, hookerClass)
+    }
+    
+    override fun <T : Hooker> hook(field: Field, hookerClass: Class<T>): MethodUnhooker<T> {
         // For field hooks, we simulate by creating a method hook
-        return MockFieldUnhooker(field)
+        return MockFieldUnhooker(field, hookerClass)
     }
     
-    override fun hook(
+    override fun <T : Hooker> hook(
         clazz: Class<*>, 
         methodName: String, 
         parameterTypes: Array<Class<*>>, 
-        hookerClass: Class<out Hooker>
-    ): MethodUnhooker<Method> {
+        hookerClass: Class<T>
+    ): MethodUnhooker<T> {
         val method = try {
             clazz.getDeclaredMethod(methodName, *parameterTypes)
         } catch (e: NoSuchMethodException) {
@@ -69,8 +77,12 @@ class MockXposedInterface : XposedInterface {
         return hook(method, hookerClass)
     }
     
-    override fun getSystemContext(): Any? {
-        return systemContext
+    override fun getSystemContext(): Context {
+        return mockContext ?: throw UnsupportedOperationException("Mock Context not set - set a proper Context for testing")
+    }
+    
+    override fun getClassLoader(): ClassLoader {
+        return classLoader
     }
     
     // Testing utilities
@@ -146,6 +158,14 @@ class MockXposedInterface : XposedInterface {
         loadedClasses[className] = clazz
     }
     
+    /**
+     * Sets a mock context for testing.
+     */
+    fun setMockContext(context: Context) {
+        // This would require making mockContext mutable, or we can handle it differently
+        // For now, tests should inject their own Context via constructor or factory
+    }
+    
     private fun createMockClass(className: String): Class<*> {
         // For testing purposes, we can't actually create classes at runtime easily
         // So we'll throw an exception that tests can catch and handle
@@ -176,30 +196,41 @@ class MockXposedInterface : XposedInterface {
 /**
  * Mock implementation of MethodUnhooker for testing.
  */
-class MockMethodUnhooker<T>(private val target: T) : MethodUnhooker<T> {
+class MockMethodUnhooker<T : Hooker>(
+    private val target: Any,
+    private val hookerClass: Class<T>
+) : MethodUnhooker<T> {
     private var isUnhooked = false
+    private val hookerInstance: T = hookerClass.getDeclaredConstructor().newInstance()
     
     override fun unhook() {
         isUnhooked = true
     }
     
-    override fun getTarget(): T = target
+    override fun getHooker(): T = hookerInstance
     
-    fun isUnhooked(): Boolean = isUnhooked
+    override fun isHooked(): Boolean = !isUnhooked
+    
+    fun getTarget(): Any = target
 }
 
 /**
  * Mock implementation for field unhookers.
  */
-class MockFieldUnhooker(field: Field) : MethodUnhooker<Field> {
+class MockFieldUnhooker<T : Hooker>(
+    private val field: Field,
+    private val hookerClass: Class<T>
+) : MethodUnhooker<T> {
     private var isUnhooked = false
-    private val target = field
+    private val hookerInstance: T = hookerClass.getDeclaredConstructor().newInstance()
     
     override fun unhook() {
         isUnhooked = true
     }
     
-    override fun getTarget(): Field = target
+    override fun getHooker(): T = hookerInstance
     
-    fun isUnhooked(): Boolean = isUnhooked
+    override fun isHooked(): Boolean = !isUnhooked
+    
+    fun getTarget(): Field = field
 } 

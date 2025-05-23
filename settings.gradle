@@ -8,9 +8,6 @@ include ':framework:settings'
 include ':framework:service'
 include ':framework'
 
-// libxposed-api
-include ':libxposed-api:api'
-
 // Scripts
 include ':scripts'
 
@@ -30,3 +27,13 @@ include ':modules:TestModule'
 include ':modules:DocumentationTest'
 
 include ':modules:IntentInterceptor'
+
+include ':modules:DebugApp'
+include ':modules:NetworkGuard'
+include ':modules:UIEnhancer'
+
+include ':modules:TestWorking'
+
+include ':modules:TestFixed'
+
+include ':modules:TestGenerated'

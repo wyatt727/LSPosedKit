@@ -7,7 +7,7 @@ import java.lang.reflect.Method
  * Allows testing of hooker implementations without requiring the actual Xposed framework.
  */
 class MockHookParam(
-    override val xposed: XposedInterface,
+    val xposed: XposedInterface,
     override val method: Method,
     override val thisObject: Any?,
     override val args: Array<Any?>
@@ -47,6 +47,10 @@ class MockHookParam(
     
     override fun hasThrowable(): Boolean {
         return hasThrowableValue
+    }
+    
+    override fun returnEarly(): Boolean {
+        return hasResultValue || hasThrowableValue
     }
     
     // Testing utilities

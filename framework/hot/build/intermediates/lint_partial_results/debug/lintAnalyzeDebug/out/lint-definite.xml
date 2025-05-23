@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="ObsoleteSdkInt"
+        severity="warning"
+        message="Unnecessary; SDK_INT is never &lt; 31">
+        <fix-data conditional="false"/>
+        <location
+            file="${:framework:hot*debug*MAIN*sourceProvider*0*javaDir*0}/com/wobbz/framework/hot/DexPatcher.kt"
+            line="26"
+            column="13"
+            startOffset="762"
+            endLine="26"
+            endColumn="58"
+            endOffset="807"/>
+    </incident>
+
+    <incident
+        id="ObsoleteSdkInt"
+        severity="warning"
+        message="Unnecessary; SDK_INT is always >= 31">
+        <fix-data conditional="true"/>
+        <location
+            file="${:framework:hot*debug*MAIN*sourceProvider*0*javaDir*0}/com/wobbz/framework/hot/DexPatcher.kt"
+            line="64"
+            column="17"
+            startOffset="2255"
+            endLine="64"
+            endColumn="63"
+            endOffset="2301"/>
+    </incident>
+
+    <incident
+        id="DiscouragedPrivateApi"
+        severity="warning"
+        message="Reflective access to getRuntime, which is not part of the public SDK and therefore likely to change in future Android releases">
+        <location
+            file="${:framework:hot*debug*MAIN*sourceProvider*0*javaDir*0}/com/wobbz/framework/hot/DexPatcher.kt"
+            line="85"
+            column="26"
+            startOffset="3082"
+            endLine="85"
+            endColumn="72"
+            endOffset="3128"/>
+    </incident>
+
+    <incident
+        id="DiscouragedPrivateApi"
+        severity="warning"
+        message="Reflective access to getRuntime, which is not part of the public SDK and therefore likely to change in future Android releases">
+        <location
+            file="${:framework:hot*debug*MAIN*sourceProvider*0*javaDir*0}/com/wobbz/framework/hot/DexPatcher.kt"
+            line="225"
+            column="30"
+            startOffset="9050"
+            endLine="225"
+            endColumn="76"
+            endOffset="9096"/>
+    </incident>
+
+    <incident
+        id="StaticFieldLeak"
+        severity="warning"
+        message="Do not place Android context classes in static fields (static reference to `HotReloadManager` which has field `context` pointing to `Context`); this is a memory leak">
+        <location
+            file="${:framework:hot*debug*MAIN*sourceProvider*0*javaDir*0}/com/wobbz/framework/hot/HotReloadManager.kt"
+            line="243"
+            column="9"
+            startOffset="8616"
+            endLine="244"
+            endColumn="55"
+            endOffset="8680"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:framework:hot*projectDir}/build.gradle"
+            line="30"
+            column="20"
+            startOffset="711"
+            endLine="30"
+            endColumn="89"
+            endOffset="780"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:framework:hot*projectDir}/build.gradle"
+            line="31"
+            column="20"
+            startOffset="800"
+            endLine="31"
+            endColumn="58"
+            endOffset="838"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.6.4 is available: 1.7.3">
+        <fix-replace
+            description="Change to 1.7.3"
+            family="Update versions"
+            oldString="1.6.4"
+            replacement="1.7.3"/>
+        <location
+            file="${:framework:hot*projectDir}/build.gradle"
+            line="34"
+            column="20"
+            startOffset="902"
+            endLine="34"
+            endColumn="76"
+            endOffset="958"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.okhttp3:okhttp than 4.10.0 is available: 4.12.0">
+        <fix-replace
+            description="Change to 4.12.0"
+            family="Update versions"
+            oldString="4.10.0"
+            replacement="4.12.0"/>
+        <location
+            file="${:framework:hot*projectDir}/build.gradle"
+            line="37"
+            column="20"
+            startOffset="1020"
+            endLine="37"
+            endColumn="56"
+            endOffset="1056"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:framework:hot*projectDir}/build.gradle"
+            line="41"
+            column="24"
+            startOffset="1144"
+            endLine="41"
+            endColumn="56"
+            endOffset="1176"/>
+    </incident>
+
+</incidents>

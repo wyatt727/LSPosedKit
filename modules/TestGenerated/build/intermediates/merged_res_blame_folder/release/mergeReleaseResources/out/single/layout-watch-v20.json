@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/layout-watch-v20/abc_alert_dialog_title_material.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-appcompat-1.1.0-18:/layout-watch-v20/abc_alert_dialog_title_material.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/layout-watch-v20/abc_alert_dialog_button_bar_material.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-appcompat-1.1.0-18:/layout-watch-v20/abc_alert_dialog_button_bar_material.xml"
+    }
+]

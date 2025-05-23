@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/your-org/LSPosedKit/android.yml?branch=main)](https://github.com/your-org/LSPosedKit/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> A zero‑boilerplate, Android 15–ready toolkit for building, testing, and hot‑reloading LSPosed modules.
+> A zero‑boilerplate, Android 15–ready toolkit for building, testing, and hot‑reloading **standalone LSPosed module APKs**.
 
 ---
 
@@ -11,13 +11,14 @@
 
 1. [Why LSPosedKit?](#why-lsposedkit)
 2. [Features](#features)
-3. [Project Layout](#project-layout)
-4. [Quick Start](#quick-start)
-5. [Visual Workflow Summary](#visual-workflow-summary)
-6. [Supported Environments](#supported-environments)
-7. [Advanced Usage](#advanced-usage)
-8. [Contributing](#contributing)
-9. [License](#license)
+3. [Architecture](#architecture)
+4. [Project Layout](#project-layout)
+5. [Quick Start](#quick-start)
+6. [Visual Workflow Summary](#visual-workflow-summary)
+7. [Supported Environments](#supported-environments)
+8. [Advanced Usage](#advanced-usage)
+9. [Contributing](#contributing)
+10. [License](#license)
 
 ---
 
@@ -27,7 +28,7 @@
 | ------------------------------------ | --------------------------------------------------------------------------------------- |
 | Chasing `libxposed-api` AARs         | Bundled **local source** ensures consistent APIs                                        |
 | Manual `module.prop` & `xposed_init` | **Annotations** (`@XposedPlugin`) replace boilerplate (See [Docs/02-annotations.md](Docs/02-annotations.md)) |
-| Reboot for every change              | **Hot‑Reload** patches DEX in <2 s—no reboot needed (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))    |
+| Reboot for every change              | **Hot‑Reload** patches DEX in <2 s—no reboot needed (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))    |
 | DIY settings screens                 | **Declarative** `settings.json` → Manager UI (See [Docs/03-settings-schema.md](Docs/03-settings-schema.md))      |
 | Fragmented utilities                 | Central **framework/** layer with services & logs (Explore in [Docs/07-framework-internals.md](Docs/07-framework-internals.md)) |
 
@@ -39,12 +40,40 @@
 * **True Hot‑Reload**: Aims for incremental DEX patching (e.g., using ART 15's DexPatch where available). Implementation details and considerations for robustness across Android versions are discussed in [Docs/06-hot-reload.md](Docs/06-hot-reload.md).
 * **Declarative Settings**: `settings.json` → fully typed PreferenceScreen. Modules can also implement custom settings activities for more complex UIs. (See [Docs/03-settings-schema.md](Docs/03-settings-schema.md))
 * **Module Dependency Graph**: `module-info.json` with SemVer checks. (See [Docs/04-module-info-schema.md](Docs/04-module-info-schema.md))
+* **Advanced Module Scaffolding**: Generate modules with optional service architecture and UI components
+* **ProGuard/R8 Integration**: Automatic optimization rules for LSPosed modules with framework protection
+* **Service Architecture**: Cross-module communication with automatic service discovery and dependency resolution
 * **Built‑In CI/CD**: GitHub Actions & GitLab templates under `Docs/`. (Templates and setup discussed in [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
-* **First‑Class Testing**: JUnit + Robolectric unit tests and connected‑device tests. (See [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
+* **First‑Class Testing**: JUnit + Robolectric unit tests and connected‑device tests with Mockito-Kotlin support. (See [Docs/12-testing-ci.md](Docs/12-testing-ci.md))
 * **Complete Lifecycle Management**: Manage module and service lifecycles with `ModuleLifecycle` and clean resource handling with `Releasable`. (See [Docs/07-framework-internals.md](Docs/07-framework-internals.md))
 * **Dynamic Service Registry**: Register, unregister, and discover services with version checking and dependency validation. (See [Docs/09-feature-manager.md](Docs/09-feature-manager.md))
 * **Hot‑Reload Safety**: Services implement `ReloadAware` to maintain state during hot‑reload cycles. (See [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
 * **Structured Async Operations**: Coroutine‑based `AsyncService` for clean async code with proper error handling. (See [Docs/08-api-reference.md](Docs/08-api-reference.md))
+* **UI Enhancement Framework**: Optional UI components with ViewBinding support and theming integration
+
+---
+
+## Architecture
+
+**Key Principle**: Each LSPosed module is a **standalone, installable APK** containing the LSPosedKit framework embedded within it.
+
+```
+┌─────────────────────────────────────┐
+│        DebugApp.apk                 │
+├─────────────────────────────────────┤
+│ ✓ DebugApp module code             │
+│ ✓ LSPosedKit framework (embedded)  │
+│ ✓ Settings system                   │
+│ ✓ Service bus                       │
+│ ✓ Hot-reload support                │
+│ ✓ Generated metadata               │
+│   - module.prop                     │
+│   - xposed_init                     │
+│   - module-info.json               │
+└─────────────────────────────────────┘
+```
+
+**No dependency on external "main" APK** — each module contains everything it needs.
 
 ---
 
@@ -53,18 +82,23 @@
 ```text
 LSPosedKit/
 ├── framework/                # Core runtime, annotation processor, hot-reload daemon
+│   ├── core/                 # Core interfaces (IModulePlugin, Hooker, etc.)
+│   ├── processor/            # Annotation processor (@XposedPlugin, etc.)
+│   ├── settings/             # Settings management system
+│   ├── service/              # Service bus for cross-module communication
+│   └── hot/                  # Hot-reload system
 ├── libxposed-api/            # Local source of libxposed-api (api/)
-├── modules/                  # One sub-project per feature module
-│   ├── DebugApp/             # Sample module
-│   │   ├── src/
-│   │   │   └── main/
-│   │   │       ├── java/     # Kotlin/Java sources
-│   │   │       └── assets/   # Contains module-info.json, settings.json
-│   │   └── build.gradle      # Module-specific build script
-│   └── …                     # Other modules
+├── modules/                  # Standalone module APKs
+│   ├── DebugApp/             # Sample module → DebugApp.apk
+│   │   ├── src/main/java/    # Module implementation
+│   │   ├── src/main/assets/  # settings.json, module-info.json
+│   │   └── build.gradle      # Android application configuration
+│   ├── NetworkGuard/         # → NetworkGuard.apk
+│   ├── IntentInterceptor/    # → IntentInterceptor.apk
+│   └── UIEnhancer/           # → UIEnhancer.apk
 ├── Docs/                     # Reference docs (schemas, guides, examples)
 ├── scripts/                  # Utility scripts (e.g. newModule)
-├── build.gradle              # Root Gradle config (SDK 35, Java 17)
+├── build.gradle              # Root Gradle config (SDK 35, Java 17)
 └── settings.gradle           # Includes :framework, :libxposed-api:api, :modules/*
 ```
 
@@ -79,13 +113,58 @@ LSPosedKit/
    cd LSPosedKit
    git submodule update --init --recursive
    ```
+
 2. **Open in IDE**
-   Import in Android Studio (Hedgehog Canary 15) or use Cursor.ai
+   Import in Android Studio (Hedgehog Canary 15) or use Cursor.ai
+
 3. **Scaffold a new module**
 
    ```bash
-   ./gradlew :scripts:newModule -Pname="DebugApp" -Pid=debug-app
+   # Basic module
+   ./gradlew :scripts:newModule -PmoduleName="DebugApp" -Pid="debug-app"
+   
+   # Module with services (for cross-module communication)
+   ./gradlew :scripts:newModule -PmoduleName="NetworkGuard" -Pid="network-guard" -PwithServices=true -Pcategory="security"
+   
+   # Module with UI components
+   ./gradlew :scripts:newModule -PmoduleName="UIEnhancer" -Pid="ui-enhancer" -PwithUI=true -Pcategory="ui"
+   
+   # Full-featured module with all options
+   ./gradlew :scripts:newModule -PmoduleName="AdvancedModule" -Pid="advanced-module" \
+     -PwithServices=true -PwithUI=true -Pcategory="system" \
+     -Pdescription="Advanced system modification module" -Pauthor="Your Name"
    ```
+
+   **Available Options:**
+   - `-PmoduleName="ModuleName"` (required) - The module class name
+   - `-Pid="module-id"` (required) - The module identifier (lowercase, hyphens allowed)
+   - `-Pdescription="Description"` (optional) - Module description
+   - `-Pauthor="Author Name"` (optional) - Module author
+   - `-Pcategory="category"` (optional) - Module category (utility, security, ui, system, etc.)
+   - `-PwithServices=true` (optional) - Generate service interfaces for cross-module communication
+   - `-PwithUI=true` (optional) - Generate UI components and layouts
+   - `-Pscope="*"` (optional) - Target package scope
+
+   This **auto-generates everything** needed for a standalone APK:
+   - Complete Android application structure with `AndroidManifest.xml`
+   - Main module class with `@XposedPlugin` annotation
+   - LSPosed bridge class (`LSPosedEntry.kt`) for automatic compatibility
+   - Example hooks manager with proper `PackageLoadedParam` integration
+   - Android resources: `strings.xml`, `arrays.xml`, launcher icon
+   - Enhanced settings schema with performance options and log levels
+   - Rich module metadata (`module-info.json`) with capabilities and dependencies
+   - ProGuard rules optimized for LSPosed modules
+   - Comprehensive unit test template with Mockito-Kotlin support
+   - Complete `build.gradle` with embedded framework and modern dependencies
+   - **Service components** (if `-PwithServices=true`):
+     - Service interface (`I[ModuleName]Service.kt`)
+     - Service implementation with FeatureManager integration
+     - Cross-module communication templates
+   - **UI components** (if `-PwithUI=true`):
+     - UI Manager class for view enhancements
+     - Activity layouts with ViewBinding support
+     - Interactive MainActivity with status and test functionality
+
 4. **Implement your hooks**
 
    ```kotlin
@@ -122,14 +201,29 @@ LSPosedKit/
      }
    }
    ```
-5. **Build & deploy**
+
+5. **Build & install the standalone APK**
 
    ```bash
-   ./gradlew assembleDebug installDebug
+   # Build the APK
+   ./gradlew :modules:DebugApp:assembleDebug
+   
+   # Install directly to device
+   adb install modules/DebugApp/build/outputs/apk/debug/DebugApp-debug.apk
+   
+   # Or use Gradle install task
+   ./gradlew :modules:DebugApp:installDebug
    ```
 
-   * **Hot‑Reload**: save changes & rerun `installDebug`—hooks update instantly.
-   * **Activation**: After installing, remember to activate the **LSPK Host** module and your new module (e.g., "DebugApp") in the LSPosed Manager app, then reboot your device.
+6. **Activate in LSPosed Manager**
+
+   * Open **LSPosed Manager** on your device
+   * Navigate to **Modules** tab
+   * Enable your new module (e.g., "DebugApp")
+   * Select target applications in scope
+   * Reboot your device
+
+   **Note**: No "LSPK Host" module needed — each module is self-contained!
 
 ---
 
@@ -142,13 +236,15 @@ graph TD
     C -- Yes --> E[Implement Hooks & Logic];
     C -- No --> D[Scaffold New Module ./gradlew :scripts:newModule];
     D --> E;
-    E --> F[Build & Deploy ./gradlew installDebug];
-    F --> G{Test Module Functionality};
-    G -- Issues? --> H[Debug & Refine Code];
-    H --> E;
-    G -- Works? --> I[Iterate with Hot-Reload for new features/fixes];
-    I --> E;
-    G -- Finalized? --> J[Generate Release Bundle ./gradlew publishBundle];
+    E --> F[Build Standalone APK ./gradlew :modules:ModuleName:assembleDebug];
+    F --> G[Install APK adb install ModuleName.apk];
+    G --> H[Activate in LSPosed Manager];
+    H --> I{Test Module Functionality};
+    I -- Issues? --> J[Debug & Refine Code];
+    J --> E;
+    I -- Works? --> K[Iterate with Hot-Reload for new features/fixes];
+    K --> E;
+    I -- Finalized? --> L[Generate Release APK ./gradlew assembleRelease];
 ```
 
 ---
@@ -201,11 +297,17 @@ These are the specifications of the primary device used for testing LSPosedKit d
 
 ## Advanced Usage
 
-* **Run DexPatch daemon**: ````bash ./gradlew runDevServer ```` (More in [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
-* **Generate bundles**: ````bash ./gradlew publishBundle ```` (More in [Docs/13-packaging.md](Docs/13-packaging.md))
+* **Run DexPatch daemon**: ```bash ./gradlew runDevServer ``` (More in [Docs/06-hot-reload.md](Docs/06-hot-reload.md))
+* **Module Generation Options**:
+  * **Basic module**: ```bash ./gradlew :scripts:newModule -PmoduleName="MyModule" -Pid="my-module" ```
+  * **Service-enabled module**: ```bash ./gradlew :scripts:newModule -PmoduleName="ServiceModule" -Pid="service-module" -PwithServices=true ```
+  * **UI-enhanced module**: ```bash ./gradlew :scripts:newModule -PmoduleName="UIModule" -Pid="ui-module" -PwithUI=true -Pcategory="ui" ```
+* **Build specific module APK**: ```bash ./gradlew :modules:ModuleName:assembleDebug ```
+* **Install all modules**: ```bash ./gradlew installDebug ```
 * **Testing** (More in [Docs/12-testing-ci.md](Docs/12-testing-ci.md)):
-  * Unit: ````bash ./gradlew testDebug ````
-  * Device: ````bash ./gradlew connectedDebugAndroidTest ````
+  * Unit: ```bash ./gradlew testDebug ```
+  * Device: ```bash ./gradlew connectedDebugAndroidTest ```
+  * Module-specific: ```bash ./gradlew :modules:ModuleName:test ```
 
 See **Docs/** for migration guides, general CLI references ([Docs/05-cli-gradle.md](Docs/05-cli-gradle.md)), API cheatsheets ([Docs/08-api-reference.md](Docs/08-api-reference.md)), CI templates, and troubleshooting ([Docs/15-troubleshooting.md](Docs/15-troubleshooting.md), [Docs/16-faq.md](Docs/16-faq.md)).
 

@@ -62,7 +62,7 @@ Create the module's build file:
 ```groovy
 // modules/DebugApp/build.gradle
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'  // 🔥 APPLICATION, not library!
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
 }
@@ -72,10 +72,13 @@ android {
     compileSdk rootProject.ext.compileSdk
     
     defaultConfig {
+        applicationId "com.wobbz.module.debugapp"  // 🔥 Required for APKs
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
+        versionCode 1                             // 🔥 Required for APKs
+        versionName "1.0.0"                       // 🔥 Required for APKs
         
-        consumerProguardFiles "consumer-rules.pro"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     
     compileOptions {
@@ -89,8 +92,13 @@ android {
 }
 
 dependencies {
+    // Framework gets EMBEDDED in the APK
     implementation project(':framework')
     kapt project(':framework:processor')
+    
+    // Standard dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
     
     // Testing
     testImplementation 'junit:junit:4.13.2'
@@ -372,7 +380,7 @@ Create the module's build file:
 ```groovy
 // modules/NetworkGuard/build.gradle
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'  // 🔥 APPLICATION, not library!
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
 }
@@ -382,10 +390,13 @@ android {
     compileSdk rootProject.ext.compileSdk
     
     defaultConfig {
+        applicationId "com.wobbz.module.networkguard"  // 🔥 Required for APKs
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
+        versionCode 1                                 // 🔥 Required for APKs
+        versionName "1.0.0"                           // 🔥 Required for APKs
         
-        consumerProguardFiles "consumer-rules.pro"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     
     compileOptions {
@@ -403,8 +414,13 @@ android {
 }
 
 dependencies {
+    // Framework gets EMBEDDED in the APK
     implementation project(':framework')
     kapt project(':framework:processor')
+    
+    // Standard dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
     
     // UI components
     implementation 'androidx.recyclerview:recyclerview:1.2.1'

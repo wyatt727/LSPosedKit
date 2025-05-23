@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="19"
+            column="13"
+            startOffset="709"
+            endLine="19"
+            endColumn="45"
+            endOffset="741"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="50"
+            column="20"
+            startOffset="1344"
+            endLine="50"
+            endColumn="89"
+            endOffset="1413"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="51"
+            column="20"
+            startOffset="1433"
+            endLine="51"
+            endColumn="58"
+            endOffset="1471"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.9.0 is available: 1.16.0">
+        <fix-replace
+            description="Change to 1.16.0"
+            family="Update versions"
+            oldString="1.9.0"
+            replacement="1.16.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="54"
+            column="20"
+            startOffset="1537"
+            endLine="54"
+            endColumn="50"
+            endOffset="1567"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.0">
+        <fix-replace
+            description="Change to 1.7.0"
+            family="Update versions"
+            oldString="1.6.1"
+            replacement="1.7.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="55"
+            column="20"
+            startOffset="1587"
+            endLine="55"
+            endColumn="56"
+            endOffset="1623"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1">
+        <fix-replace
+            description="Change to 2.2.1"
+            family="Update versions"
+            oldString="2.1.4"
+            replacement="2.2.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="56"
+            column="20"
+            startOffset="1643"
+            endLine="56"
+            endColumn="70"
+            endOffset="1693"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.8.0 is available: 1.12.0">
+        <fix-replace
+            description="Change to 1.12.0"
+            family="Update versions"
+            oldString="1.8.0"
+            replacement="1.12.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="57"
+            column="20"
+            startOffset="1713"
+            endLine="57"
+            endColumn="64"
+            endOffset="1757"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.preference:preference-ktx than 1.2.0 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.2.0"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="60"
+            column="20"
+            startOffset="1816"
+            endLine="60"
+            endColumn="62"
+            endOffset="1858"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.fragment:fragment-ktx than 1.5.5 is available: 1.8.7">
+        <fix-replace
+            description="Change to 1.8.7"
+            family="Update versions"
+            oldString="1.5.5"
+            replacement="1.8.7"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="61"
+            column="20"
+            startOffset="1878"
+            endLine="61"
+            endColumn="58"
+            endOffset="1916"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="67"
+            column="20"
+            startOffset="2084"
+            endLine="67"
+            endColumn="53"
+            endOffset="2117"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi-kotlin than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="68"
+            column="20"
+            startOffset="2137"
+            endLine="68"
+            endColumn="60"
+            endOffset="2177"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="72"
+            column="24"
+            startOffset="2265"
+            endLine="72"
+            endColumn="56"
+            endOffset="2297"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test:core than 1.4.0 is available: 1.6.1">
+        <fix-replace
+            description="Change to 1.6.1"
+            family="Update versions"
+            oldString="1.4.0"
+            replacement="1.6.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="73"
+            column="24"
+            startOffset="2321"
+            endLine="73"
+            endColumn="50"
+            endOffset="2347"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="74"
+            column="31"
+            startOffset="2378"
+            endLine="74"
+            endColumn="62"
+            endOffset="2409"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1">
+        <fix-replace
+            description="Change to 3.6.1"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.6.1"/>
+        <location
+            file="${:modules:UIEnhancer*projectDir}/build.gradle"
+            line="75"
+            column="31"
+            startOffset="2440"
+            endLine="75"
+            endColumn="75"
+            endOffset="2484"/>
+    </incident>
+
+</incidents>

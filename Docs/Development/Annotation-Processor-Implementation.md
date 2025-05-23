@@ -499,12 +499,21 @@ To use the annotation processor in a module project, add it as a kapt dependency
 
 ```groovy
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'  // 🔥 APPLICATION for module APKs!
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
 
+android {
+    defaultConfig {
+        applicationId "com.example.testmodule"  // 🔥 Required for APKs
+        versionCode 1                           // 🔥 Required for APKs
+        versionName "1.0.0"                     // 🔥 Required for APKs
+    }
+}
+
 dependencies {
+    // Framework gets EMBEDDED in the APK
     implementation project(':framework')
     kapt project(':framework:processor')
 }

@@ -5,6 +5,13 @@ plugins {
 // Apply the newModule script
 apply from: 'newModule.gradle'
 
-// Additional scripts can be added here
-// apply from: 'publishBundle.gradle'
-// apply from: 'signing.gradle' 
+// Apply publishBundle script only when explicitly requested and module exists
+if (project.hasProperty('publishBundle') && project.hasProperty('moduleName')) {
+    def moduleName = project.property('moduleName')
+    def moduleDir = new File(rootProject.projectDir, "modules/${moduleName}")
+    if (moduleDir.exists()) {
+        apply from: 'publishBundle.gradle'
+    }
+}
+
+apply from: 'signing.gradle' 

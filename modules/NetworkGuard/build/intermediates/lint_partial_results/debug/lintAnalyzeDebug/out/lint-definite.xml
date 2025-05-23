@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:modules:NetworkGuard*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="18"
+            column="13"
+            startOffset="682"
+            endLine="18"
+            endColumn="45"
+            endOffset="714"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="52"
+            column="20"
+            startOffset="1344"
+            endLine="52"
+            endColumn="89"
+            endOffset="1413"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="53"
+            column="20"
+            startOffset="1433"
+            endLine="53"
+            endColumn="58"
+            endOffset="1471"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.9.0 is available: 1.16.0">
+        <fix-replace
+            description="Change to 1.16.0"
+            family="Update versions"
+            oldString="1.9.0"
+            replacement="1.16.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="55"
+            column="20"
+            startOffset="1496"
+            endLine="55"
+            endColumn="50"
+            endOffset="1526"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.0">
+        <fix-replace
+            description="Change to 1.7.0"
+            family="Update versions"
+            oldString="1.6.1"
+            replacement="1.7.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="56"
+            column="20"
+            startOffset="1546"
+            endLine="56"
+            endColumn="56"
+            endOffset="1582"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.recyclerview:recyclerview than 1.2.1 is available: 1.4.0">
+        <fix-replace
+            description="Change to 1.4.0"
+            family="Update versions"
+            oldString="1.2.1"
+            replacement="1.4.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="57"
+            column="20"
+            startOffset="1602"
+            endLine="57"
+            endColumn="62"
+            endOffset="1644"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.6.0 is available: 1.12.0">
+        <fix-replace
+            description="Change to 1.12.0"
+            family="Update versions"
+            oldString="1.6.0"
+            replacement="1.12.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="59"
+            column="20"
+            startOffset="1718"
+            endLine="59"
+            endColumn="64"
+            endOffset="1762"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.preference:preference-ktx than 1.2.0 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.2.0"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="62"
+            column="20"
+            startOffset="1821"
+            endLine="62"
+            endColumn="62"
+            endOffset="1863"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.fragment:fragment-ktx than 1.5.5 is available: 1.8.7">
+        <fix-replace
+            description="Change to 1.8.7"
+            family="Update versions"
+            oldString="1.5.5"
+            replacement="1.8.7"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="63"
+            column="20"
+            startOffset="1883"
+            endLine="63"
+            endColumn="58"
+            endOffset="1921"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="65"
+            column="20"
+            startOffset="1946"
+            endLine="65"
+            endColumn="53"
+            endOffset="1979"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi-kotlin than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="66"
+            column="20"
+            startOffset="1999"
+            endLine="66"
+            endColumn="60"
+            endOffset="2039"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="69"
+            column="24"
+            startOffset="2112"
+            endLine="69"
+            endColumn="56"
+            endOffset="2144"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="70"
+            column="31"
+            startOffset="2175"
+            endLine="70"
+            endColumn="62"
+            endOffset="2206"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1">
+        <fix-replace
+            description="Change to 3.6.1"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.6.1"/>
+        <location
+            file="${:modules:NetworkGuard*projectDir}/build.gradle"
+            line="71"
+            column="31"
+            startOffset="2237"
+            endLine="71"
+            endColumn="75"
+            endOffset="2281"/>
+    </incident>
+
+</incidents>

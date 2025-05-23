@@ -75,7 +75,7 @@ class XposedInterfaceTest {
         
         // Verify unhooker works
         assertNotNull(unhooker)
-        assertEquals(method, unhooker.getTarget())
+        assertTrue(unhooker.isHooked())
         
         val hookedMethods = mockXposed.getHookedMethods()
         assertEquals(1, hookedMethods.size)
@@ -91,7 +91,7 @@ class XposedInterfaceTest {
         val unhooker = mockXposed.hook(
             testClass,
             "methodWithParams",
-            arrayOf(String::class.java, Int::class.javaPrimitiveType),
+            arrayOf(String::class.java, Int::class.java),
             TestHooker::class.java
         )
         
@@ -134,15 +134,15 @@ class XposedInterfaceTest {
     @Test
     fun testUnhooking() {
         val method = HookTestUtil.createTestMethod("methodWithReturn", String::class.java)
-        val unhooker = mockXposed.hook(method, TestHooker::class.java) as MockMethodUnhooker
+        val unhooker = mockXposed.hook(method, TestHooker::class.java)
         
         // Verify hook is active
         assertTrue(mockXposed.isMethodHooked(method))
-        assertFalse(unhooker.isUnhooked())
+        assertTrue(unhooker.isHooked())
         
         // Unhook
         unhooker.unhook()
-        assertTrue(unhooker.isUnhooked())
+        assertFalse(unhooker.isHooked())
     }
     
     @Test
@@ -176,11 +176,17 @@ class XposedInterfaceTest {
      */
     class TestHooker : Hooker {
         override fun beforeHook(param: HookParam) {
-            param.xposed.log(LogLevel.INFO, "TestHooker executed - beforeHook")
+            // For testing, we can access the mock xposed through the MockHookParam
+            if (param is MockHookParam) {
+                param.xposed.log(LogLevel.INFO, "TestHooker executed - beforeHook")
+            }
         }
         
         override fun afterHook(param: HookParam) {
-            param.xposed.log(LogLevel.INFO, "TestHooker executed - afterHook")
+            // For testing, we can access the mock xposed through the MockHookParam
+            if (param is MockHookParam) {
+                param.xposed.log(LogLevel.INFO, "TestHooker executed - afterHook")
+            }
             // Modify the result
             param.setResult("modified")
         }

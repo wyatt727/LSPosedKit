@@ -1,0 +1,7 @@
+id=test-module
+name=Test Module
+version=v1.0.0
+versionCode=1
+author=LSPosedKit
+description=Simple test module for basic functionality testing
+updateJson= 

@@ -8,7 +8,7 @@
     proguardFiles="build/intermediates/default_proguard_files/global/proguard-android.txt-8.3.0"
     consumerProguardFiles="consumer-rules.pro"
     partialResultsDir="build/intermediates/lint_partial_results/debug/lintAnalyzeDebug/out"
-    desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/27b847e8c10c3cc9d8eb1153ef900027/transformed/D8BackportedDesugaredMethods.txt">
+    desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/0591ede8b1c7c849b6c96a798f0f5b9b/transformed/D8BackportedDesugaredMethods.txt">
   <buildFeatures
       namespacing="REQUIRED"/>
   <sourceProviders>
@@ -26,8 +26,8 @@
       classOutputs="build/intermediates/javac/debug/compileDebugJavaWithJavac/classes:build/tmp/kotlin-classes/debug:build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar"
       type="MAIN"
       applicationId="com.wobbz.framework.service"
-      generatedSourceFolders="build/generated/ap_generated_sources/debug/out:build/generated/source/buildConfig/debug"
+      generatedSourceFolders="build/generated/ap_generated_sources/debug/out"
       generatedResourceFolders="build/generated/res/resValues/debug"
-      desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/27b847e8c10c3cc9d8eb1153ef900027/transformed/D8BackportedDesugaredMethods.txt">
+      desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/0591ede8b1c7c849b6c96a798f0f5b9b/transformed/D8BackportedDesugaredMethods.txt">
   </artifact>
 </variant>

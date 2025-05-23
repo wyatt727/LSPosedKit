@@ -1,6 +1,6 @@
 <dependencies>
   <compile
-      roots=":@@:framework:core::debug,org.jetbrains.kotlin:kotlin-reflect:1.9.0@jar,androidx.annotation:annotation:1.5.0@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4@jar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar,:@@:libxposed-api:api::debug">
+      roots=":@@:framework:core::debug,org.jetbrains.kotlin:kotlin-reflect:1.9.0@jar,androidx.annotation:annotation:1.5.0@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4@jar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,io.github.libxposed:api:100@aar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar">
     <dependency
         name=":@@:framework:core::debug"
         simpleName="LSPosedKit.framework:core"/>
@@ -25,18 +25,18 @@
     <dependency
         name="org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar"
         simpleName="org.jetbrains.kotlin:kotlin-stdlib"/>
+    <dependency
+        name="io.github.libxposed:api:100@aar"
+        simpleName="io.github.libxposed:api"/>
     <dependency
         name="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar"
         simpleName="org.jetbrains.kotlin:kotlin-stdlib-common"/>
     <dependency
         name="org.jetbrains:annotations:13.0@jar"
         simpleName="org.jetbrains:annotations"/>
-    <dependency
-        name=":@@:libxposed-api:api::debug"
-        simpleName="io.github.libxposed:api"/>
   </compile>
   <package
-      roots=":@@:framework:core::debug,org.jetbrains.kotlin:kotlin-reflect:1.9.0@jar,androidx.annotation:annotation:1.5.0@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4@jar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,:@@:libxposed-api:api::debug,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar">
+      roots=":@@:framework:core::debug,org.jetbrains.kotlin:kotlin-reflect:1.9.0@jar,androidx.annotation:annotation:1.5.0@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4@jar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,io.github.libxposed:api:100@aar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar">
     <dependency
         name=":@@:framework:core::debug"
         simpleName="LSPosedKit.framework:core"/>
@@ -62,7 +62,7 @@
         name="org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar"
         simpleName="org.jetbrains.kotlin:kotlin-stdlib"/>
     <dependency
-        name=":@@:libxposed-api:api::debug"
+        name="io.github.libxposed:api:100@aar"
         simpleName="io.github.libxposed:api"/>
     <dependency
         name="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar"

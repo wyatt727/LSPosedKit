@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <!-- Empty array means it applies to all apps -->
+        <!-- Add specific package names here to limit scope: -->
+        <!-- <item>com.example.targetapp</item> -->
+    </string-array>
+</resources> 

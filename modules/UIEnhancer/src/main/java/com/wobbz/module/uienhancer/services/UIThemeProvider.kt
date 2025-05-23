@@ -117,8 +117,17 @@ class UIThemeProvider(
         // Clean up any resources if needed
     }
     
-    override fun onReload() {
+    override fun onBeforeReload() {
+        // Called before the module is hot-reloaded
+        // Save any state that needs to persist across reloads
+        checkNotReleased()
+        // No specific action needed for theme provider before reload
+    }
+    
+    override fun onAfterReload() {
+        // Called after the module is hot-reloaded
         // Refresh theme configuration on hot reload
+        checkNotReleased()
         themeManager.refreshConfiguration()
     }
     

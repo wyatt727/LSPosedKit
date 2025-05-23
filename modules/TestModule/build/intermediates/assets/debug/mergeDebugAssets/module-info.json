@@ -1,0 +1,15 @@
+{
+  "id": "test-module",
+  "name": "TestModule",
+  "version": "1.0.0",
+  "description": "Test module for standalone APK generation",
+  "author": "LSPosedKit Developer",
+  "features": [
+    "test-module.core"
+  ],
+  "capabilities": {
+    "hotReload": true
+  },
+  "providedServices": {},
+  "serviceDependencies": []
+}

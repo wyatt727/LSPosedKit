@@ -1,0 +1,94 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.wobbz.module.debugapp"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="31"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- Permissions that might be needed by the module -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:6:5-67
+12-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:6:22-64
+13
+14    <application
+14-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:8:5-41:19
+15        android:allowBackup="true"
+15-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:12:9-35
+16        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+16-->[androidx.core:core:1.8.0] /Users/pentester/.gradle/caches/transforms-3/60fadacd37bb40cd1f8f3f68ce425240/transformed/core-1.8.0/AndroidManifest.xml:24:18-86
+17        android:extractNativeLibs="false"
+17-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:13:9-42
+18        android:icon="@mipmap/ic_launcher"
+18-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:10:9-43
+19        android:label="@string/app_name"
+19-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:9:9-41
+20        android:theme="@android:style/Theme.DeviceDefault" >
+20-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:11:9-59
+21
+22        <!-- Main launcher activity (optional - for modules that want a settings UI) -->
+23        <activity
+23-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:16:9-25:20
+24            android:name="com.wobbz.module.debugapp.MainActivity"
+24-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:17:13-41
+25            android:exported="true"
+25-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:18:13-36
+26            android:label="@string/app_name"
+26-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:19:13-45
+27            android:theme="@android:style/Theme.DeviceDefault.Settings" >
+27-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:20:13-72
+28            <intent-filter>
+28-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:21:13-24:29
+29                <action android:name="android.intent.action.MAIN" />
+29-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:22:17-69
+29-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:22:25-66
+30
+31                <category android:name="android.intent.category.LAUNCHER" />
+31-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:23:17-77
+31-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:23:27-74
+32            </intent-filter>
+33        </activity>
+34
+35        <!-- LSPosed module metadata -->
+36        <meta-data
+36-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:28:9-30:36
+37            android:name="xposedmodule"
+37-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:29:13-40
+38            android:value="true" />
+38-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:30:13-33
+39        <meta-data
+39-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:31:9-33:73
+40            android:name="xposeddescription"
+40-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:32:13-45
+41            android:value="Force enables debug flags in applications" />
+41-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:33:13-70
+42        <meta-data
+42-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:34:9-36:34
+43            android:name="xposedminversion"
+43-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:35:13-44
+44            android:value="93" />
+44-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:36:13-31
+45        <meta-data
+45-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:37:9-39:54
+46            android:name="xposedscope"
+46-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:38:13-39
+47            android:resource="@array/xposed_scope" />
+47-->/Users/pentester/Tools/LSPosedKit/modules/DebugApp/src/main/AndroidManifest.xml:39:13-51
+48
+49        <uses-library
+49-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
+50            android:name="androidx.window.extensions"
+50-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
+51            android:required="false" />
+51-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
+52        <uses-library
+52-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
+53            android:name="androidx.window.sidecar"
+53-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
+54            android:required="false" />
+54-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+55    </application>
+56
+57</manifest>

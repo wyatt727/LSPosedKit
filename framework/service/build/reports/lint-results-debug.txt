@@ -1,0 +1,24 @@
+/Users/pentester/Tools/LSPosedKit/framework/service/build.gradle:29: Warning: A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0 [GradleDependency]
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/service/build.gradle:30: Warning: A newer version of org.jetbrains.kotlin:kotlin-reflect than 1.9.0 is available: 1.9.24 [GradleDependency]
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${rootProject.ext.kotlinVersion}"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/service/build.gradle:31: Warning: A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1 [GradleDependency]
+    implementation 'androidx.annotation:annotation:1.5.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/service/build.gradle:34: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.6.4 is available: 1.7.3 [GradleDependency]
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pentester/Tools/LSPosedKit/framework/service/build.gradle:38: Warning: A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0 [GradleDependency]
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+0 errors, 5 warnings

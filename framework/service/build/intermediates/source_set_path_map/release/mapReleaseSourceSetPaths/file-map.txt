@@ -1,0 +1,8 @@
+com.wobbz.framework.service-release-0 /Users/pentester/Tools/LSPosedKit/framework/core/build/intermediates/packaged_res/release/packageReleaseResources
+com.wobbz.framework.service-pngs-1 /Users/pentester/Tools/LSPosedKit/framework/service/build/generated/res/pngs/release
+com.wobbz.framework.service-resValues-2 /Users/pentester/Tools/LSPosedKit/framework/service/build/generated/res/resValues/release
+com.wobbz.framework.service-mergeReleaseResources-3 /Users/pentester/Tools/LSPosedKit/framework/service/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+com.wobbz.framework.service-mergeReleaseResources-4 /Users/pentester/Tools/LSPosedKit/framework/service/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+com.wobbz.framework.service-release-5 /Users/pentester/Tools/LSPosedKit/framework/service/build/intermediates/merged_res/release/mergeReleaseResources
+com.wobbz.framework.service-main-6 /Users/pentester/Tools/LSPosedKit/framework/service/src/main/res
+com.wobbz.framework.service-release-7 /Users/pentester/Tools/LSPosedKit/framework/service/src/release/res

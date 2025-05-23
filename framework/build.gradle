@@ -30,5 +30,5 @@ dependencies {
     api project(':framework:hot')
     api project(':framework:settings')
     api project(':framework:service')
-    api project(':libxposed-api:api')
+    api 'io.github.libxposed:api:100'
 } 

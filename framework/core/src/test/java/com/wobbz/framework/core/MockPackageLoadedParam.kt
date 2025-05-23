@@ -1,14 +1,16 @@
 package com.wobbz.framework.core
 
 /**
- * Mock implementation of PackageLoadedParam for unit testing.
- * Allows testing of module package loading behavior without requiring the actual Xposed framework.
+ * Mock implementation for testing package loading behavior.
+ * Provides a similar interface to PackageLoadedParam without inheritance.
  */
 class MockPackageLoadedParam(
-    override val packageName: String,
-    override val classLoader: ClassLoader = MockPackageLoadedParam::class.java.classLoader,
-    override val xposed: XposedInterface = MockXposedInterface()
-) : PackageLoadedParam {
+    val packageName: String,
+    val classLoader: ClassLoader = MockPackageLoadedParam::class.java.classLoader!!,
+    val xposed: XposedInterface = MockXposedInterface(),
+    val isSystemApp: Boolean = false,
+    val appInfo: android.content.pm.ApplicationInfo? = null
+) {
     
     companion object {
         /**
@@ -30,6 +32,19 @@ class MockPackageLoadedParam(
          */
         fun forPackageWithClassLoader(packageName: String, classLoader: ClassLoader): MockPackageLoadedParam {
             return MockPackageLoadedParam(packageName, classLoader = classLoader)
+        }
+        
+        /**
+         * Creates a mock param that matches a real PackageLoadedParam for testing.
+         */
+        fun fromReal(param: PackageLoadedParam): MockPackageLoadedParam {
+            return MockPackageLoadedParam(
+                packageName = param.packageName,
+                classLoader = param.classLoader,
+                xposed = param.xposed,
+                isSystemApp = param.isSystemApp,
+                appInfo = param.appInfo
+            )
         }
     }
 } 

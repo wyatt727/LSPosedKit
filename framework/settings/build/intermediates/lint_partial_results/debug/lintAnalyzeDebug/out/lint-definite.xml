@@ -91,4 +91,23 @@
             endOffset="1084"/>
     </incident>
 
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:framework:settings*projectDir}/build.gradle"
+            line="42"
+            column="24"
+            startOffset="1172"
+            endLine="42"
+            endColumn="56"
+            endOffset="1204"/>
+    </incident>
+
 </incidents>

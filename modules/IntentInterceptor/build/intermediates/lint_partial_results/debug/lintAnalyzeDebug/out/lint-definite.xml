@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:modules:IntentInterceptor*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="19"
+            column="13"
+            startOffset="735"
+            endLine="19"
+            endColumn="45"
+            endOffset="767"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="53"
+            column="20"
+            startOffset="1383"
+            endLine="53"
+            endColumn="89"
+            endOffset="1452"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="54"
+            column="20"
+            startOffset="1472"
+            endLine="54"
+            endColumn="58"
+            endOffset="1510"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="57"
+            column="20"
+            startOffset="1598"
+            endLine="57"
+            endColumn="53"
+            endOffset="1631"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.squareup.moshi:moshi-kotlin than 1.14.0 is available: 1.15.0">
+        <fix-replace
+            description="Change to 1.15.0"
+            family="Update versions"
+            oldString="1.14.0"
+            replacement="1.15.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="58"
+            column="20"
+            startOffset="1651"
+            endLine="58"
+            endColumn="60"
+            endOffset="1691"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.9.0 is available: 1.16.0">
+        <fix-replace
+            description="Change to 1.16.0"
+            family="Update versions"
+            oldString="1.9.0"
+            replacement="1.16.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="61"
+            column="20"
+            startOffset="1770"
+            endLine="61"
+            endColumn="50"
+            endOffset="1800"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.recyclerview:recyclerview than 1.3.0 is available: 1.4.0">
+        <fix-replace
+            description="Change to 1.4.0"
+            family="Update versions"
+            oldString="1.3.0"
+            replacement="1.4.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="62"
+            column="20"
+            startOffset="1820"
+            endLine="62"
+            endColumn="62"
+            endOffset="1862"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.8.0 is available: 1.12.0">
+        <fix-replace
+            description="Change to 1.12.0"
+            family="Update versions"
+            oldString="1.8.0"
+            replacement="1.12.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="64"
+            column="20"
+            startOffset="1936"
+            endLine="64"
+            endColumn="64"
+            endOffset="1980"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.preference:preference-ktx than 1.2.0 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.2.0"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="65"
+            column="20"
+            startOffset="2000"
+            endLine="65"
+            endColumn="62"
+            endOffset="2042"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.fragment:fragment-ktx than 1.5.0 is available: 1.8.7">
+        <fix-replace
+            description="Change to 1.8.7"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.8.7"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="66"
+            column="20"
+            startOffset="2062"
+            endLine="66"
+            endColumn="58"
+            endOffset="2100"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.6.0 is available: 2.9.0">
+        <fix-replace
+            description="Change to 2.9.0"
+            family="Update versions"
+            oldString="2.6.0"
+            replacement="2.9.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="69"
+            column="20"
+            startOffset="2153"
+            endLine="69"
+            endColumn="70"
+            endOffset="2203"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-livedata-ktx than 2.6.0 is available: 2.9.0">
+        <fix-replace
+            description="Change to 2.9.0"
+            family="Update versions"
+            oldString="2.6.0"
+            replacement="2.9.0"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="70"
+            column="20"
+            startOffset="2223"
+            endLine="70"
+            endColumn="69"
+            endOffset="2272"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.6.4 is available: 1.7.3">
+        <fix-replace
+            description="Change to 1.7.3"
+            family="Update versions"
+            oldString="1.6.4"
+            replacement="1.7.3"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="73"
+            column="20"
+            startOffset="2336"
+            endLine="73"
+            endColumn="76"
+            endOffset="2392"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test:core than 1.5.0 is available: 1.6.1">
+        <fix-replace
+            description="Change to 1.6.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.6.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="79"
+            column="24"
+            startOffset="2602"
+            endLine="79"
+            endColumn="50"
+            endOffset="2628"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="83"
+            column="31"
+            startOffset="2755"
+            endLine="83"
+            endColumn="62"
+            endOffset="2786"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1">
+        <fix-replace
+            description="Change to 3.6.1"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.6.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="84"
+            column="31"
+            startOffset="2817"
+            endLine="84"
+            endColumn="75"
+            endOffset="2861"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test:runner than 1.5.2 is available: 1.6.2">
+        <fix-replace
+            description="Change to 1.6.2"
+            family="Update versions"
+            oldString="1.5.2"
+            replacement="1.6.2"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="85"
+            column="31"
+            startOffset="2892"
+            endLine="85"
+            endColumn="59"
+            endOffset="2920"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test:rules than 1.5.0 is available: 1.6.1">
+        <fix-replace
+            description="Change to 1.6.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.6.1"/>
+        <location
+            file="${:modules:IntentInterceptor*projectDir}/build.gradle"
+            line="86"
+            column="31"
+            startOffset="2951"
+            endLine="86"
+            endColumn="58"
+            endOffset="2978"/>
+    </incident>
+
+</incidents>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.wobbz.module.testgenerated.TestGeneratedTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-05-23T20:02:59" hostname="mac-{{serial-number}}" time="0.004">
+  <properties/>
+  <testcase name="testLifecycleMethods" classname="com.wobbz.module.testgenerated.TestGeneratedTest" time="0.003"/>
+  <testcase name="testHotReload" classname="com.wobbz.module.testgenerated.TestGeneratedTest" time="0.0"/>
+  <testcase name="testModuleInstantiation" classname="com.wobbz.module.testgenerated.TestGeneratedTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

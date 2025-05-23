@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="partial_results">
+    <map id="UnusedResources">
+        <entry
+            name="model"
+            string="array[xposed_scope(U)],mipmap[ic_launcher(U)],string[app_name(U),module_description(U)];;;;"/>
+    </map>
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.wobbz.module.intentinterceptor.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+
+</incidents>

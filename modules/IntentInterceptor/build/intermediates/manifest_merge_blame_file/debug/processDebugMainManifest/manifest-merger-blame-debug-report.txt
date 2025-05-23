@@ -1,0 +1,160 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.wobbz.module.intentinterceptor"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="31"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- Permissions that might be needed by the module -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:6:5-67
+12-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:6:22-64
+13
+14    <permission
+14-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+15        android:name="com.wobbz.module.intentinterceptor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+15-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+16        android:protectionLevel="signature" />
+16-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+17
+18    <uses-permission android:name="com.wobbz.module.intentinterceptor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+18-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+18-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+19
+20    <application
+20-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:8:5-41:19
+21        android:allowBackup="true"
+21-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:12:9-35
+22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+22-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+23        android:debuggable="true"
+24        android:extractNativeLibs="false"
+24-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:13:9-42
+25        android:icon="@mipmap/ic_launcher"
+25-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:10:9-43
+26        android:label="@string/app_name"
+26-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:9:9-41
+27        android:theme="@android:style/Theme.DeviceDefault" >
+27-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:11:9-59
+28
+29        <!-- Main launcher activity (optional - for modules that want a settings UI) -->
+30        <activity
+30-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:16:9-25:20
+31            android:name="com.wobbz.module.intentinterceptor.MainActivity"
+31-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:17:13-41
+32            android:exported="true"
+32-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:18:13-36
+33            android:label="@string/app_name"
+33-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:19:13-45
+34            android:theme="@android:style/Theme.DeviceDefault.Settings" >
+34-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:20:13-72
+35            <intent-filter>
+35-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:21:13-24:29
+36                <action android:name="android.intent.action.MAIN" />
+36-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:22:17-69
+36-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:22:25-66
+37
+38                <category android:name="android.intent.category.LAUNCHER" />
+38-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:23:17-77
+38-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:23:27-74
+39            </intent-filter>
+40        </activity>
+41
+42        <!-- LSPosed module metadata -->
+43        <meta-data
+43-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:28:9-30:36
+44            android:name="xposedmodule"
+44-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:29:13-40
+45            android:value="true" />
+45-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:30:13-33
+46        <meta-data
+46-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:31:9-33:58
+47            android:name="xposeddescription"
+47-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:32:13-45
+48            android:value="@string/module_description" />
+48-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:33:13-55
+49        <meta-data
+49-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:34:9-36:34
+50            android:name="xposedminversion"
+50-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:35:13-44
+51            android:value="93" />
+51-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:36:13-31
+52        <meta-data
+52-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:37:9-39:54
+53            android:name="xposedscope"
+53-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:38:13-39
+54            android:resource="@array/xposed_scope" />
+54-->/Users/pentester/Tools/LSPosedKit/modules/IntentInterceptor/src/main/AndroidManifest.xml:39:13-51
+55
+56        <provider
+56-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+57            android:name="androidx.startup.InitializationProvider"
+57-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+58            android:authorities="com.wobbz.module.intentinterceptor.androidx-startup"
+58-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+59            android:exported="false" >
+59-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+60            <meta-data
+60-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+61                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+61-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+62                android:value="androidx.startup" />
+62-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+63            <meta-data
+63-->[androidx.lifecycle:lifecycle-process:2.6.0] /Users/pentester/.gradle/caches/transforms-3/08466fded69a182af36617f111f94eb0/transformed/lifecycle-process-2.6.0/AndroidManifest.xml:29:13-31:52
+64                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+64-->[androidx.lifecycle:lifecycle-process:2.6.0] /Users/pentester/.gradle/caches/transforms-3/08466fded69a182af36617f111f94eb0/transformed/lifecycle-process-2.6.0/AndroidManifest.xml:30:17-78
+65                android:value="androidx.startup" />
+65-->[androidx.lifecycle:lifecycle-process:2.6.0] /Users/pentester/.gradle/caches/transforms-3/08466fded69a182af36617f111f94eb0/transformed/lifecycle-process-2.6.0/AndroidManifest.xml:31:17-49
+66            <meta-data
+66-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:30:13-32:52
+67                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+67-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:31:17-85
+68                android:value="androidx.startup" />
+68-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:32:17-49
+69        </provider>
+70
+71        <uses-library
+71-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
+72            android:name="androidx.window.extensions"
+72-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
+73            android:required="false" />
+73-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
+74        <uses-library
+74-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
+75            android:name="androidx.window.sidecar"
+75-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
+76            android:required="false" />
+76-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+77
+78        <receiver
+78-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:35:9-47:20
+79            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+79-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:36:13-76
+80            android:directBootAware="false"
+80-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:37:13-44
+81            android:enabled="true"
+81-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:38:13-35
+82            android:exported="true"
+82-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:39:13-36
+83            android:permission="android.permission.DUMP" >
+83-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:40:13-57
+84            <intent-filter>
+84-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:41:13-43:29
+85                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+85-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:42:17-91
+85-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:42:25-88
+86            </intent-filter>
+87            <intent-filter>
+87-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:44:13-46:29
+88                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+88-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:45:17-85
+88-->[androidx.profileinstaller:profileinstaller:1.2.1] /Users/pentester/.gradle/caches/transforms-3/9158009af4564894a047afcfce3c4af7/transformed/profileinstaller-1.2.1/AndroidManifest.xml:45:25-82
+89            </intent-filter>
+90        </receiver>
+91    </application>
+92
+93</manifest>

@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/values-ldrtl-v17/values-ldrtl-v17.xml",
+            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-42:/values-ldrtl-v17/values-ldrtl-v17.xml",
             "map": [
                 {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7d9c0805462dcf2c954929d08696d165/transformed/material-1.8.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,191",
-                        "endColumns": "135,140",
-                        "endOffsets": "186,327"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-41:/values-ldrtl-v17/values-ldrtl-v17.xml",
-            "map": [
-                {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7d9c0805462dcf2c954929d08696d165/transformed/material-1.8.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/65f860b9a3331aaee139c423ae26d319/transformed/material-1.8.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

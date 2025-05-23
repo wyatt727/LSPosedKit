@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        
+        
+        
+    </string-array>
+    <string name="app_name">IntentInterceptor</string>
+    <string name="module_description">Comprehensive Intent monitoring, filtering, and modification with history tracking</string>
+</resources>

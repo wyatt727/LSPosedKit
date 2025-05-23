@@ -1,10 +1,10 @@
 <libraries>
   <library
       name=":@@:framework:core::debug"
-      jars="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out/jars/classes.jar:/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out/jars/libs/R.jar"
+      jars="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out/jars/classes.jar:/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out/jars/libs/R.jar"
       resolved="LSPosedKit.framework:core:unspecified"
       partialResultsDir="/Users/pentester/Tools/LSPosedKit/framework/core/build/intermediates/lint_partial_results/debug/lintAnalyzeDebug/out"
-      folder="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out"
+      folder="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -42,19 +42,10 @@
       jars="/Users/pentester/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.9.0/8ee15ef0c67dc83d874f412d84378d7f0eb50b63/kotlin-stdlib-1.9.0.jar"
       resolved="org.jetbrains.kotlin:kotlin-stdlib:1.9.0"/>
   <library
-      name="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar"
-      jars="/Users/pentester/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.9.0/cd65c21cfd1eec4d44ef09f9f52b6d9f8a720636/kotlin-stdlib-common-1.9.0.jar"
-      resolved="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0"/>
-  <library
-      name="org.jetbrains:annotations:13.0@jar"
-      jars="/Users/pentester/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar"
-      resolved="org.jetbrains:annotations:13.0"/>
-  <library
-      name=":@@:libxposed-api:api::debug"
-      jars="/Users/pentester/Tools/LSPosedKit/libxposed-api/api/build/.transforms/07c6c4d47bf1720dc1c079c6b894c58c/transformed/out/jars/classes.jar"
-      resolved="io.github.libxposed:api:unspecified"
-      partialResultsDir="/Users/pentester/Tools/LSPosedKit/libxposed-api/api/build/intermediates/lint_partial_results/debug/lintAnalyzeDebug/out"
-      folder="/Users/pentester/Tools/LSPosedKit/libxposed-api/api/build/.transforms/07c6c4d47bf1720dc1c079c6b894c58c/transformed/out"
+      name="io.github.libxposed:api:100@aar"
+      jars="/Users/pentester/.gradle/caches/transforms-3/98210c06914302a3a118c536b15a10a1/transformed/api-100/jars/classes.jar"
+      resolved="io.github.libxposed:api:100"
+      folder="/Users/pentester/.gradle/caches/transforms-3/98210c06914302a3a118c536b15a10a1/transformed/api-100"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -63,4 +54,12 @@
       symbolFile="R.txt"
       externalAnnotations="annotations.zip"
       proguardRules="proguard.txt"/>
+  <library
+      name="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar"
+      jars="/Users/pentester/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.9.0/cd65c21cfd1eec4d44ef09f9f52b6d9f8a720636/kotlin-stdlib-common-1.9.0.jar"
+      resolved="org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0"/>
+  <library
+      name="org.jetbrains:annotations:13.0@jar"
+      jars="/Users/pentester/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar"
+      resolved="org.jetbrains:annotations:13.0"/>
 </libraries>

@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.wobbz.module.networkguard.NetworkGuard-mergeReleaseResources-42:/values-h550dp-port-v13/values-h550dp-port-v13.xml",
+            "map": [
+                {
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/0356c842263137569ad8617549c352b2/transformed/material-1.6.0/res/values-h550dp-port-v13/values-h550dp-port-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "76",
+                        "endOffsets": "127"
+                    }
+                }
+            ]
+        }
+    ]
+}

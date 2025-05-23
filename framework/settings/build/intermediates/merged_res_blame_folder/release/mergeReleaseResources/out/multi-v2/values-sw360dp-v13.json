@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.wobbz.framework.settings-mergeReleaseResources-26:/values-sw360dp-v13/values-sw360dp-v13.xml",
+            "map": [
+                {
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/9ab34d3c7bc948ee69d84a6b2562c446/transformed/preference-1.2.0/res/values-sw360dp-v13/values-sw360dp-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "71",
+                        "endOffsets": "122"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.wobbz.framework.settings-release-28:/values-sw360dp-v13/values-sw360dp-v13.xml",
+            "map": [
+                {
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/9ab34d3c7bc948ee69d84a6b2562c446/transformed/preference-1.2.0/res/values-sw360dp-v13/values-sw360dp-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "71",
+                        "endOffsets": "122"
+                    }
+                }
+            ]
+        }
+    ]
+}

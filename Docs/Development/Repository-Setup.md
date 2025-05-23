@@ -135,22 +135,31 @@ task clean(type: Delete) {
 ```groovy
 rootProject.name = 'LSPosedKit'
 
-// Framework modules
+// Framework modules (libraries - get embedded in module APKs)
 include ':framework:core'
 include ':framework:processor'
 include ':framework:hot'
 include ':framework:settings'
+include ':framework:service'
 include ':framework'
 
-// libxposed-api
+// libxposed-api (library - gets embedded)
 include ':libxposed-api:api'
 
-// Sample modules will be included here
-// Example: include ':modules:DebugApp'
+// Scripts for module generation
+include ':scripts'
 
-// Find all modules in modules directory
+// Sample modules (applications - produce standalone APKs)
+include ':modules:DebugApp'
+include ':modules:NetworkGuard'
+include ':modules:IntentInterceptor'
+include ':modules:UIEnhancer'
+
+// Auto-discover additional modules in modules directory
 file('modules').eachDir { dir ->
-    include ":modules:${dir.name}"
+    if (!['DebugApp', 'NetworkGuard', 'IntentInterceptor', 'UIEnhancer'].contains(dir.name)) {
+        include ":modules:${dir.name}"
+    }
 }
 ```
 
@@ -299,14 +308,117 @@ git add .
 git commit -m "Initial repository setup"
 ```
 
+## Automated Module Creation
+
+LSPosedKit includes a powerful module scaffolding system that automatically generates complete, buildable standalone APK modules. This system is available once the repository is set up.
+
+### Module Scaffolding Script
+
+The `scripts/newModule.gradle` script generates everything needed for a standalone APK module:
+
+```bash
+# Create a new module with comprehensive auto-generation
+./gradlew :scripts:newModule \
+  -PmoduleName="TestModule" \
+  -Pid="test-module" \
+  -Pdescription="Test module for development" \
+  -Pauthor="Your Name"
+```
+
+### What Gets Auto-Generated
+
+The script creates a **complete, installable Android application** with:
+
+**📁 Directory Structure**:
+```
+modules/TestModule/
+├── src/main/java/com/wobbz/module/testmodule/
+│   ├── TestModule.kt                    # Main module class
+│   ├── MainActivity.kt                  # Launcher activity
+│   └── hooks/ExampleTestModuleHooks.kt  # Hooks manager
+├── src/main/assets/
+│   ├── settings.json                    # Settings schema
+│   └── module-info.json                 # Module metadata
+├── src/main/res/
+│   ├── values/strings.xml               # String resources
+│   ├── values/arrays.xml                # xposed_scope array
+│   └── mipmap-mdpi/ic_launcher.xml      # Vector icon
+├── src/test/java/com/wobbz/module/testmodule/
+│   └── TestModuleTest.kt                # Unit tests
+├── src/main/AndroidManifest.xml         # Application manifest
+├── build.gradle                        # Application build config
+└── README.md                           # Module documentation
+```
+
+**🔧 Complete Application Configuration**:
+- `build.gradle` with `com.android.application` plugin
+- Proper `applicationId`, `versionCode`, `versionName` for APK
+- Embedded framework with `implementation project(':framework')`
+- All required Android dependencies
+
+**📱 Ready-to-Install APK Components**:
+- `AndroidManifest.xml` with LSPosed metadata:
+  - `xposedmodule=true`
+  - `xposeddescription` with module description
+  - `xposedminversion=93`
+  - `xposedscope` resource reference
+- Launcher activity for settings access
+- Complete resource files for Android installation
+
+**💻 Template Code with Best Practices**:
+- Main module class implementing `IModulePlugin`, `IHotReloadable`, `ModuleLifecycle`
+- Hooks manager with proper `PackageLoadedParam` integration
+- Example hooker implementation showing `beforeHook`/`afterHook` patterns
+- Unit test template with mock utilities
+
+### Build and Install
+
+The generated module can immediately be built as a standalone APK:
+
+```bash
+# Build the standalone APK (contains embedded framework)
+./gradlew :modules:TestModule:assembleDebug
+
+# Install directly to device
+adb install modules/TestModule/build/outputs/apk/debug/TestModule-debug.apk
+
+# Or use Gradle install task
+./gradlew :modules:TestModule:installDebug
+```
+
+**Result**: A complete ~14MB standalone APK ready for activation in LSPosed Manager!
+
+### Module Architecture Features
+
+Generated modules include:
+
+- **Package Filtering**: Settings-based inclusion/exclusion of target apps
+- **Hot-Reload Support**: `@HotReloadable` annotation and lifecycle hooks
+- **Service Bus Integration**: Ready for cross-module communication
+- **Proper Resource Management**: `Releasable` interface implementation
+- **Debug Logging**: Configurable logging with `LogLevel` utilities
+- **Settings Management**: JSON schema with automatic UI generation
+
+### Customization Points
+
+After generation, customize your module by:
+
+1. **Replace example hooks** in `hooks/ExampleTestModuleHooks.kt`
+2. **Update settings schema** in `assets/settings.json`  
+3. **Modify package filtering** logic in main module class
+4. **Add additional services** and register with `FeatureManager`
+5. **Customize UI** by modifying `MainActivity.kt`
+
+The scaffolding provides a complete foundation that follows LSPosedKit best practices and patterns.
+
 ## Next Steps
 
 After completing the repository setup:
 
 1. Implement the core interfaces and classes as defined in the API reference
-2. Create the annotation processor for generating module metadata
+2. Create the annotation processor for generating module metadata  
 3. Implement the hot-reload system
 4. Create the settings management system
-5. Build the sample modules
+5. Build the sample modules using the scaffolding script
 
 Refer to the respective implementation guides for details on each component. 

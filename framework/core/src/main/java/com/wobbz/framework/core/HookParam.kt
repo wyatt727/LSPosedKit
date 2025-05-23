@@ -60,12 +60,19 @@ interface HookParam {
      * 
      * @return true if the result has been modified, false otherwise
      */
-    fun hasThrowable(): Boolean
+    fun hasResult(): Boolean
     
     /**
      * Checks if a throwable has been set.
      * 
      * @return true if a throwable has been set, false otherwise
+     */
+    fun hasThrowable(): Boolean
+    
+    /**
+     * Checks if the method should return early (either result or throwable has been set).
+     * 
+     * @return true if the method should return early, false otherwise
      */
     fun returnEarly(): Boolean
 } 

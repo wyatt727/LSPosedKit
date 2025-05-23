@@ -1,2 +1,20 @@
 R_DEF: Internal format may change without notice
 local
+array xposed_scope
+color black
+color purple_200
+color purple_500
+color purple_700
+color teal_200
+color teal_700
+color ui_enhancer_accent
+color ui_enhancer_background
+color ui_enhancer_primary
+color ui_enhancer_surface
+color white
+mipmap ic_launcher
+string app_name
+string module_description
+style AppTheme
+style AppTheme.NoActionBar
+style AppTheme.Settings

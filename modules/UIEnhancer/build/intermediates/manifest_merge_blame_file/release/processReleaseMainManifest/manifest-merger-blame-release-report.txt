@@ -1,0 +1,127 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.wobbz.module.uienhancer"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="31"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- Permissions that might be needed by the module -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:6:5-67
+12-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:6:22-64
+13
+14    <permission
+14-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+15        android:name="com.wobbz.module.uienhancer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+15-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+16        android:protectionLevel="signature" />
+16-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+17
+18    <uses-permission android:name="com.wobbz.module.uienhancer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+18-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+18-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+19
+20    <application
+20-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:8:5-41:19
+21        android:allowBackup="true"
+21-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:12:9-35
+22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+22-->[androidx.core:core:1.9.0] /Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+23        android:extractNativeLibs="false"
+23-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:13:9-42
+24        android:icon="@mipmap/ic_launcher"
+24-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:10:9-43
+25        android:label="@string/app_name"
+25-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:9:9-41
+26        android:theme="@style/AppTheme" >
+26-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:11:9-40
+27
+28        <!-- Main launcher activity (optional - for modules that want a settings UI) -->
+29        <activity
+29-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:16:9-25:20
+30            android:name="com.wobbz.module.uienhancer.MainActivity"
+30-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:17:13-41
+31            android:exported="true"
+31-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:18:13-36
+32            android:label="@string/app_name"
+32-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:19:13-45
+33            android:theme="@style/AppTheme.NoActionBar" >
+33-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:20:13-56
+34            <intent-filter>
+34-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:21:13-24:29
+35                <action android:name="android.intent.action.MAIN" />
+35-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:22:17-69
+35-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:22:25-66
+36
+37                <category android:name="android.intent.category.LAUNCHER" />
+37-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:23:17-77
+37-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:23:27-74
+38            </intent-filter>
+39        </activity>
+40
+41        <!-- LSPosed module metadata -->
+42        <meta-data
+42-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:28:9-30:36
+43            android:name="xposedmodule"
+43-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:29:13-40
+44            android:value="true" />
+44-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:30:13-33
+45        <meta-data
+45-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:31:9-33:58
+46            android:name="xposeddescription"
+46-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:32:13-45
+47            android:value="@string/module_description" />
+47-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:33:13-55
+48        <meta-data
+48-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:34:9-36:34
+49            android:name="xposedminversion"
+49-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:35:13-44
+50            android:value="93" />
+50-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:36:13-31
+51        <meta-data
+51-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:37:9-39:54
+52            android:name="xposedscope"
+52-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:38:13-39
+53            android:resource="@array/xposed_scope" />
+53-->/Users/pentester/Tools/LSPosedKit/modules/UIEnhancer/src/main/AndroidManifest.xml:39:13-51
+54
+55        <provider
+55-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+56            android:name="androidx.startup.InitializationProvider"
+56-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+57            android:authorities="com.wobbz.module.uienhancer.androidx-startup"
+57-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+58            android:exported="false" >
+58-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+59            <meta-data
+59-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+60                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+60-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+61                android:value="androidx.startup" />
+61-->[androidx.emoji2:emoji2:1.2.0] /Users/pentester/.gradle/caches/transforms-3/0c5d9453bfea5e5cb9f64ef5bb1a89ab/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+62            <meta-data
+62-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/pentester/.gradle/caches/transforms-3/68959c744b7133c69b616b182ed03c8d/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:31:13-33:52
+63                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+63-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/pentester/.gradle/caches/transforms-3/68959c744b7133c69b616b182ed03c8d/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:32:17-78
+64                android:value="androidx.startup" />
+64-->[androidx.lifecycle:lifecycle-process:2.4.1] /Users/pentester/.gradle/caches/transforms-3/68959c744b7133c69b616b182ed03c8d/transformed/lifecycle-process-2.4.1/AndroidManifest.xml:33:17-49
+65        </provider>
+66
+67        <uses-library
+67-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:25:9-27:40
+68            android:name="androidx.window.extensions"
+68-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:26:13-54
+69            android:required="false" />
+69-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:27:13-37
+70        <uses-library
+70-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:28:9-30:40
+71            android:name="androidx.window.sidecar"
+71-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:29:13-51
+72            android:required="false" />
+72-->[androidx.window:window:1.0.0] /Users/pentester/.gradle/caches/transforms-3/a86507bf38e2a1372315690faa0eb04d/transformed/window-1.0.0/AndroidManifest.xml:30:13-37
+73    </application>
+74
+75</manifest>

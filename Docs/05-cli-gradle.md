@@ -1,105 +1,38 @@
-# CLI & Gradle Reference Guide
+# CLI & Gradle Reference
 
-> Complete reference for all command-line tasks, Gradle configuration, build flags, and advanced development workflows in LSPosedKit.
+> Complete command-line reference for building, testing, and deploying LSPosedKit modules as **standalone APKs**.
 
-## Gradle Task Overview
+## Quick Reference
 
-LSPosedKit extends the standard Android Gradle Plugin with specialized tasks for module development, hot-reloading, and deployment. This guide covers all available tasks and their configuration options.
-
-## Common Development Tasks
-
-### Building Modules
-
-| Task                         | Description                                         | Example                                  |
-|------------------------------|-----------------------------------------------------|------------------------------------------|
-| `assembleDebug`              | Build debug APK for all modules                     | `./gradlew assembleDebug`                |
-| `assembleRelease`            | Build release APK for all modules                   | `./gradlew assembleRelease`              |
-| `:modules:name:assembleDebug` | Build specific module debug APK                     | `./gradlew :modules:debug-app:assembleDebug` |
-| `installDebug`               | Build & install debug APKs on connected device      | `./gradlew installDebug`                 |
-| `uninstallDebug`             | Uninstall debug APKs from connected device          | `./gradlew uninstallDebug`               |
-| `connectedDebugAndroidTest`  | Run instrumented tests on connected device          | `./gradlew connectedDebugAndroidTest`    |
-
-### Hot-Reload Development
-
-| Task                         | Description                                         | Example                                  |
-|------------------------------|-----------------------------------------------------|------------------------------------------|
-| `runDevServer`               | Start hot-reload development server                 | `./gradlew runDevServer`                 |
-| `stopDevServer`              | Stop hot-reload development server                  | `./gradlew stopDevServer`                |
-| `hotReload`                  | Trigger hot-reload for all modules                  | `./gradlew hotReload`                    |
-| `:modules:name:hotReload`    | Trigger hot-reload for specific module              | `./gradlew :modules:debug-app:hotReload` |
-
-### Module Management
-
-| Task                         | Description                                         | Example                                  |
-|------------------------------|-----------------------------------------------------|------------------------------------------|
-| `:scripts:newModule`         | Generate new module from template                   | `./gradlew :scripts:newModule -Pname="Debug App" -Pid=debug-app` |
-| `processAnnotations`         | Process annotations for all modules                 | `./gradlew processAnnotations`           |
-| `verifyDependencies`         | Validate module dependency graph                    | `./gradlew verifyDependencies`           |
-
-### Release Management
-
-| Task                         | Description                                         | Example                                  |
-|------------------------------|-----------------------------------------------------|------------------------------------------|
-| `publishBundle`              | Generate .lspkmod bundles in dist/                  | `./gradlew publishBundle`                |
-| `:modules:name:publishBundle`| Generate .lspkmod bundle for specific module        | `./gradlew :modules:debug-app:publishBundle` |
-| `generateChangeLog`          | Auto-generate changelog from git commits            | `./gradlew generateChangeLog`            |
-
-## Configuration Parameters
-
-LSPosedKit supports various configuration parameters passed via Gradle properties:
-
-### Global Configuration
-
-| Property                  | Description                                   | Example                                  |
-|---------------------------|-----------------------------------------------|------------------------------------------|
-| `-Pjava21`                | Enable Java 21 support                        | `./gradlew assembleDebug -Pjava21`       |
-| `-PskipTests`             | Skip running tests during build               | `./gradlew assembleRelease -PskipTests`  |
-| `-PdevicePort=18777`      | Set custom port for hot-reload server         | `./gradlew runDevServer -PdevicePort=19999` |
-| `-PuseReleaseKeystore`    | Use release signing configuration             | `./gradlew assembleRelease -PuseReleaseKeystore` |
-
-### Module Creation
-
-| Property                  | Description                                   | Example                                  |
-|---------------------------|-----------------------------------------------|------------------------------------------|
-| `-Pname`                  | Human-readable module name                    | `./gradlew :scripts:newModule -Pname="My Module"` |
-| `-Pid`                    | Module identifier (kebab-case)                | `./gradlew :scripts:newModule -Pid=my-module` |
-| `-Ppackage`               | Java package name (optional)                  | `./gradlew :scripts:newModule -Ppackage=com.example.mymodule` |
-| `-Pauthor`                | Module author name (optional)                 | `./gradlew :scripts:newModule -Pauthor="Jane Developer"` |
-
-### Release Configuration
-
-| Property                  | Description                                   | Example                                  |
-|---------------------------|-----------------------------------------------|------------------------------------------|
-| `-PversionCode=10`        | Set specific version code                     | `./gradlew assembleRelease -PversionCode=10` |
-| `-PversionName=1.2.0`     | Set specific version name                     | `./gradlew assembleRelease -PversionName=1.2.0` |
-| `-PkeyAlias=upload`       | Set signing key alias                         | `./gradlew publishBundle -PkeyAlias=upload` |
-| `-PkeyPassword=secret`    | Set signing key password                      | `./gradlew publishBundle -PkeyPassword=secret` |
-
-## Task Details & Examples
-
-### Building & Installing
-
-#### Basic Build
+### Building Standalone APKs
 
 ```bash
-# Build all modules in debug mode
+# Build all module APKs
 ./gradlew assembleDebug
-
-# Build specific module
-./gradlew :modules:debug-app:assembleDebug
-
-# Build release versions (requires signing config)
 ./gradlew assembleRelease
+
+# Build specific module APK
+./gradlew :modules:DebugApp:assembleDebug
+./gradlew :modules:NetworkGuard:assembleRelease
+
+# Check build outputs
+ls modules/*/build/outputs/apk/debug/*.apk
+ls modules/*/build/outputs/apk/release/*.apk
 ```
 
-#### Installation
+### Installation
 
 ```bash
-# Build and install all modules
+# Install specific module APK
+./gradlew :modules:DebugApp:installDebug
+adb install modules/DebugApp/build/outputs/apk/debug/DebugApp-debug.apk
+
+# Install all module APKs
 ./gradlew installDebug
 
-# Install specific module
-./gradlew :modules:debug-app:installDebug
+# Uninstall specific module
+./gradlew :modules:DebugApp:uninstallDebug
+adb uninstall com.wobbz.module.debugapp
 
 # Uninstall all modules
 ./gradlew uninstallDebug
@@ -131,8 +64,8 @@ With the dev server running, any module rebuilds will trigger automatic hot-relo
 # Start development server (in one terminal)
 ./gradlew runDevServer
 
-# In another terminal, build a module
-./gradlew :modules:debug-app:assembleDebug
+# In another terminal, build a module APK
+./gradlew :modules:DebugApp:assembleDebug
 
 # Changes will automatically hot-reload to the device
 ```
@@ -143,7 +76,7 @@ If needed, manually trigger hot-reload for specific modules:
 
 ```bash
 # Manually trigger hot-reload for a specific module
-./gradlew :modules:debug-app:hotReload
+./gradlew :modules:DebugApp:hotReload
 
 # Force hot-reload of all modules
 ./gradlew hotReload -PforceReload=true
@@ -155,28 +88,54 @@ If needed, manually trigger hot-reload for specific modules:
 
 ```bash
 # Basic module creation
-./gradlew :scripts:newModule -Pname="Debug App" -Pid=debug-app
+./gradlew :scripts:newModule -PmoduleName="DebugApp" -Pid="debug-app"
 
-# Full configuration
+# With optional configuration
 ./gradlew :scripts:newModule \
-  -Pname="Debug App" \
-  -Pid=debug-app \
-  -Ppackage=com.example.debugapp \
+  -PmoduleName="DebugApp" \
+  -Pid="debug-app" \
+  -Pdescription="Force enable debug flags in apps" \
   -Pauthor="Jane Developer" \
-  -PtargetSdk=35 \
-  -PminSdk=31 \
-  -PwithHotReload=true \
-  -PwithSettings=true
+  -Pscope="*"
 ```
 
-This creates:
-- Module directory structure at `modules/debug-app/`
-- Gradle build configuration
-- Basic module implementation
-- Module metadata files
-- Test skeleton
+This **auto-generates a complete standalone APK module** with:
 
-**Note**: The module scaffolding script properly handles command-line properties using `gradle.startParameter.projectProperties` to avoid conflicts with Gradle's built-in `project.name` property. This ensures that `-Pname` parameters are correctly applied instead of being overridden by the project name.
+**📁 Complete Directory Structure**:
+- Module directory at `modules/DebugApp/`
+- Source: `src/main/java/`, `src/test/java/`, `src/main/assets/`
+- Resources: `src/main/res/values/`, `src/main/res/mipmap-mdpi/`
+
+**🔧 Android Application Configuration**:
+- `build.gradle` with `com.android.application` plugin
+- Complete APK configuration with `applicationId`, `versionCode`, `versionName`
+- Embedded framework dependencies with `implementation project(':framework')`
+
+**🔗 Automatic LSPosed Compatibility**:
+- `LSPosedEntry.kt` - Bridge class implementing `IXposedHookLoadPackage`
+- `xposed_init` file pointing to the bridge class
+- No manual setup required for LSPosed Manager recognition
+
+**📱 Auto-Generated Android Files**:
+- `AndroidManifest.xml` with LSPosed metadata and launcher activity
+- `MainActivity.kt` with module information dialog (no immediate finish())
+- `strings.xml`, `arrays.xml`, and vector launcher icon
+- All required files for installable APK
+
+**💻 Ready-to-Use Code Templates**:
+- Main module class with `@XposedPlugin` annotation and lifecycle management
+- LSPosed compatibility layer with automatic framework bridging
+- Example hooks manager with proper `PackageLoadedParam` integration
+- Unit test template with mock utilities and assertion examples
+
+**📄 Complete Metadata**:
+- `settings.json` with package filtering and debugging options
+- `module-info.json` with service declarations and capabilities
+- `README.md` with module-specific implementation notes and architecture details
+
+**🎯 Result**: Run `./gradlew :modules:DebugApp:assembleDebug` and get a complete 14MB standalone APK ready for `adb install` and immediate LSPosed Manager recognition!
+
+**Note**: The module scaffolding script properly handles command-line properties using `gradle.startParameter.projectProperties` to avoid conflicts with Gradle's built-in `project.name` property. This ensures that `-PmoduleName` parameters are correctly applied instead of being overridden by the project name.
 
 #### Verifying Module Dependencies
 
@@ -190,24 +149,24 @@ This creates:
 
 ### Release Management
 
-#### Building a Release Bundle
+#### Building Release APKs
 
 ```bash
-# Generate .lspkmod bundle for all modules
-./gradlew publishBundle
+# Generate signed release APKs for all modules
+./gradlew assembleRelease
 
 # Generate for specific module
-./gradlew :modules:network-guard:publishBundle
+./gradlew :modules:NetworkGuard:assembleRelease
 
 # With custom signing configuration
-./gradlew publishBundle \
+./gradlew assembleRelease \
   -PuseReleaseKeystore=true \
   -PkeyAlias=upload \
   -PkeyPassword=secret \
   -PstorePassword=secret
 ```
 
-The resulting `.lspkmod` bundles will be located in the `dist/` directory.
+The resulting signed APKs will be located in each module's `build/outputs/apk/release/` directory.
 
 #### Automated Changelog Generation
 
@@ -251,7 +210,7 @@ Each module's `build.gradle` can be customized:
 
 ```groovy
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'  // 🔥 APPLICATION for standalone APKs
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
 }
@@ -261,8 +220,11 @@ android {
     compileSdk 35
 
     defaultConfig {
+        applicationId "com.example.networkguard"  // 🔥 Required for APKs
         minSdk 31
         targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
         
         // Custom settings
         manifestPlaceholders = [
@@ -277,12 +239,14 @@ android {
     buildTypes {
         debug {
             // Development settings
+            debuggable true
             buildConfigField "boolean", "VERBOSE_LOGGING", "true"
         }
         release {
             // Production settings
+            debuggable false
             buildConfigField "boolean", "VERBOSE_LOGGING", "false"
-            minifyEnabled true
+            minifyEnabled false  // LSPosed modules typically don't minify
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -296,118 +260,301 @@ android {
 }
 
 dependencies {
-    // Core dependencies
+    // Core dependencies - framework gets EMBEDDED in APK
     implementation project(':framework')
     kapt project(':framework:processor')
     
-    // Add custom dependencies
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    // Standard dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
     
-    // Test dependencies
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    // Optional UI dependencies for settings screens
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'com.google.android.material:material:1.8.0'
+    
+    // JSON processing for network rules
+    implementation 'com.squareup.moshi:moshi:1.14.0'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
 }
 ```
 
-## Continuous Integration Tasks
+## Development Workflow
 
-LSPosedKit includes specialized tasks for CI/CD environments:
-
-```bash
-# Validate all modules (useful for pull requests)
-./gradlew validateModules
-
-# Run all tests (unit + instrumented if device connected)
-./gradlew runAllTests
-
-# Build all module variants
-./gradlew buildAllVariants
-
-# Create release artifacts
-./gradlew createReleaseArtifacts
-```
-
-## Command-Line Utilities
-
-LSPosedKit includes several helper scripts in the `scripts/` directory:
-
-### Module Management
+### Typical Development Session
 
 ```bash
-# Create a new module
-./scripts/create-module.sh "Network Guard" network-guard
+# 1. Start development server for hot-reload
+./gradlew runDevServer
 
-# List all modules and their versions
-./scripts/list-modules.sh
+# 2. In another terminal, build and install your module
+./gradlew :modules:MyModule:assembleDebug
+./gradlew :modules:MyModule:installDebug
 
-# Check module dependencies
-./scripts/check-dependencies.sh
+# 3. Make code changes, then rebuild
+./gradlew :modules:MyModule:assembleDebug
+# Hot-reload automatically applies changes!
+
+# 4. Run tests
+./gradlew :modules:MyModule:testDebug
+
+# 5. Generate release APK when ready
+./gradlew :modules:MyModule:assembleRelease
 ```
 
-### Device Interaction
+### APK Outputs and Verification
 
 ```bash
-# Push a DEX patch to device
-./scripts/push-dex.sh modules/network-guard/build/intermediates/dex/debug/out/classes.dex
+# Check APK build outputs
+find modules/*/build/outputs/apk -name "*.apk" -type f
 
-# Trigger module reload
-./scripts/reload-module.sh network-guard
+# Verify APK signing
+apksigner verify --verbose modules/MyModule/build/outputs/apk/release/MyModule-release.apk
 
-# View module logs
-./scripts/view-logs.sh network-guard
+# Check APK contents and metadata
+aapt dump badging modules/MyModule/build/outputs/apk/release/MyModule-release.apk
+
+# Extract APK to examine structure
+unzip -l modules/MyModule/build/outputs/apk/debug/MyModule-debug.apk
 ```
 
-## Environment Variables
-
-LSPosedKit recognizes several environment variables:
-
-| Variable                     | Description                                      | Example                         |
-|------------------------------|--------------------------------------------------|--------------------------------|
-| `ANDROID_SDK_ROOT`           | Android SDK location                             | `/home/user/Android/Sdk`        |
-| `ANDROID_HOME`               | Alternative Android SDK location                 | `/home/user/android-sdk`        |
-| `JAVA_HOME`                  | JDK location                                     | `/opt/jdk-17`                   |
-| `LSPK_KEYSTORE_PATH`         | Path to signing keystore                         | `/home/user/.signing/keys.jks`  |
-| `LSPK_KEYSTORE_PASSWORD`     | Keystore password                                | `keystore_password`             |
-| `LSPK_KEY_ALIAS`             | Signing key alias                                | `upload_key`                    |
-| `LSPK_KEY_PASSWORD`          | Signing key password                             | `key_password`                  |
-
-## Troubleshooting Build Issues
-
-### Common Errors
-
-| Error                                    | Solution                                                      |
-|------------------------------------------|---------------------------------------------------------------|
-| `SDK location not found`                 | Set `ANDROID_HOME` or create `local.properties` with `sdk.dir` |
-| `Could not find tools.jar`               | Ensure `JAVA_HOME` points to a valid JDK                       |
-| `Cannot run program "adb"`               | Add Android SDK platform-tools to your PATH                    |
-| `Failed to apply plugin [...]`           | Update Gradle version or check plugin compatibility            |
-| `Annotation processor [...] not found`   | Run `./gradlew clean` and rebuild                             |
-
-### Diagnostic Commands
+### Debugging Commands
 
 ```bash
-# Check environment configuration
-./gradlew environmentCheck
+# View build dependencies
+./gradlew :modules:MyModule:dependencies
 
-# Print build environment details
-./gradlew buildEnvironment
+# Check for dependency conflicts
+./gradlew :modules:MyModule:dependencyInsight --dependency kotlin-stdlib
 
-# Show project dependencies
-./gradlew :modules:debug-app:dependencies
+# Debug annotation processing
+./gradlew :modules:MyModule:assembleDebug --debug
 
-# Get detailed build info
-./gradlew assembleDebug --info
+# Clean specific module
+./gradlew :modules:MyModule:clean
 
-# Debug build process
-./gradlew assembleDebug --debug
+# Clean all modules
+./gradlew clean
 ```
 
-## Best Practices
+## Environment Setup Commands
 
-1. **Use the New Module Script** for consistent module structure
-2. **Enable Hot-Reload Server** during development for faster iteration
-3. **Run `verifyDependencies`** before publishing to ensure compatibility
-4. **Keep Module ID Consistent** between `@XposedPlugin` and `module-info.json`
-5. **Use Project-Level gradle.properties** for team-shared settings
-6. **Use User-Level gradle.properties** for personal credentials
-7. **Commit build.gradle Changes** but never commit keystore credentials
+### Project Initialization
+
+```bash
+# Clone repository with submodules
+git clone --recursive https://github.com/your-org/LSPosedKit.git
+
+# Or initialize submodules after cloning
+git submodule update --init --recursive
+
+# Verify environment
+./gradlew tasks --all | grep -E "(assemble|install|test)"
+```
+
+### Development Tools
+
+```bash
+# Start logcat for LSPosed modules
+adb logcat -s LSPK:* -v time
+
+# Start logcat for specific module
+adb logcat -s LSPK-NetworkGuard:* -v time
+
+# Clear logs
+adb logcat -c
+
+# Monitor device storage
+adb shell df -h
+```
+
+### Device Management
+
+```bash
+# List connected devices
+adb devices
+
+# Install to specific device
+adb -s DEVICE_ID install modules/MyModule/build/outputs/apk/debug/MyModule-debug.apk
+
+# Check installed packages
+adb shell pm list packages | grep -E "(wobbz|module)"
+
+# Grant runtime permissions (if needed)
+adb shell pm grant com.wobbz.module.mymodule android.permission.WRITE_EXTERNAL_STORAGE
+```
+
+## Performance & Optimization
+
+### Build Performance
+
+```bash
+# Enable parallel builds
+echo "org.gradle.parallel=true" >> gradle.properties
+
+# Enable build cache
+echo "org.gradle.caching=true" >> gradle.properties
+
+# Increase heap size
+echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m" >> gradle.properties
+
+# Profile build performance
+./gradlew assembleDebug --profile
+```
+
+### Module Size Optimization
+
+```bash
+# Analyze APK size
+./gradlew :modules:MyModule:assembleRelease
+bundletool analyze-apks --apk modules/MyModule/build/outputs/apk/release/MyModule-release.apk
+
+# Check for unused resources
+./gradlew :modules:MyModule:assembleRelease --scan
+
+# Enable resource shrinking (use carefully with LSPosed modules)
+# Modify build.gradle:
+# buildTypes {
+#     release {
+#         shrinkResources true
+#         minifyEnabled true
+#     }
+# }
+```
+
+## CI/CD Integration
+
+### GitHub Actions
+
+```yaml
+name: Build and Test Modules
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Build debug APKs
+      run: ./gradlew assembleDebug
+    
+    - name: Run tests
+      run: ./gradlew testDebug
+    
+    - name: Upload APKs
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-apks
+        path: modules/*/build/outputs/apk/debug/*.apk
+```
+
+### GitLab CI
+
+```yaml
+image: openjdk:17-jdk
+
+variables:
+  ANDROID_SDK_ROOT: "/opt/android-sdk"
+
+before_script:
+  - apt-get --quiet update --yes
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  
+stages:
+  - build
+  - test
+
+build_apks:
+  stage: build
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+      - modules/*/build/outputs/apk/debug/*.apk
+    expire_in: 1 week
+
+test_modules:
+  stage: test
+  script:
+    - ./gradlew testDebug
+  artifacts:
+    reports:
+      junit: modules/*/build/test-results/testDebug/*.xml
+```
+
+## Troubleshooting Commands
+
+### Common Build Issues
+
+```bash
+# Clear Gradle cache
+rm -rf ~/.gradle/caches/
+./gradlew clean
+
+# Invalidate IDE caches (Android Studio)
+# File → Invalidate Caches and Restart
+
+# Check for conflicting dependencies
+./gradlew :modules:MyModule:dependencyInsight --dependency "group:artifact"
+
+# Force dependency updates
+./gradlew --refresh-dependencies
+```
+
+### Installation Issues
+
+```bash
+# Force uninstall before install
+./gradlew :modules:MyModule:uninstallDebug :modules:MyModule:installDebug
+
+# Check package installation status
+adb shell pm list packages | grep mymodule
+
+# Clear app data
+adb shell pm clear com.wobbz.module.mymodule
+
+# Restart LSPosed Manager
+adb shell am force-stop org.lsposed.manager
+```
+
+### Hot-Reload Issues
+
+```bash
+# Check development server status
+curl http://localhost:18777/status
+
+# Restart development server
+./gradlew stopDevServer
+./gradlew runDevServer
+
+# Check ADB connection
+adb devices
+adb shell echo "Connected"
+
+# Verify hot-reload ports
+adb shell netstat -tuln | grep 18777
+```
+
+This comprehensive CLI reference should provide all the commands needed for effective LSPosed module development with the corrected standalone APK architecture.

@@ -76,8 +76,8 @@ dependencies {
 **Cause**: Gradle property conflicts where built-in project properties override command-line `-P` parameters.
 
 **Symptoms**:
-- Running `./gradlew :scripts:newModule -Pname="MyModule"` creates a module named "scripts" or "LSPosedKit"
-- The `-Pname` parameter appears to be ignored
+- Running `./gradlew :scripts:newModule -PmoduleName="MyModule"` creates a module named "scripts" or "LSPosedKit"
+- The `-PmoduleName` parameter appears to be ignored
 
 **Debug Steps**:
 1. Check if you're using `project.findProperty('name')` in Gradle scripts
@@ -113,7 +113,10 @@ This approach avoids conflicts with Gradle's built-in project properties and ens
 2. Look for errors in the module info generation task
 3. Verify the JSON structure is valid
 
-**Solution**: Fix the module info generation task or manually create a valid `module-info.json` file.
+**Solution**: The newModule scaffolding script automatically generates a valid `module-info.json` file. If you're getting this error:
+- For scaffolded modules: Check that the annotation processor is running correctly
+- For manual modules: Fix the module info generation task or manually create a valid `module-info.json` file
+- Verify the JSON syntax is valid using a JSON validator
 
 ### Kotlin Errors
 
@@ -918,3 +921,34 @@ Be aware of these built-in Gradle properties that can cause conflicts:
 Use specific parameter names or prefixes to avoid conflicts:
 - Instead of `-Pname`, use `-PmoduleName`
 - Instead of `-Pversion`, use `-PmoduleVersion` 
+
+### MainActivity Issues
+
+#### Error: "Module app closes immediately when launched"
+
+**Cause**: Older scaffolded modules have `MainActivity.kt` that calls `finish()` immediately in `onCreate()`.
+
+**Debug Steps**:
+1. Check `MainActivity.kt` for immediate `finish()` call
+2. Verify the module was generated with recent scaffolding script
+
+**Solution**: Update your `MainActivity.kt` to show module information instead of finishing immediately:
+
+```kotlin
+class MainActivity : Activity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        showModuleInfo()  // Instead of finish()
+    }
+    
+    private fun showModuleInfo() {
+        AlertDialog.Builder(this)
+            .setTitle("Your Module Name")
+            .setMessage("Module information and instructions...")
+            .setPositiveButton("OK") { _, _ -> finish() }
+            .show()
+    }
+}
+```
+
+**Note**: New modules created with the updated scaffolding script automatically include the improved MainActivity.

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        
+    </string-array>
+    <string name="app_name">DebugApp</string>
+    <string name="module_description">Force enables debug flags in applications</string>
+</resources>

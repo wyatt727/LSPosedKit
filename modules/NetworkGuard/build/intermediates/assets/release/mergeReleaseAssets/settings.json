@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Network Guard Settings",
+  "description": "Configuration settings for the Network Guard module",
+  "properties": {
+    "monitor_all_apps": {
+      "type": "boolean",
+      "title": "Monitor all apps",
+      "description": "Monitor network traffic for all apps (except excluded apps)",
+      "default": false
+    },
+    "logging_enabled": {
+      "type": "boolean",
+      "title": "Enable logging",
+      "description": "Log all network connections (allowed and blocked)",
+      "default": true
+    },
+    "block_by_default": {
+      "type": "boolean",
+      "title": "Block by default",
+      "description": "Block all connections unless explicitly allowed by rules",
+      "default": false
+    },
+    "log_level": {
+      "type": "string",
+      "title": "Log level",
+      "description": "Verbosity level for logging",
+      "enum": ["DEBUG", "INFO", "WARN", "ERROR"],
+      "default": "INFO"
+    },
+    "excluded_packages": {
+      "type": "array",
+      "title": "Excluded packages",
+      "description": "Packages to exclude from network monitoring",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "com.android.systemui",
+        "com.android.settings",
+        "de.robv.android.xposed.installer"
+      ]
+    },
+    "included_packages": {
+      "type": "array",
+      "title": "Included packages",
+      "description": "Packages to monitor when 'Monitor all apps' is off",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "com.android.browser",
+        "com.android.chrome",
+        "org.mozilla.firefox"
+      ]
+    },
+    "rule_update_interval": {
+      "type": "integer",
+      "title": "Rule update interval",
+      "description": "Interval in minutes to check for rule updates (0 = disabled)",
+      "minimum": 0,
+      "maximum": 1440,
+      "default": 60
+    }
+  }
+} 

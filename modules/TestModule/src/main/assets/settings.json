@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "TestModule Settings",
+  "properties": {
+    "enable_for_all": {
+      "type": "boolean",
+      "title": "Enable for all apps",
+      "description": "Enable TestModule for all apps (except excluded apps)",
+      "default": false
+    },
+    "excluded_packages": {
+      "type": "array",
+      "title": "Excluded packages",
+      "description": "Packages to exclude when 'Enable for all apps' is on",
+      "items": {
+        "type": "string"
+      },
+      "default": ["com.android.systemui", "com.android.settings"]
+    },
+    "included_packages": {
+      "type": "array",
+      "title": "Included packages",
+      "description": "Packages to include when 'Enable for all apps' is off",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "enable_logging": {
+      "type": "boolean",
+      "title": "Enable logging",
+      "description": "Enable detailed logging for debugging",
+      "default": false
+    }
+  }
+}

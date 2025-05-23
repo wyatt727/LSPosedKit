@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.wobbz.framework.core.ReflectionTestUtilTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2025-05-23T19:35:22" hostname="mac-{{serial-number}}" time="0.19">
+  <properties/>
+  <testcase name="testValidateFieldForHooking" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.062"/>
+  <testcase name="testGetMethodSafely" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.001"/>
+  <testcase name="testFindFieldsMatching" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.003"/>
+  <testcase name="testInvokeMethodSafely" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.001"/>
+  <testcase name="testGetFieldSafely" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.001"/>
+  <testcase name="testWorkingWithPrivateMembers" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testReflectionTestException" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testGetClassHierarchy" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testFindMethodsMatching" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testCreateMockField" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.001"/>
+  <testcase name="testSetAndGetFieldSafely" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testValidationResult" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.115"/>
+  <testcase name="testCreateMockMethod" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <testcase name="testCreateTestInstance" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.001"/>
+  <testcase name="testValidateMethodForHooking" classname="com.wobbz.framework.core.ReflectionTestUtilTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

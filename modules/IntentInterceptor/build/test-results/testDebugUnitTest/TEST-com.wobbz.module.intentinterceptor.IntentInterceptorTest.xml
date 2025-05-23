@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.wobbz.module.intentinterceptor.IntentInterceptorTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-05-23T19:35:26" hostname="mac-{{serial-number}}" time="0.207">
+  <properties/>
+  <testcase name="testModuleImplementsInterfaces" classname="com.wobbz.module.intentinterceptor.IntentInterceptorTest" time="0.005"/>
+  <testcase name="testLifecycleMethods" classname="com.wobbz.module.intentinterceptor.IntentInterceptorTest" time="0.201"/>
+  <testcase name="testHotReload" classname="com.wobbz.module.intentinterceptor.IntentInterceptorTest" time="0.001"/>
+  <testcase name="testModuleCreation" classname="com.wobbz.module.intentinterceptor.IntentInterceptorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

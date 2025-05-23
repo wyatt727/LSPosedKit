@@ -22,12 +22,30 @@ android {
     kotlinOptions {
         jvmTarget = rootProject.ext.javaVersion.toString()
     }
+
+    sourceSets {
+        testFixtures {
+            java.srcDirs = ['src/testFixtures/java']
+        }
+    }
+}
+
+// Manual test fixtures configuration to avoid annotation processor conflicts
+configurations {
+    testFixturesApi
+    testFixturesImplementation
+    testFixturesRuntimeOnly
 }
 
 dependencies {
-    api project(':libxposed-api:api')
+    api 'io.github.libxposed:api:100'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
     implementation 'androidx.annotation:annotation:1.5.0'
+    
+    // Test fixtures dependencies - manually configured
+    testFixturesApi 'junit:junit:4.13.2'
+    testFixturesApi 'org.mockito:mockito-core:4.0.0'
+    testFixturesApi "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
     
     // Testing
     testImplementation 'junit:junit:4.13.2'

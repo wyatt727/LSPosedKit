@@ -7,12 +7,12 @@
         message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
         <location
             file="${:framework:core*projectDir}/build.gradle"
-            line="29"
+            line="42"
             column="20"
-            startOffset="655"
-            endLine="29"
+            startOffset="942"
+            endLine="42"
             endColumn="89"
-            endOffset="724"/>
+            endOffset="1011"/>
     </incident>
 
     <incident
@@ -26,12 +26,50 @@
             replacement="1.9.1"/>
         <location
             file="${:framework:core*projectDir}/build.gradle"
-            line="30"
+            line="43"
             column="20"
-            startOffset="744"
-            endLine="30"
+            startOffset="1031"
+            endLine="43"
             endColumn="58"
-            endOffset="782"/>
+            endOffset="1069"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:framework:core*projectDir}/build.gradle"
+            line="47"
+            column="21"
+            startOffset="1192"
+            endLine="47"
+            endColumn="53"
+            endOffset="1224"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:framework:core*projectDir}/build.gradle"
+            line="52"
+            column="24"
+            startOffset="1402"
+            endLine="52"
+            endColumn="56"
+            endOffset="1434"/>
     </incident>
 
 </incidents>

@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
 }
@@ -9,10 +9,26 @@ android {
     compileSdk rootProject.ext.compileSdk
     
     defaultConfig {
+        applicationId "com.wobbz.module.uienhancer"
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
+        versionCode 1
+        versionName "1.0.0"
         
-        consumerProguardFiles "consumer-rules.pro"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     
     compileOptions {
@@ -36,8 +52,13 @@ dependencies {
     
     // UI libraries for advanced styling
     implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.8.0'
+    
+    // Preference UI for settings
+    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
     
     // Color manipulation and graphics
     implementation 'androidx.palette:palette-ktx:1.0.0'
@@ -50,4 +71,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.0.0'
     testImplementation 'androidx.test:core:1.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 } 

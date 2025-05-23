@@ -3,6 +3,7 @@ package com.wobbz.framework.core
 import android.content.Context
 import com.wobbz.framework.core.exceptions.HookException
 import io.github.libxposed.api.XposedInterface as LibXposedInterface
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -74,6 +75,36 @@ class XposedInterfaceImpl(
     }
     
     override fun <T : Hooker> hook(
+        constructor: Constructor<*>,
+        hookerClass: Class<T>
+    ): MethodUnhooker<T> {
+        return try {
+            val hooker = hookerClass.getDeclaredConstructor().newInstance()
+            
+            // Create adapter to bridge LSPosedKit Hooker with libxposed Hooker
+            val adapter = HookerAdapter(hooker)
+            
+            // Set the current hooker for this thread before hooking
+            adapter.setCurrentHooker()
+            
+            // Use the real libxposed API to hook the constructor
+            val libUnhooker = libXposedInterface.hook(constructor, HookerAdapter::class.java)
+            
+            // Wrap the libxposed unhooker with our implementation
+            val unhookCallback = {
+                adapter.clearCurrentHooker()
+                libUnhooker.unhook()
+            }
+            
+            LogUtil.logInfo(TAG, "Hooked constructor: ${constructor.declaringClass.name}")
+            MethodUnhookerImpl(hooker, unhookCallback)
+        } catch (e: Exception) {
+            LogUtil.logError(TAG, "Failed to create hook for constructor", e)
+            throw HookException("Failed to create hook for constructor", e)
+        }
+    }
+    
+    override fun <T : Hooker> hook(
         field: Field,
         hookerClass: Class<T>
     ): MethodUnhooker<T> {
@@ -111,16 +142,9 @@ class XposedInterfaceImpl(
     }
     
     override fun getSystemContext(): Context {
-        // Use the application info to get context
-        // This is a simplified approach - real implementation would need more work
-        return try {
-            // For now, we can't easily get system context through libxposed API
-            // This would need to be implemented differently based on the framework capabilities
-            throw NotImplementedError("getSystemContext() needs framework-specific implementation")
-        } catch (e: Exception) {
-            LogUtil.logError(TAG, "Failed to get system context", e)
-            throw e
-        }
+        // For now, we can't easily get system context through libxposed API
+        // This would need to be implemented differently based on the framework capabilities
+        throw NotImplementedError("getSystemContext() needs framework-specific implementation")
     }
     
     override fun getClassLoader(): ClassLoader {

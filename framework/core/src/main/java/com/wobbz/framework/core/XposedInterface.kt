@@ -1,6 +1,7 @@
 package com.wobbz.framework.core
 
 import android.content.Context
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -45,6 +46,18 @@ interface XposedInterface {
      */
     fun <T : Hooker> hook(
         method: Method,
+        hookerClass: Class<T>
+    ): MethodUnhooker<T>
+    
+    /**
+     * Hooks a constructor with the specified hooker.
+     * 
+     * @param constructor The constructor to hook
+     * @param hookerClass The hooker class to use for callbacks
+     * @return A MethodUnhooker to unhook the constructor later
+     */
+    fun <T : Hooker> hook(
+        constructor: Constructor<*>,
         hookerClass: Class<T>
     ): MethodUnhooker<T>
     

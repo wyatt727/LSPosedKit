@@ -1,0 +1,18 @@
+{
+  "id": "test-module",
+  "name": "Test Module",
+  "version": "1.0.0",
+  "description": "Simple test module for basic functionality testing",
+  "author": "LSPosedKit",
+  "scope": ["*"],
+  "minApiVersion": 31,
+  "maxApiVersion": 35,
+  "className": "TestModule",
+  "packageName": "com.wobbz.module.testmodule",
+  "isHotReloadable": true,
+  "capabilities": [
+    "basic-testing"
+  ],
+  "services": [],
+  "dependencies": []
+} 

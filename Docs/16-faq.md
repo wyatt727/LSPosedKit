@@ -38,7 +38,7 @@ LSPosedKit is a development toolkit for building, testing, and hot-reloading LSP
 
 ```bash
 # Option 1: Use the scaffold script (recommended)
-./gradlew :scripts:newModule -Pname="My Module" -Pid=my-module
+./gradlew :scripts:newModule -PmoduleName="MyModule" -Pid="my-module"
 
 # Option 2: Manual approach
 mkdir -p modules/my-module/src/main/{java,assets,res}

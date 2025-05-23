@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="incidents">
+
+    <incident
+        id="RedundantLabel"
+        severity="warning"
+        message="Redundant label can be removed">
+        <fix-attribute
+            description="Delete label"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="label"/>
+        <location
+            file="${:modules:DebugApp*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="19"
+            column="13"
+            startOffset="726"
+            endLine="19"
+            endColumn="45"
+            endOffset="758"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlin:kotlin-stdlib than 1.9.0 is available: 2.0.0">
+        <location
+            file="${:modules:DebugApp*projectDir}/build.gradle"
+            line="49"
+            column="20"
+            startOffset="1309"
+            endLine="49"
+            endColumn="89"
+            endOffset="1378"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.annotation:annotation than 1.5.0 is available: 1.9.1">
+        <fix-replace
+            description="Change to 1.9.1"
+            family="Update versions"
+            oldString="1.5.0"
+            replacement="1.9.1"/>
+        <location
+            file="${:modules:DebugApp*projectDir}/build.gradle"
+            line="50"
+            column="20"
+            startOffset="1398"
+            endLine="50"
+            endColumn="58"
+            endOffset="1436"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.mockito:mockito-core than 4.0.0 is available: 4.11.0">
+        <fix-replace
+            description="Change to 4.11.0"
+            family="Update versions"
+            oldString="4.0.0"
+            replacement="4.11.0"/>
+        <location
+            file="${:modules:DebugApp*projectDir}/build.gradle"
+            line="54"
+            column="24"
+            startOffset="1524"
+            endLine="54"
+            endColumn="56"
+            endOffset="1556"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1">
+        <fix-replace
+            description="Change to 1.2.1"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.2.1"/>
+        <location
+            file="${:modules:DebugApp*projectDir}/build.gradle"
+            line="55"
+            column="31"
+            startOffset="1587"
+            endLine="55"
+            endColumn="62"
+            endOffset="1618"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1">
+        <fix-replace
+            description="Change to 3.6.1"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.6.1"/>
+        <location
+            file="${:modules:DebugApp*projectDir}/build.gradle"
+            line="56"
+            column="31"
+            startOffset="1649"
+            endLine="56"
+            endColumn="75"
+            endOffset="1693"/>
+    </incident>
+
+</incidents>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.wobbz.framework.core.XposedInterfaceTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-05-23T19:35:26" hostname="mac-{{serial-number}}" time="0.061">
+  <properties/>
+  <testcase name="testHookExecution" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.023"/>
+  <testcase name="testUnhooking" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.0"/>
+  <testcase name="testClearLogs" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.001"/>
+  <testcase name="testLogging" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.0"/>
+  <testcase name="testClassLoadingNotFound" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.027"/>
+  <testcase name="testHookWithException" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.004"/>
+  <testcase name="testMethodHooking" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.002"/>
+  <testcase name="testMultipleHooks" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.001"/>
+  <testcase name="testClassLoading" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.0"/>
+  <testcase name="testErrorLogging" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.001"/>
+  <testcase name="testMethodHookingByName" classname="com.wobbz.framework.core.XposedInterfaceTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

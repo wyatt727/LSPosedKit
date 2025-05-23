@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="partial_results">
+    <map id="UnusedResources">
+        <location id="R.string.module_description"
+            file="${:modules:NetworkGuard*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="4"
+            column="13"
+            startOffset="113"
+            endLine="4"
+            endColumn="38"
+            endOffset="138"/>
+        <entry
+            name="model"
+            string="array[xposed_scope(U)],mipmap[ic_launcher(U)],string[app_name(U),module_description(D)];;;;"/>
+    </map>
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.wobbz.module.networkguard.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+
+</incidents>

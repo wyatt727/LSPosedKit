@@ -44,6 +44,10 @@ internal class HookParamImpl(
         return throwableSet
     }
     
+    override fun hasResult(): Boolean {
+        return resultSet
+    }
+    
     override fun returnEarly(): Boolean {
         return resultSet || throwableSet
     }

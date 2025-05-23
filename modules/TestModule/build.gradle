@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'  // Changed from library to application
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+    namespace 'com.wobbz.module.testmodule'
+    compileSdk rootProject.ext.compileSdk
+    
+    defaultConfig {
+        applicationId "com.wobbz.module.testmodule"  // Required for applications
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        versionCode 1                   // Required for applications
+        versionName "1.0.0"             // Required for applications
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            debuggable false
+            minifyEnabled false  // LSPosed modules typically don't minify
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+    
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion.toString()
+    }
+}
+
+dependencies {
+    // Framework dependencies - these get EMBEDDED in the APK
+    implementation project(':framework')
+    kapt project(':framework:processor')
+    
+    // Standard dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

@@ -70,7 +70,7 @@ LSPosedKit/
 1. **Create a new module in LSPosedKit**:
 
 ```bash
-./gradlew :scripts:newModule -Pname="My Module" -Pid=my-module
+./gradlew :scripts:newModule -PmoduleName="MyModule" -Pid="my-module"
 ```
 
 2. **Copy source files**:

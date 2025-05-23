@@ -1,0 +1,40 @@
+{
+  "id": "network-guard",
+  "name": "Network Guard",
+  "version": "1.0.0",
+  "description": "Monitors and controls network traffic using rule-based filtering",
+  "author": "LSPosedKit",
+  "features": [
+    "network.inspection",
+    "network.blocking",
+    "network.rules"
+  ],
+  "providedServices": {
+    "com.wobbz.module.networkguard.services.INetworkRuleService": "1.0.0"
+  },
+  "serviceDependencies": [
+    {
+      "service": "com.wobbz.module.networkguard.ILoggingService",
+      "version": "^1.0.0",
+      "optional": true
+    }
+  ],
+  "capabilities": {
+    "hotReload": true,
+    "lifecycle": true,
+    "resourceManagement": true
+  },
+  "extensionPoints": {
+    "network.rule.provider": "com.wobbz.module.networkguard.rules.NetworkRuleProvider",
+    "network.traffic.monitor": "com.wobbz.module.networkguard.hooks.NetworkHooks"
+  },
+  "permissions": [
+    "INTERNET",
+    "ACCESS_NETWORK_STATE"
+  ],
+  "targetPackages": [
+    "*"
+  ],
+  "minApiVersion": 31,
+  "maxApiVersion": 35
+} 

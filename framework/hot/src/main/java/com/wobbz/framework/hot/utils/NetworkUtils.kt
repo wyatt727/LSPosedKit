@@ -1,5 +1,6 @@
 package com.wobbz.framework.hot.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -17,6 +18,7 @@ object NetworkUtils {
     /**
      * Checks if the device has an active network connection.
      */
+    @SuppressLint("MissingPermission")
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/ui_enhancer_primary</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/ui_enhancer_accent</item>
+    </style>
+    
+    <!-- Settings theme for preference screens -->
+    <style name="AppTheme.Settings" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="colorPrimary">@color/ui_enhancer_primary</item>
+        <item name="colorAccent">@color/ui_enhancer_accent</item>
+    </style>
+    
+    <!-- Simplified no action bar theme -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ui_enhancer_primary</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/ui_enhancer_accent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+</resources> 

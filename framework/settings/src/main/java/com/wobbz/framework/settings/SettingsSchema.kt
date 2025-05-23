@@ -46,12 +46,26 @@ internal class SettingsSchema(
                 val default = propObj.opt("default")
                 val title = propObj.optString("title", key)
                 val description = propObj.optString("description", "")
+                val minimum = propObj.opt("minimum")
+                val maximum = propObj.opt("maximum")
+                
+                // Parse enum values if present
+                val enumValues = propObj.optJSONArray("enum")?.let { enumArray ->
+                    val values = mutableListOf<String>()
+                    for (i in 0 until enumArray.length()) {
+                        values.add(enumArray.getString(i))
+                    }
+                    values
+                }
                 
                 properties[key] = SchemaProperty(
                     type = type,
                     default = default,
                     title = title,
-                    description = description
+                    description = description,
+                    minimum = minimum,
+                    maximum = maximum,
+                    enumValues = enumValues
                 )
             }
             
@@ -67,7 +81,10 @@ internal data class SchemaProperty(
     val type: SchemaPropertyType,
     val default: Any?,
     val title: String,
-    val description: String
+    val description: String,
+    val minimum: Any? = null,
+    val maximum: Any? = null,
+    val enumValues: List<String>? = null
 )
 
 /**

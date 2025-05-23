@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/values-port/values-port.xml",
+            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-42:/values-port/values-port.xml",
             "map": [
                 {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7638403fb91a256a5fe607e32b34ff97/transformed/appcompat-1.5.0/res/values-port/values-port.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "55",
-                        "endOffsets": "106"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-41:/values-port/values-port.xml",
-            "map": [
-                {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7638403fb91a256a5fe607e32b34ff97/transformed/appcompat-1.5.0/res/values-port/values-port.xml",
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/836ba8730b67f5d5a7a5e421a7ab8eca/transformed/appcompat-1.6.1/res/values-port/values-port.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

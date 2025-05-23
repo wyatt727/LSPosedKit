@@ -1,25 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/values-small-v4/values-small-v4.xml",
+            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-42:/values-small-v4/values-small-v4.xml",
             "map": [
                 {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7d9c0805462dcf2c954929d08696d165/transformed/material-1.8.0/res/values-small-v4/values-small-v4.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,128,198,270",
-                        "endColumns": "72,69,71,69",
-                        "endOffsets": "123,193,265,335"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-41:/values-small-v4/values-small-v4.xml",
-            "map": [
-                {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7d9c0805462dcf2c954929d08696d165/transformed/material-1.8.0/res/values-small-v4/values-small-v4.xml",
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/65f860b9a3331aaee139c423ae26d319/transformed/material-1.8.0/res/values-small-v4/values-small-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        
+        
+        
+    </string-array>
+    <string name="app_name">TestModule</string>
+    <string name="module_description">Test module for standalone APK generation</string>
+</resources>

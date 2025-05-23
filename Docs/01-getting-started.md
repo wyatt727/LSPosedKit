@@ -1,6 +1,6 @@
 # Getting Started with LSPosedKit
 
-> Complete guide to setting up your development environment, building your first module, and understanding the LSPosedKit workflow.
+> Complete guide to setting up your development environment, building your first **standalone module APK**, and understanding the LSPosedKit workflow.
 
 ## System Requirements
 
@@ -79,13 +79,24 @@ git submodule update --init --recursive
 ./gradlew environmentCheck
 ```
 
-## Build and Install
+## Build and Install Standalone Module APKs
+
+**Key Concept**: Each LSPosed module is built as a standalone APK containing the LSPosedKit framework embedded within it.
 
 ```bash
-# Build everything in debug mode
+# Build all modules as standalone APKs
 ./gradlew assembleDebug
 
-# Install to connected device 
+# Build specific module APK
+./gradlew :modules:DebugApp:assembleDebug
+
+# Install specific module APK to connected device 
+./gradlew :modules:DebugApp:installDebug
+
+# Or install directly with adb
+adb install modules/DebugApp/build/outputs/apk/debug/DebugApp-debug.apk
+
+# Install all module APKs
 ./gradlew installDebug
 
 # Optional: Refresh package database
@@ -95,12 +106,14 @@ adb shell cmd package reconcile
 adb logcat -s LSPK:* -v time
 ```
 
-## First-Time Module Activation
+## Module Activation
+
+**Important**: No "LSPK Host" module needed — each module is completely self-contained!
 
 1. Open **LSPosed Manager** on your device
 2. Navigate to **Modules** tab
-3. Enable **LSPK Host** (required)
-4. Enable at least one module (e.g., "NetworkGuard")
+3. Enable your installed modules (e.g., "DebugApp", "NetworkGuard")
+4. For each module, select target applications in scope
 5. Tap the check (✓) icon to apply changes
 6. Reboot your device when prompted
 
@@ -110,12 +123,12 @@ After reboot, check for proper initialization:
 
 ```bash
 # Filter for module-specific logs
-adb logcat -s LSPK-NetworkGuard:V | grep "\[INIT\]"
+adb logcat -s LSPK-DebugApp:V | grep "\[INIT\]"
 ```
 
 Expected output:
 ```
-05-22 12:34:56.789 LSPK-NetworkGuard I [INIT] NetworkGuard loaded for com.android.systemui
+05-22 12:34:56.789 LSPK-DebugApp I [INIT] DebugApp loaded for com.android.systemui
 ```
 
 ## Creating Your First Module
@@ -124,15 +137,46 @@ Expected output:
 
 ```bash
 # Create a new module with standardized template
-./gradlew :scripts:newModule -Pname="Debug App" -Pid=debug-app
+./gradlew :scripts:newModule -PmoduleName="DebugApp" -Pid="debug-app"
+
+# With optional description and author
+./gradlew :scripts:newModule \
+  -PmoduleName="DebugApp" \
+  -Pid="debug-app" \
+  -Pdescription="Force enable debug flags in apps" \
+  -Pauthor="Your Name"
 ```
 
-This creates:
-- Module directory structure under `modules/debug-app/`
-- Basic Gradle configuration
-- Skeleton module implementation
-- Starter `settings.json` and `module-info.json`
-- Test directory with unit test template
+This **automatically generates everything** needed for a standalone APK module:
+
+**📁 Directory Structure**:
+- Module directory structure under `modules/DebugApp/`
+- Source directories: `src/main/java/`, `src/test/java/`, `src/main/assets/`
+- Resource directories: `src/main/res/values/`, `src/main/res/mipmap-mdpi/`
+
+**🔧 Application Configuration**:
+- **Android application** Gradle configuration (not library!)
+- Complete `build.gradle` with embedded framework dependencies
+- `AndroidManifest.xml` with LSPosed metadata and launcher activity
+
+**📱 Android Resources**:
+- `strings.xml` with module name and description
+- `arrays.xml` with xposed_scope configuration
+- `ic_launcher.xml` vector drawable launcher icon
+- `MainActivity.kt` for settings access (customizable)
+
+**💻 Code Templates**:
+- Main module class with `@XposedPlugin` annotation
+- Example hooks manager with proper `PackageLoadedParam` access
+- Unit test template with mock utilities
+- Complete module implementation skeleton
+
+**📄 Metadata Files**:
+- `settings.json` schema with package filtering and logging options
+- `module-info.json` with capabilities and service declarations
+- `README.md` with module-specific documentation
+
+**🎯 Result**: A complete, buildable standalone APK module ready for customization!
 
 ### Option 2: Manual Setup
 
@@ -144,7 +188,7 @@ This creates:
 2. Create Gradle build file (`modules/debug-app/build.gradle`):
    ```groovy
    plugins {
-       id 'com.android.library'
+       id 'com.android.application'  // 🔥 APPLICATION, not library!
        id 'org.jetbrains.kotlin.android'
        id 'org.jetbrains.kotlin.kapt'
    }
@@ -154,14 +198,35 @@ This creates:
        compileSdk 35
        
        defaultConfig {
+           applicationId "com.example.debugapp"  // 🔥 Required for APKs
            minSdk 31
            targetSdk 35
+           versionCode 1                         // 🔥 Required for APKs
+           versionName "1.0.0"                   // 🔥 Required for APKs
+           
+           testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+       }
+       
+       buildTypes {
+           debug {
+               debuggable true
+               minifyEnabled false
+           }
+           release {
+               debuggable false
+               minifyEnabled false  // LSPosed modules typically don't minify
+           }
        }
    }
    
    dependencies {
+       // Framework gets EMBEDDED in the APK
        implementation project(':framework')
        kapt project(':framework:processor')
+       
+       // Standard dependencies
+       implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+       implementation 'androidx.annotation:annotation:1.5.0'
    }
    ```
 
@@ -200,45 +265,70 @@ This creates:
    include ':modules:debug-app'
    ```
 
-## Development Workflow
+5. **Build and install the standalone APK**:
+   ```bash
+   # Build your module APK
+   ./gradlew :modules:debug-app:assembleDebug
+   
+   # Install to device
+   ./gradlew :modules:debug-app:installDebug
+   ```
 
-```mermaid
-graph TD
-    A[Write/Edit Module Code] --> B[Build with ./gradlew assembleDebug]
-    B --> C[Install with ./gradlew installDebug]
-    C --> D[Check logs with adb logcat]
-    D -- Issues? --> E[Debug and fix]
-    E --> A
-    D -- Working? --> F[Add more features]
-    F --> A
+## Architecture Understanding
+
+### Standalone APK Structure
+
+Each module APK contains:
+
+```
+debug-app.apk
+├── META-INF/
+├── classes.dex           ← Your module code + embedded framework
+├── assets/
+│   ├── module.prop       ← Generated by scaffolding script & annotation processor
+│   ├── xposed_init       ← Generated by scaffolding script (points to LSPosedEntry bridge)
+│   ├── module-info.json  ← Generated by scaffolding script & annotation processor
+│   └── settings.json     ← Your settings schema
+├── res/                  ← Any resources your module needs
+└── AndroidManifest.xml   ← Application manifest
 ```
 
-For rapid development, use Hot-Reload:
+### No Dependencies
 
-1. Start development server:
-   ```bash
-   ./gradlew runDevServer
-   ```
-
-2. Make code changes and build:
-   ```bash
-   ./gradlew :modules:debug-app:assembleDebug
-   ```
-
-3. Hot-reload will automatically push changes to device (~2 seconds)
-
-## Common First-Time Issues
-
-| Issue | Solution |
-|-------|----------|
-| **Module not showing in LSPosed Manager** | Ensure LSPK Host is enabled; check for build errors; verify module metadata |
-| **"App not installed" error** | Uninstall existing app first; check for signature conflicts |
-| **No logs appearing** | Check tag filters; ensure module is enabled in LSPosed Manager |
-| **Hot-reload not working** | Verify DEX patch server is running; check ADB connection; ensure module implements `IHotReloadable` |
-| **Hooks not applying** | Verify package name in scope array; check for typos in class/method names; use `xp.log()` to debug |
+**Unlike traditional LSPosed development**:
+- ❌ No need for separate "LSPosedKit Host" APK
+- ❌ No runtime dependencies on external modules
+- ✅ Each module APK is completely self-contained
+- ✅ Install any module independently: `adb install MyModule.apk`
+- ✅ Framework code embedded in each APK
 
 ## Next Steps
 
-- Review [02-annotations.md](02-annotations.md) to understand module metadata
-- Explore [03-settings-schema.md](03-settings-schema.md) for adding user preferences
-- See [10-examples.md](10-examples.md) for real-world module examples 
+1. **Explore Sample Modules**: Check out `modules/NetworkGuard/`, `modules/IntentInterceptor/`, etc.
+2. **Read Documentation**: Browse `Docs/` for detailed guides on settings, hot-reload, service bus, etc.
+3. **Start Development**: Use hot-reload for rapid iteration during development
+4. **Package for Release**: Generate signed APKs for distribution
+
+## Troubleshooting
+
+### Build Issues
+
+**Error**: "This project uses Android Gradle plugin 8.3.0..."
+**Solution**: Ensure you're using Gradle 8.4+ and JDK 17
+
+**Error**: "Cannot resolve symbol 'IModulePlugin'"  
+**Solution**: Verify the framework dependency is included: `implementation project(':framework')`
+
+### Installation Issues
+
+**Error**: "App not installed" when using `adb install`
+**Solution**: Uninstall any previous version: `adb uninstall com.example.debugapp`
+
+**Module not showing in LSPosed Manager**
+**Solution**: 
+1. Verify the APK was installed: `adb shell pm list packages | grep debugapp`
+2. Check that `xposed_init` and `module.prop` are in `assets/` (auto-generated by scaffolding script)
+3. For scaffolded modules: Verify `xposed_init` points to the correct LSPosedEntry bridge class
+4. Restart LSPosed Manager
+
+For more troubleshooting, see [Docs/15-troubleshooting.md](15-troubleshooting.md). 

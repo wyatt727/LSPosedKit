@@ -1,22 +1,24 @@
 # Packaging & Release Management
 
-> Complete guide to signing, packaging, and distributing LSPosedKit modules as `.lspkmod` bundles.
+> Complete guide to signing, packaging, and distributing LSPosedKit modules as **standalone APKs**.
 
 ## Overview
 
 LSPosedKit provides a streamlined workflow for packaging and releasing modules. This guide covers:
 
-1. **Signing Configuration**: Setting up signing keys for release builds
+1. **Signing Configuration**: Setting up signing keys for release APKs
 2. **Version Management**: Managing version numbers across files
-3. **`.lspkmod` Bundle Creation**: Packaging modules for distribution
-4. **Release Channels**: Options for distributing your modules
+3. **APK Generation**: Building standalone, installable module APKs
+4. **Release Channels**: Options for distributing your module APKs
 5. **Metadata Management**: Ensuring consistent metadata across files
+
+**Key Concept**: Each LSPosed module is packaged as a **standalone Android APK** containing the entire LSPosedKit framework embedded within it. No external dependencies or "host" APKs are required.
 
 ## Signing Configuration
 
 ### Setting Up Signing Keys
 
-Before releasing modules, you need to create and configure signing keys:
+Before releasing modules, you need to create and configure signing keys for your APKs:
 
 #### 1. Generate a Keystore
 
@@ -81,12 +83,31 @@ ext {
 }
 ```
 
-#### 4. Configure Module-Level Gradle
+#### 4. Configure Module-Level Gradle (Android Application)
 
 In each module's `build.gradle`:
 
 ```groovy
+plugins {
+    id 'com.android.application'  // 🔥 APPLICATION, not library
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
 android {
+    namespace 'com.wobbz.module.debugapp'
+    compileSdk 35
+    
+    defaultConfig {
+        applicationId "com.wobbz.module.debugapp"  // 🔥 Required for APKs
+        minSdk 31
+        targetSdk 35
+        versionCode rootProject.ext.modules.debugApp.versionCode
+        versionName rootProject.ext.modules.debugApp.versionName
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    
     signingConfigs {
         release {
             storeFile file(rootProject.ext.signingConfig.storeFile)
@@ -97,21 +118,53 @@ android {
     }
     
     buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
+            debuggable false
+            minifyEnabled false  // LSPosed modules typically don't minify
             signingConfig signingConfigs.release
-            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    // Framework gets EMBEDDED in the APK
+    implementation project(':framework')
+    kapt project(':framework:processor')
+    
+    // Standard dependencies
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation 'androidx.annotation:annotation:1.5.0'
 }
 ```
 
 ### Using the Signing Configuration
 
-Once configured, you can build signed releases:
+Once configured, you can build signed release APKs:
 
 ```bash
+# Build signed release APK for specific module
+./gradlew :modules:DebugApp:assembleRelease
+
+# Build all module release APKs
 ./gradlew assembleRelease
+
+# Install release APK to device
+./gradlew :modules:DebugApp:installRelease
 ```
 
 For CI/CD environments, you can pass credentials directly:
@@ -141,8 +194,16 @@ ext {
             versionCode: 1
         ],
         networkGuard: [
-            versionName: "2.1.0",
+            versionName: "2.1.0", 
             versionCode: 5
+        ],
+        intentInterceptor: [
+            versionName: "1.2.0",
+            versionCode: 3
+        ],
+        uiEnhancer: [
+            versionName: "1.1.0",
+            versionCode: 2
         ]
     ]
 }
@@ -158,7 +219,7 @@ apply from: 'versions.gradle'
 
 Your module's version should be consistent across:
 1. `@XposedPlugin` annotation
-2. `module-info.json`
+2. `module-info.json`  
 3. APK manifest (`versionName` and `versionCode`)
 
 Use Gradle to ensure consistency:
@@ -198,171 +259,61 @@ task generateModuleInfo {
 preBuild.dependsOn generateModuleInfo
 ```
 
-### Semantic Versioning
+## APK Generation and Distribution
 
-Follow [Semantic Versioning](https://semver.org/) (SemVer) for your modules:
-
-- **MAJOR**: Incompatible API changes
-- **MINOR**: Backward-compatible functionality additions
-- **PATCH**: Backward-compatible bug fixes
-- **Pre-release**: `-alpha.1`, `-beta.2`, `-rc.1`
-
-Example versioning:
-- `1.0.0`: Initial release
-- `1.0.1`: Bug fixes
-- `1.1.0`: New features, backward-compatible
-- `2.0.0`: Breaking changes
-- `1.1.0-beta.1`: Beta release of new features
-
-## Creating `.lspkmod` Bundles
-
-`.lspkmod` bundles are the standard distribution format for LSPosedKit modules:
-
-### Bundle Structure
-
-A `.lspkmod` bundle is essentially a ZIP file containing:
-
-```
-module-name.lspkmod/
-├── module.apk              # The signed APK file
-├── module-info.json        # Module metadata
-├── changelog.md            # Release notes (optional)
-├── icon.png                # Module icon (optional)
-└── META-INF/
-    └── signatures.json     # Bundle signature information
-```
-
-### Building Bundles with Gradle
-
-LSPosedKit provides Gradle tasks for bundle creation:
-
-```groovy
-// In module's build.gradle
-tasks.register('createBundle') {
-    dependsOn 'assembleRelease'
-    
-    doLast {
-        def bundleName = "debug-app-${android.defaultConfig.versionName}.lspkmod"
-        def bundleDir = file("$buildDir/bundle")
-        def bundleFile = file("$buildDir/outputs/bundle/$bundleName")
-        
-        // Create bundle directory structure
-        delete bundleDir
-        bundleDir.mkdirs()
-        
-        // Copy APK
-        copy {
-            from "$buildDir/outputs/apk/release"
-            include "*-release.apk"
-            into bundleDir
-            rename { "module.apk" }
-        }
-        
-        // Copy metadata
-        copy {
-            from "src/main/assets"
-            include "module-info.json"
-            into bundleDir
-        }
-        
-        // Copy changelog if it exists
-        if (file("CHANGELOG.md").exists()) {
-            copy {
-                from "CHANGELOG.md"
-                into bundleDir
-            }
-        }
-        
-        // Create bundle zip
-        file("$buildDir/outputs/bundle").mkdirs()
-        ant.zip(destfile: bundleFile, basedir: bundleDir)
-        
-        println "Created bundle: $bundleFile"
-    }
-}
-```
-
-### Using the Bundle Task
+### Building Release APKs
 
 ```bash
-# Create bundle for a specific module
-./gradlew :modules:debug-app:createBundle
+# Build all module APKs
+./gradlew assembleRelease
 
-# Create bundles for all modules
-./gradlew createBundle
+# Build specific module APK
+./gradlew :modules:NetworkGuard:assembleRelease
+
+# Output location
+ls modules/*/build/outputs/apk/release/*.apk
 ```
 
-### Simplified Bundle Creation
+### APK Structure
 
-LSPosedKit's framework module includes a pre-configured task:
+Each generated APK contains:
+
+```
+NetworkGuard-release.apk
+├── META-INF/
+│   ├── MANIFEST.MF
+│   ├── CERT.SF          ← Your signing certificate
+│   └── CERT.RSA         ← Your signing key
+├── classes.dex          ← Module code + embedded LSPosedKit framework
+├── assets/
+│   ├── module.prop      ← Generated: LSPosed metadata
+│   ├── xposed_init      ← Generated: Entry point class
+│   ├── module-info.json ← Generated: Extended metadata 
+│   └── settings.json    ← Your settings schema
+├── res/                 ← Any Android resources
+└── AndroidManifest.xml  ← Application manifest
+```
+
+### Distribution Options
+
+#### Option 1: Direct APK Distribution
+
+Share the APK files directly:
 
 ```bash
-# Create bundle with default settings
-./gradlew :modules:debug-app:publishBundle
-
-# Override settings
-./gradlew :modules:debug-app:publishBundle -PbundleVersion=1.0.0-beta1
+# Share via file hosting
+cp modules/NetworkGuard/build/outputs/apk/release/NetworkGuard-release.apk ~/Downloads/
 ```
 
-The `publishBundle` task:
-1. Builds a release APK
-2. Validates module metadata
-3. Creates a properly structured bundle
-4. Signs the bundle
-5. Places the output in `dist/`
+**Installation**: `adb install NetworkGuard-release.apk` or side-load manually
 
-## Bundle Signing and Verification
+#### Option 2: GitHub Releases
 
-LSPosedKit bundles include integrity verification:
-
-### Signing Bundles
-
-```groovy
-// In module's build.gradle
-tasks.register('signBundle') {
-    dependsOn 'createBundle'
-    
-    doLast {
-        def bundleName = "debug-app-${android.defaultConfig.versionName}.lspkmod"
-        def bundleFile = file("$buildDir/outputs/bundle/$bundleName")
-        
-        // Generate signature file
-        exec {
-            commandLine 'java', '-jar', '../tools/bundlesigner.jar', 
-                     'sign', 
-                     '--keystore', rootProject.ext.signingConfig.storeFile,
-                     '--storepass', rootProject.ext.signingConfig.storePassword,
-                     '--keyalias', rootProject.ext.signingConfig.keyAlias,
-                     '--keypass', rootProject.ext.signingConfig.keyPassword,
-                     bundleFile
-        }
-        
-        println "Signed bundle: $bundleFile"
-    }
-}
-```
-
-### Verifying Bundles
-
-```bash
-# Verify a bundle's integrity
-java -jar tools/bundlesigner.jar verify path/to/module.lspkmod
-```
-
-## Release Channels
-
-Several options exist for distributing your module bundles:
-
-### GitHub Releases
-
-1. Create a GitHub release
-2. Upload the `.lspkmod` bundle
-3. Add release notes and changelog
-
-Example GitHub Action:
+Automate APK distribution via GitHub releases:
 
 ```yaml
-name: Release Module
+# .github/workflows/release.yml
+name: Release APKs
 
 on:
   push:
@@ -373,369 +324,141 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-          
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          
-      - name: Import keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
-          
-      - name: Build bundle
-        run: |
-          ./gradlew :modules:debug-app:publishBundle \
-            -PLSPK_STORE_FILE=keystore.jks \
-            -PLSPK_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
-            -PLSPK_KEY_ALIAS=upload \
-            -PLSPK_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
-            
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/*.lspkmod
-          draft: false
-          prerelease: false
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Build Release APKs
+      run: ./gradlew assembleRelease
+      env:
+        LSPK_STORE_FILE: ${{ secrets.KEYSTORE_BASE64 }}
+        LSPK_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        LSPK_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        LSPK_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload APKs
+      run: |
+        for apk in modules/*/build/outputs/apk/release/*.apk; do
+          gh release upload ${{ github.ref }} "$apk"
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### LSPosed Repository
+#### Option 3: F-Droid (Advanced)
 
-If you want your module included in the official LSPosed repository:
+For open-source modules, consider F-Droid distribution:
 
-1. Create a pull request to the [LSPosed Module Repository](https://github.com/LSPosed/LSPosed-Repo)
-2. Include your module metadata and bundle URL
-3. Follow the repository guidelines for submission
+1. Create F-Droid metadata file
+2. Submit to F-Droid repository
+3. Follow F-Droid guidelines for reproducible builds
 
-### Custom Distribution
+### Quality Assurance
 
-For private or enterprise distribution:
+#### APK Verification
 
-1. Set up a web server to host `.lspkmod` files
-2. Create a JSON API for module discovery
-3. Implement a custom module repository
+```bash
+# Verify APK signing
+apksigner verify --verbose modules/NetworkGuard/build/outputs/apk/release/NetworkGuard-release.apk
 
-## Bundle Metadata Management
+# Check APK contents
+aapt dump badging modules/NetworkGuard/build/outputs/apk/release/NetworkGuard-release.apk
 
-Proper metadata is crucial for module discoverability and user experience:
-
-### Required Metadata
-
-Your `module-info.json` should include:
-
-```json
-{
-  "$schema": "https://json-schema.org/draft-07/schema#",
-  "id": "debug-app",
-  "version": "1.0.0",
-  "name": "Debug App",
-  "author": "Your Name",
-  "description": "Force-enable debugging flags for all applications",
-  "minHostVersion": "1.0.0",
-  "features": [
-    "app.debugging"
-  ],
-  "screenshots": [
-    "https://example.com/screenshots/screenshot1.png",
-    "https://example.com/screenshots/screenshot2.png"
-  ],
-  "changelog": "https://example.com/changelog",
-  "website": "https://example.com/debug-app",
-  "source": "https://github.com/yourusername/debug-app",
-  "support": "https://github.com/yourusername/debug-app/issues",
-  "donate": "https://example.com/donate"
-}
+# Extract and examine
+unzip -l modules/NetworkGuard/build/outputs/apk/release/NetworkGuard-release.apk
 ```
 
-### Icon Requirements
+#### Testing Checklist
 
-For optimal display in LSPosed Manager:
+Before distributing APKs:
 
-- Format: PNG
-- Size: 192×192 pixels
-- Filename: `icon.png`
-- Location: Bundle root directory
+- [ ] **Build Verification**: APK builds successfully with release signing
+- [ ] **Installation Test**: APK installs cleanly on test device
+- [ ] **LSPosed Recognition**: Module appears in LSPosed Manager
+- [ ] **Functionality Test**: Core module features work as expected  
+- [ ] **Hot-Reload Test**: Hot-reload functionality works (if enabled)
+- [ ] **Settings Test**: Settings UI generates correctly from schema
+- [ ] **Logs Test**: Module logs appear with correct tags
+- [ ] **Uninstall Test**: Module uninstalls cleanly
 
-### Changelog Format
+## Advanced Packaging
 
-Include a `CHANGELOG.md` in your bundle:
+### Custom Gradle Tasks
 
-```markdown
-# Changelog
-
-## [1.0.0] - 2023-06-01
-
-### Added
-- Initial release
-- Support for enabling debug flags in all applications
-
-### Fixed
-- Properly handle system applications
-
-## [0.9.0] - 2023-05-15
-
-### Added
-- Beta preview release
-```
-
-## Advanced Packaging Options
-
-### ProGuard/R8 Configuration
-
-For optimal release builds, configure ProGuard:
-
-Create `proguard-rules.pro` in your module directory:
-
-```proguard
-# Keep annotations
--keep @com.wobbz.framework.processor.XposedPlugin class * {*;}
--keep @com.wobbz.framework.processor.HotReloadable class * {*;}
--keep @com.wobbz.framework.processor.SettingsKey class * {*;}
-
-# Keep interfaces
--keep interface com.wobbz.framework.core.IModulePlugin {*;}
--keep interface com.wobbz.framework.hot.IHotReloadable {*;}
--keep interface com.wobbz.framework.settings.SettingsProvider {*;}
-
-# Keep all hookers
--keep class * implements de.robv.android.xposed.callback.XC_LoadPackage$Hooker {*;}
-
-# Keep settings classes
--keepclassmembers class * {
-    @com.wobbz.framework.processor.SettingsKey *;
-}
-
-# Keep module main class and its methods
--keep class * implements com.wobbz.framework.core.IModulePlugin {
-    public <methods>;
-}
-```
-
-Enable ProGuard in your module's `build.gradle`:
+Create custom tasks for packaging workflows:
 
 ```groovy
-android {
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+// In module's build.gradle
+
+task packageForDistribution(type: Copy, dependsOn: assembleRelease) {
+    description = "Package module APK with documentation for distribution"
+    group = "distribution"
+    
+    from("build/outputs/apk/release") {
+        include "*.apk"
     }
+    from("src/main/assets") {
+        include "README.md"
+        include "CHANGELOG.md"
+    }
+    
+    into("$buildDir/dist")
+    
+    doLast {
+        println "Distribution package created at: $buildDir/dist"
+    }
+}
+
+task generateChecksums(type: Exec, dependsOn: packageForDistribution) {
+    description = "Generate SHA256 checksums for APK files"
+    group = "distribution"
+    
+    workingDir "$buildDir/dist"
+    commandLine "sh", "-c", "sha256sum *.apk > checksums.txt"
 }
 ```
 
-### Asset Bundling
+### Module Dependencies
 
-Include additional assets in your module:
-
-```groovy
-android {
-    sourceSets {
-        main {
-            assets {
-                srcDirs = ['src/main/assets', 'assets']
-            }
-        }
-    }
-}
-```
-
-Create an `assets` directory with:
-- Documentation
-- Configuration templates
-- Sample data
-
-### Localization
-
-For international users, include localized resources:
-
-```
-src/main/res/
-├── values/
-│   └── strings.xml          # Default (English)
-├── values-es/
-│   └── strings.xml          # Spanish
-├── values-ja/
-│   └── strings.xml          # Japanese
-└── values-ru/
-    └── strings.xml          # Russian
-```
-
-Configure your `settings.json` to use resource strings:
+If your modules depend on each other (rare), ensure proper version constraints:
 
 ```json
+// module-info.json
 {
-  "properties": {
-    "enable_debug": {
-      "type": "boolean",
-      "title": "@string/debug_enable_title",
-      "description": "@string/debug_enable_description",
-      "default": true
-    }
+  "id": "advanced-module",
+  "dependencies": {
+    "network-guard": "^2.0.0",
+    "intent-interceptor": ">=1.1.0"
   }
 }
 ```
 
-### Flavor Variants
-
-Create different variants of your module:
-
-```groovy
-android {
-    flavorDimensions "version"
-    productFlavors {
-        free {
-            dimension "version"
-            applicationIdSuffix ".free"
-            versionNameSuffix "-free"
-        }
-        pro {
-            dimension "version"
-            applicationIdSuffix ".pro"
-            versionNameSuffix "-pro"
-        }
-    }
-}
-```
-
-Build flavor-specific bundles:
-
-```bash
-./gradlew :modules:debug-app:publishFreeBundle
-./gradlew :modules:debug-app:publishProBundle
-```
-
-## Release Checklist
-
-Before releasing a module, verify:
-
-1. **Version Numbers**:
-   - `@XposedPlugin` annotation version
-   - `module-info.json` version
-   - Android manifest versionCode and versionName
-
-2. **Metadata**:
-   - Accurate description
-   - Proper feature tags
-   - Correct compatibility information
-
-3. **Documentation**:
-   - Updated README
-   - Updated CHANGELOG
-   - User guide
-
-4. **Testing**:
-   - Unit tests pass
-   - Integration tests pass
-   - Manual testing on target device(s)
-   - Tested with target applications
-
-5. **Signing**:
-   - Signed with release key
-   - Bundle verified
-
-6. **Distribution**:
-   - Checksums generated
-   - Release notes prepared
-   - Upload destinations configured
-
-## Continuous Delivery
-
-Automate your release process:
-
-### Semantic Release
-
-Install dependencies:
-
-```bash
-npm install -g semantic-release @semantic-release/git @semantic-release/changelog
-```
-
-Create `.releaserc.json`:
-
-```json
-{
-  "branches": ["main"],
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/changelog",
-    ["@semantic-release/exec", {
-      "prepareCmd": "./gradlew :modules:debug-app:publishBundle -PbundleVersion=${nextRelease.version}"
-    }],
-    ["@semantic-release/github", {
-      "assets": [
-        {"path": "dist/debug-app-*.lspkmod", "label": "Debug App Module"}
-      ]
-    }],
-    "@semantic-release/git"
-  ]
-}
-```
-
-Configure GitHub Actions:
-
-```yaml
-name: Release
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          
-      - name: Import keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
-          
-      - name: Install semantic-release
-        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec
-          
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LSPK_STORE_FILE: keystore.jks
-          LSPK_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          LSPK_KEY_ALIAS: upload
-          LSPK_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: npx semantic-release
-```
+Note: Dependencies are checked at runtime, not at APK install time.
 
 ## Conclusion
 
-Proper packaging and release management ensures your modules are:
+LSPosedKit's packaging system produces **standalone APKs** that can be distributed and installed independently. Each APK contains:
 
-- **Reliable**: Properly signed and verified
-- **Discoverable**: Well-documented with accurate metadata
-- **Maintainable**: Versioned according to best practices
-- **Professional**: Polished and ready for distribution
+- ✅ Your module implementation
+- ✅ Complete LSPosedKit framework (embedded)
+- ✅ Generated metadata files
+- ✅ Settings and UI resources
+- ✅ Proper Android application structure
 
-By following this guide, you'll create high-quality releases that users can confidently install and enjoy. 
+This approach eliminates dependency management issues and makes distribution straightforward — just share the APK file! 

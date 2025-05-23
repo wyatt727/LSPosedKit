@@ -1,408 +1,361 @@
 # Framework Internals
 
-> A deep dive into the internal architecture of LSPosedKit's framework layer, explaining how components interact and the design patterns used throughout the system.
+> A deep dive into the internal architecture of LSPosedKit's **embedded framework** layer, explaining how components interact within standalone module APKs and the design patterns used throughout the system.
+
+## Embedded Framework Architecture
+
+**Key Principle**: Each LSPosed module APK contains the complete LSPosedKit framework embedded within it, enabling standalone operation.
+
+```
+┌─────────────────────────────────────┐
+│        NetworkGuard.apk             │
+├─────────────────────────────────────┤
+│ NetworkGuard Module Code            │
+├─────────────────────────────────────┤
+│ Embedded LSPosedKit Framework:      │
+│ ├─ Core Runtime                     │
+│ ├─ Service Registry                 │
+│ ├─ Settings Management              │
+│ ├─ Hot-Reload System                │
+│ └─ Cross-Module Communication       │
+└─────────────────────────────────────┘
+```
 
 ## Package Architecture
 
-The LSPosedKit framework is organized into several core packages, each with a specific responsibility:
+The LSPosedKit framework is organized into several core packages, each embedded within every module:
 
 | Package                         | Key classes                           | Role                      |
 | ------------------------------- | ------------------------------------- | ------------------------- |
-| `com.wobbz.framework.core`      | `LspkRuntime`, `DexPatchServer`       | Host bootstrap & services |
+| `com.wobbz.framework.core`      | `LSPosedKitRuntime`, `IModulePlugin`  | Module bootstrap & core interfaces |
 | `com.wobbz.framework.processor` | `XposedPluginProcessor`               | KAPT annotation processor |
-| `com.wobbz.framework.hot`       | `PatchInstaller`, `ReloadBroadcaster` | DexPatch plumbing         |
-| `com.wobbz.framework.settings`  | `SettingsProvider`, `SettingsStore`   | Preference management     |
-| `com.wobbz.framework.service`   | `FeatureManager`, `ServiceRegistry`   | Module interop & services |
-| `com.wobbz.framework.util`      | `LogUtil`, `ReflectionHelper`         | Common utilities          |
+| `com.wobbz.framework.hot`       | `HotReloadManager`, `DexPatcher`      | DEX patching & hot-reload |
+| `com.wobbz.framework.settings`  | `SettingsProvider`, `SettingsStorage` | Module preference management |
+| `com.wobbz.framework.service`   | `FeatureManager`, `ServiceRegistry`   | Cross-module communication |
 
-## Initialization Sequence
+## Initialization Sequence (Per Module)
 
-When the system starts, LSPosedKit undergoes a structured initialization sequence:
+When LSPosed loads a module APK, each module initializes its embedded framework independently:
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant LSPosed
-    participant Host as "LspkRuntime (Host APK)"
-    participant PI as "PatchInstaller"
-    participant FM as "FeatureManager"
-    participant Modules as "Loaded Modules"
+    participant ModuleAPK as "NetworkGuard.apk"
+    participant Framework as "Embedded Framework"
+    participant ModuleCode as "NetworkGuard Logic"
+    participant ServiceBus as "Service Registry"
 
-    Note over LSPosed, Host: LSPosed loads the LSPK Host APK
-    LSPosed->>Host: attachBaseContext(context)
-    Host->>PI: verifyHostVersionCompat()
-    Host->>FM: initializeServiceRegistry()
-    Host->>Modules: loadModulesViaServiceLoader()
+    Note over LSPosed, ModuleAPK: LSPosed discovers and loads NetworkGuard.apk
+    LSPosed->>ModuleAPK: loadApplication()
+    ModuleAPK->>Framework: Initialize embedded framework
+    Framework->>Framework: Bootstrap LSPosedKitRuntime
+    Framework->>ServiceBus: Initialize service registry
+    Framework->>ModuleCode: Load NetworkGuard module
+    ModuleCode->>ServiceBus: Register INetworkRuleService
     
-    loop For each module
-        Host->>Modules: initialize(context, xposedInterface)
-        Modules->>FM: register services/features
-    end
-
-    Note over LSPosed, Host: When target app launches
-    LSPosed->>Host: handleLoadPackage(lpparam)
-    Host->>Modules: dispatchPackageLoaded(lpparam)
-    Modules->>Modules: Apply hooks to target app
+    Note over LSPosed, ModuleAPK: When target app launches
+    LSPosed->>ModuleAPK: handleLoadPackage(lpparam)
+    ModuleAPK->>Framework: Process package load event
+    Framework->>ModuleCode: onPackageLoaded(param)
+    ModuleCode->>ModuleCode: Apply NetworkGuard hooks
 ```
 
-## Core Components
+## Cross-Module Communication
 
-### LspkRuntime
+When multiple LSPosedKit modules are installed, they can communicate via their embedded service registries:
 
-The central nervous system of LSPosedKit, `LspkRuntime` handles:
+```mermaid
+sequenceDiagram
+    autonumber
+    participant NetworkGuard as "NetworkGuard.apk"
+    participant IntentInterceptor as "IntentInterceptor.apk"
+    participant ServiceDiscovery as "Cross-Module Discovery"
 
-- Integration with LSPosed framework
-- Module discovery, loading, and lifecycle management
-- Package event dispatch to appropriate modules
-- Hot-reload coordination
-
-```java
-public class LspkRuntime implements IXposedHookLoadPackage, IXposedHookZygoteInit {
-    private final ModuleRegistry moduleRegistry;
-    private final ServiceRegistry serviceRegistry;
-    private final HotReloadManager hotReloadManager;
+    Note over NetworkGuard, IntentInterceptor: Both modules initialize independently
+    NetworkGuard->>ServiceDiscovery: Register INetworkRuleService
+    IntentInterceptor->>ServiceDiscovery: Register IIntentHistoryService
     
-    @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
-        // Find modules targeting this package
-        for (ModuleInfo module : moduleRegistry.getModulesForPackage(lpparam.packageName)) {
-            module.dispatch(new PackageLoadedParam(lpparam));
+    Note over NetworkGuard, IntentInterceptor: Service discovery across modules
+    IntentInterceptor->>ServiceDiscovery: Query for INetworkRuleService
+    ServiceDiscovery->>NetworkGuard: Forward service request
+    NetworkGuard->>IntentInterceptor: Provide service reference
+    
+    Note over NetworkGuard, IntentInterceptor: Cross-module collaboration
+    IntentInterceptor->>NetworkGuard: checkNetworkRulesForApp(packageName)
+    NetworkGuard->>IntentInterceptor: return NetworkRuleDecision
+```
+
+## Core Components (Embedded in Each Module)
+
+### LSPosedKitRuntime (Per Module)
+
+Each module contains its own instance of the runtime, responsible for:
+
+- Integration with LSPosed framework (via generated `xposed_init`)
+- Module-specific lifecycle management
+- Package event handling for that module
+- Hot-reload coordination for that module
+
+```kotlin
+class LSPosedKitRuntime : IXposedHookLoadPackage {
+    private val modulePlugin: IModulePlugin
+    private val serviceRegistry: ServiceRegistry
+    private val hotReloadManager: HotReloadManager
+    
+    override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
+        // Check if this module targets the loaded package
+        if (shouldProcessPackage(lpparam.packageName)) {
+            val param = PackageLoadedParam(lpparam, xposedInterface)
+            modulePlugin.onPackageLoaded(param)
         }
     }
     
-    @Override
-    public void initZygote(StartupParam startupParam) {
-        // Initialize system-wide hooks
+    private fun shouldProcessPackage(packageName: String): Boolean {
+        // Check @XposedPlugin scope configuration
+        return scopeTargets.contains(packageName) || scopeTargets.contains("*")
     }
 }
 ```
 
-### ServiceRegistry & FeatureManager
+### ServiceRegistry (Per Module, Cross-Module Capable)
 
-The `ServiceRegistry` provides a lightweight dependency injection system that allows modules to expose services to each other:
+Each module contains an embedded service registry that provides:
+
+1. **Internal Services**: Services specific to that module
+2. **Cross-Module Discovery**: Ability to find services from other installed LSPosedKit modules
 
 ```kotlin
 object FeatureManager {
-    private val registry = ConcurrentHashMap<Class<*>, Any>()
+    private val localRegistry = ConcurrentHashMap<Class<*>, Any>()
+    private val crossModuleRegistry = CrossModuleServiceRegistry()
     
     fun <T : Any> register(serviceClass: Class<T>, implementation: T) {
-        registry[serviceClass] = implementation
+        // Register locally
+        localRegistry[serviceClass] = implementation
+        
+        // Make available for cross-module discovery
+        crossModuleRegistry.advertise(serviceClass, implementation)
     }
     
     fun <T : Any> get(serviceClass: Class<T>): T? {
-        @Suppress("UNCHECKED_CAST")
-        return registry[serviceClass] as? T
+        // First check local registry
+        val local = localRegistry[serviceClass] as? T
+        if (local != null) return local
+        
+        // Then check other modules
+        return crossModuleRegistry.discover(serviceClass)
     }
+}
+```
+
+### XposedPluginProcessor (Build-Time, Per Module)
+
+The annotation processor generates module-specific files during each module's build:
+
+1. Processes `@XposedPlugin` annotations in the module
+2. Generates metadata files specific to that module
+3. Creates proper `xposed_init` entry point
+4. Validates module configuration
+
+Generated files per module:
+```
+modules/NetworkGuard/src/main/assets/
+├── module.prop          ← LSPosed metadata for NetworkGuard
+├── xposed_init          ← Entry point: com.wobbz.module.networkguard.XposedInit
+├── module-info.json     ← Extended metadata for NetworkGuard
+└── settings.json        ← Settings schema (manually authored)
+```
+
+## Hot-Reload Architecture (Per Module)
+
+Each module contains its own hot-reload capabilities:
+
+### HotReloadManager (Per Module)
+
+Embedded in each module APK to handle:
+
+1. DEX patch reception for that specific module
+2. Module-specific reloading logic
+3. Coordination with the module's `IHotReloadable` implementation
+
+```kotlin
+class HotReloadManager(private val modulePlugin: IModulePlugin) {
     
-    fun hasFeature(featureId: String): Boolean {
-        return features.contains(featureId)
-    }
-}
-```
-
-This enables modules to interact without direct dependencies:
-
-```kotlin
-// Provider module
-class DebugAppProvider : IDebugProvider {
-    override fun getRules(): List<DebugRule> = loadRules()
-}
-
-// Register during initialization
-FeatureManager.register(IDebugProvider::class.java, DebugAppProvider())
-
-// Consumer module
-val provider = FeatureManager.get(IDebugProvider::class.java)
-if (provider != null) {
-    applyRules(provider.getRules())
-}
-```
-
-### XposedPluginProcessor
-
-The annotation processor plays a critical role in eliminating boilerplate:
-
-1. Processes `@XposedPlugin` annotations at compile time
-2. Generates metadata files for module discovery
-3. Creates `ServiceLoader` entries for automatic loading
-4. Validates module configuration for correctness
-
-```kotlin
-@AutoService(Processor::class)
-class XposedPluginProcessor : AbstractProcessor() {
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        roundEnv.getElementsAnnotatedWith(XposedPlugin::class.java).forEach { element ->
-            val annotation = element.getAnnotation(XposedPlugin::class.java)
-            
-            // Generate module metadata
-            generateModuleMetadata(element, annotation)
-            
-            // Generate ServiceLoader entry
-            generateServiceLoaderEntry(element)
+    fun handleHotReload(newDexBytes: ByteArray) {
+        // Apply DEX patch for this module only
+        val patcher = DexPatcher()
+        patcher.applyPatch(newDexBytes)
+        
+        // Notify module of reload
+        if (modulePlugin is IHotReloadable) {
+            modulePlugin.onHotReload()
         }
         
-        return true
+        // Re-register services if needed
+        reregisterModuleServices()
     }
 }
 ```
 
-## Hot-Reload Architecture
+### Development Server Integration
 
-The hot-reload system consists of several collaborating components:
+The development server can hot-reload specific modules:
 
-### DexPatchServer
+```bash
+# Start development server
+./gradlew runDevServer
 
-A TCP server that runs on the development machine and:
-
-1. Listens for connections from the device
-2. Monitors module build outputs for changes
-3. Computes DEX patches when changes occur
-4. Pushes patches to the device
-5. Triggers reload broadcasts
-
-### PatchInstaller
-
-On the device side, responsible for:
-
-1. Receiving and validating DEX patches
-2. Safely installing patches into the runtime
-3. Managing patch filesystem storage
-4. Coordinating with ReloadBroadcaster
-
-### ReloadBroadcaster
-
-Notifies modules when a reload is required:
-
-```kotlin
-class ReloadBroadcaster(private val context: Context) {
-    fun broadcastReload(moduleId: String, force: Boolean = false) {
-        val intent = Intent(ACTION_LSPK_RELOAD).apply {
-            putExtra(EXTRA_MODULE_ID, moduleId)
-            putExtra(EXTRA_FORCE, force)
-        }
-        context.sendBroadcast(intent)
-    }
-}
+# Build specific module → triggers hot-reload for just that module
+./gradlew :modules:NetworkGuard:assembleDebug
 ```
 
-### Reload Sequence
+### Hot-Reload Sequence (Per Module)
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Dev as "Developer (PC)"
-    participant Host as "LSPK Host (Device)"
-    participant Mod as "YourModule (Device)"
-    participant RB as "ReloadBroadcaster (Device)"
+    participant DevServer as "Development Server"
+    participant ModuleAPK as "NetworkGuard.apk"
+    participant HotReload as "Embedded HotReloadManager"
+    participant ModuleCode as "NetworkGuard Logic"
 
-    Note over Dev, Host: Developer builds and pushes DEX patch
-    Dev->>Host: adb push <module_name>.dex to /data/local/tmp/lspk-hot/
-    Note over Host, RB: Host component (e.g., DexPatchServer) triggers reload
-    Host->>RB: sendBroadcast(ACTION_LSPK_RELOAD with module_name)
-    RB->>Mod: onHotReload()
-    Mod->>Mod: Perform unhooking & rehooking logic
+    Note over Dev, DevServer: Developer builds NetworkGuard module
+    Dev->>DevServer: ./gradlew :modules:NetworkGuard:assembleDebug
+    DevServer->>DevServer: Detect NetworkGuard DEX changes
+    DevServer->>ModuleAPK: Push NetworkGuard DEX patch via ADB
+    ModuleAPK->>HotReload: Process incoming DEX patch
+    HotReload->>ModuleCode: onHotReload() - unhook existing hooks
+    HotReload->>HotReload: Apply DEX patch
+    HotReload->>ModuleCode: Re-initialize with new code
+    ModuleCode->>ModuleCode: Apply updated hooks
 ```
 
-## Settings Provider Architecture
+## Settings Management (Per Module)
 
-The settings system consists of:
+Each module has its own embedded settings system:
 
-1. `SettingsStore`: Low-level persistence and retrieval
-2. `SettingsProvider`: Type-safe API for accessing settings
-3. `SettingsKey` annotation: For binding properties to settings
+### SettingsProvider (Per Module)
 
 ```kotlin
-class SettingsProvider(private val store: SettingsStore) {
-    fun bool(key: String, default: Boolean = false): Boolean {
-        return store.getBoolean(key, default)
+class SettingsProvider(private val moduleId: String) {
+    private val storage = SettingsStorage(moduleId)
+    private val schema = loadSettingsSchema() // from assets/settings.json
+    
+    fun <T> getValue(key: String, defaultValue: T): T {
+        return storage.getValue(key, defaultValue)
     }
     
-    fun int(key: String, default: Int = 0): Int {
-        return store.getInt(key, default)
-    }
-    
-    fun <T : Any> bind(clazz: Class<T>): T {
-        // Create proxy that maps annotated properties to settings
+    fun <T> setValue(key: String, value: T) {
+        storage.setValue(key, value)
+        notifySettingsChanged(key, value)
     }
 }
 ```
 
-The settings architecture follows a key-value store pattern with JSON Schema validation for type safety.
+### Settings UI Integration
 
-## ClassLoader Hierarchy
-
-LSPosedKit carefully manages ClassLoader hierarchies to ensure proper class resolution:
+Each module's settings are managed independently in LSPosed Manager:
 
 ```
-BootClassLoader
-    ↑
-SystemClassLoader
-    ↑
-ApplicationClassLoader (LSPosed Host)
-    ↑
-ModuleClassLoader (Individual modules)
+LSPosed Manager → Modules
+├── NetworkGuard → Settings (from NetworkGuard's settings.json)
+├── IntentInterceptor → Settings (from IntentInterceptor's settings.json)
+└── UIEnhancer → Settings (from UIEnhancer's settings.json)
 ```
 
-During hot-reload, a new ClassLoader is created with the patched DEX:
+## Module Lifecycle Management
 
-```
-BootClassLoader
-    ↑
-SystemClassLoader
-    ↑
-ApplicationClassLoader
-    ↑
-ModuleClassLoader
-    ↑
-PatchedModuleClassLoader (contains updated classes)
-```
+### ModuleLifecycle Interface
 
-## Error Handling & Logging
-
-LSPosedKit implements a robust error handling strategy:
-
-1. **Compartmentalization**: Module errors are isolated and don't crash other modules
-2. **Graceful Degradation**: System continues functioning if components fail
-3. **Detailed Logging**: Comprehensive logging with tagged output
-4. **Error Boundaries**: Critical paths are wrapped in try-catch with fallbacks
+Each module can implement lifecycle callbacks:
 
 ```kotlin
-class ErrorBoundary {
-    fun <T> runCatching(operation: () -> T, fallback: T, logger: LogUtil): T {
-        return try {
-            operation()
-        } catch (e: Throwable) {
-            logger.error("Operation failed", e)
-            fallback
-        }
+interface ModuleLifecycle {
+    fun onStart()                    // Module activated in LSPosed Manager
+    fun onStop()                     // Module deactivated
+    fun onPackageLoaded(param: PackageLoadedParam)  // Target app loads
+}
+```
+
+### Releasable Resources
+
+Modules should implement `Releasable` for proper cleanup:
+
+```kotlin
+class NetworkGuard : IModulePlugin, ModuleLifecycle, Releasable {
+    private val hooks = mutableListOf<MethodUnhooker<*>>()
+    private val networkMonitor = NetworkMonitor()
+    
+    override fun onStop() {
+        release()
+    }
+    
+    override fun release() {
+        hooks.forEach { it.unhook() }
+        hooks.clear()
+        networkMonitor.cleanup()
     }
 }
 ```
 
-## Advanced Integration Points
+## Memory and Performance Considerations
 
-### Xposed Integration
+### Framework Overhead
 
-LSPosedKit exposes a simpler API that wraps Xposed complexity:
+Since each module embeds the framework:
 
-```kotlin
-interface XposedInterface {
-    fun loadClass(name: String): Class<*>
-    
-    fun <T : Hooker> hook(method: Method, hooker: Class<T>): MethodUnhooker<T>
-    
-    fun log(level: LogLevel, message: String)
-}
-```
+- **Memory**: ~500KB framework overhead per module
+- **Boot Time**: Minimal impact (framework lazy-loads)
+- **Cross-Module Efficiency**: Service discovery uses minimal IPC
 
-### Resource Injection
+### Optimization Strategies
 
-For modules that need to modify resources:
+1. **Shared Framework Code**: Framework classes are identical across modules, enabling OS-level deduplication
+2. **Lazy Initialization**: Framework components initialize only when needed
+3. **Service Registry Cleanup**: Unused services are automatically garbage collected
 
-```kotlin
-class ResourceHelper(private val resparam: XC_InitPackageResources.InitPackageResourcesParam) {
-    fun replaceLayout(layoutId: Int, newLayoutResId: Int) {
-        resparam.res.setReplacement(
-            resparam.packageName,
-            "layout",
-            layoutId,
-            newLayoutResId
-        )
-    }
-}
-```
+## Key Benefits of Embedded Architecture
 
-## Thread Safety Considerations
+1. **Independence**: Each module is completely self-contained
+2. **Isolation**: Module failures don't affect other modules
+3. **Versioning**: Each module can embed different framework versions if needed
+4. **Distribution**: Standard APK distribution with no external dependencies
+5. **Development**: Hot-reload works per-module without affecting others
 
-LSPosedKit is designed for concurrent execution with:
+## Inter-Module Service Examples
 
-- Thread-safe collections (`ConcurrentHashMap`, etc.)
-- Immutable data structures where possible
-- Explicit synchronization when required
-- Thread-local storage for context-specific data
+### Network Rule Service (NetworkGuard)
 
 ```kotlin
-object ThreadLocalContext {
-    private val currentPackage = ThreadLocal<String>()
-    
-    fun setPackage(packageName: String) {
-        currentPackage.set(packageName)
-    }
-    
-    fun getCurrentPackage(): String? {
-        return currentPackage.get()
-    }
-    
-    fun clear() {
-        currentPackage.remove()
+interface INetworkRuleService {
+    fun checkRule(packageName: String, url: String): NetworkDecision
+    fun addRule(rule: NetworkRule)
+}
+
+// Implementation in NetworkGuard module
+class NetworkRuleProvider : INetworkRuleService {
+    override fun checkRule(packageName: String, url: String): NetworkDecision {
+        // Check rules and return decision
     }
 }
+
+// Registration during NetworkGuard initialization
+FeatureManager.register(INetworkRuleService::class.java, NetworkRuleProvider())
 ```
 
-## Performance Optimization
+### Intent History Service (IntentInterceptor)
 
-Key performance optimizations include:
+```kotlin
+interface IIntentHistoryService {
+    fun recordIntent(intent: Intent, sourcePackage: String)
+    fun getIntentHistory(packageName: String): List<IntentRecord>
+}
 
-1. **Lazy Loading**: Components are initialized on demand
-2. **Targeted Hooks**: Modules only hook into specified packages
-3. **Resource Pooling**: Connection and thread pools for shared resources
-4. **Caching**: Frequently accessed data is cached
-5. **Minimal Reflection**: Reflection usage is minimized and results cached
+// Usage in another module
+val historyService = FeatureManager.get(IIntentHistoryService::class.java)
+historyService?.recordIntent(capturedIntent, sourcePackageName)
+```
 
-## Advanced: Extending the Framework
-
-For developers who want to extend LSPosedKit itself:
-
-1. **Custom Annotation Processors**: Extend `XposedPluginProcessor`
-2. **Service Providers**: Implement and register new services
-3. **Event Listeners**: Create listeners for framework events
-4. **Custom ClassLoaders**: Extend module loading behavior
-
-## Best Practices for Framework Integration
-
-1. **Respect API Boundaries**: Use public APIs, avoid reflection on internals
-2. **Error Handling**: Always handle exceptions in your hooks
-3. **Resource Cleanup**: Release resources when modules are disabled
-4. **Thread Safety**: Assume your code will run in multiple threads
-5. **Lightweight Initialization**: Keep module startup fast and efficient
-
-## Appendix: Key Class Relationships
-
-```mermaid
-classDiagram
-    class LspkRuntime {
-        +handleLoadPackage()
-        +initZygote()
-    }
-    
-    class ModuleRegistry {
-        +loadModules()
-        +getModulesForPackage()
-    }
-    
-    class IModulePlugin {
-        +initialize()
-        +onPackageLoaded()
-    }
-    
-    class HotReloadManager {
-        +installPatch()
-        +broadcastReload()
-    }
-    
-    class IHotReloadable {
-        +onHotReload()
-    }
-    
-    class FeatureManager {
-        +register()
-        +get()
-        +hasFeature()
-    }
-    
-    LspkRuntime --> ModuleRegistry
-    LspkRuntime --> HotReloadManager
-    ModuleRegistry --> IModulePlugin
-    HotReloadManager --> IHotReloadable
-    IModulePlugin --> FeatureManager
-</rewritten_file> 
+This embedded architecture provides the flexibility of traditional LSPosed modules while maintaining the simplicity of standalone APK distribution. 

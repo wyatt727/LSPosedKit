@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.3.0" type="partial_results">
+    <map id="UnusedResources">
+        <location id="R.color.black"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="8"
+            column="12"
+            startOffset="293"
+            endLine="8"
+            endColumn="24"
+            endOffset="305"/>
+        <location id="R.color.teal_700"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="7"
+            column="12"
+            startOffset="248"
+            endLine="7"
+            endColumn="27"
+            endOffset="263"/>
+        <location id="R.color.white"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="9"
+            column="12"
+            startOffset="335"
+            endLine="9"
+            endColumn="24"
+            endOffset="347"/>
+        <location id="R.color.purple_500"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="4"
+            column="12"
+            startOffset="109"
+            endLine="4"
+            endColumn="29"
+            endOffset="126"/>
+        <location id="R.style.AppTheme_Settings"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/themes.xml"
+            line="12"
+            column="12"
+            startOffset="477"
+            endLine="12"
+            endColumn="36"
+            endOffset="501"/>
+        <location id="R.color.purple_200"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="3"
+            column="12"
+            startOffset="62"
+            endLine="3"
+            endColumn="29"
+            endOffset="79"/>
+        <entry
+            name="model"
+            string="array[xposed_scope(U)],color[purple_200(D),purple_500(D),purple_700(U),teal_200(D),teal_700(D),black(D),white(D),ui_enhancer_primary(U),ui_enhancer_accent(U),ui_enhancer_background(D),ui_enhancer_surface(D)],mipmap[ic_launcher(U)],string[app_name(U),module_description(U)],style[AppTheme(U),AppTheme_NoActionBar(U),Theme_AppCompat_DayNight_DarkActionBar(R),AppTheme_Settings(D),PreferenceThemeOverlay_v14_Material(R),Theme_AppCompat_DayNight_NoActionBar(R)];f^11^8^3^9,10^14^8^3^9^13,12^11^13^8^9;;;"/>
+        <location id="R.color.ui_enhancer_surface"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="15"
+            column="12"
+            startOffset="586"
+            endLine="15"
+            endColumn="38"
+            endOffset="612"/>
+        <location id="R.color.teal_200"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="6"
+            column="12"
+            startOffset="203"
+            endLine="6"
+            endColumn="27"
+            endOffset="218"/>
+        <location id="R.color.ui_enhancer_background"
+            file="${:modules:UIEnhancer*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="14"
+            column="12"
+            startOffset="529"
+            endLine="14"
+            endColumn="41"
+            endOffset="558"/>
+    </map>
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.wobbz.module.uienhancer.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+
+</incidents>

@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_fade_enter.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_fade_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_close_exit.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_close_exit.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_fade_exit.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_fade_exit.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_close_enter.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_close_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_open_enter.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_open_enter.xml"
+    },
+    {
+        "merged": "com.wobbz.module.testgenerated.TestGenerated-release-32:/animator/fragment_open_exit.xml",
+        "source": "com.wobbz.module.testgenerated.TestGenerated-fragment-1.5.5-23:/animator/fragment_open_exit.xml"
+    }
+]

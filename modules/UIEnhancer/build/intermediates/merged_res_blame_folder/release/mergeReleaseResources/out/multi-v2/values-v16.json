@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-release-43:/values-v16/values-v16.xml",
+            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-42:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/0c1d96c62d573e0a487517b4fc5ff58c/transformed/core-1.9.0/res/values-v16/values-v16.xml",
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/94d14089342cb945c7ec153aae6dcd2a/transformed/core-1.9.0/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -14,41 +14,7 @@
                     }
                 },
                 {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7638403fb91a256a5fe607e32b34ff97/transformed/appcompat-1.5.0/res/values-v16/values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endLines": "5",
-                        "endColumns": "12",
-                        "endOffsets": "223"
-                    },
-                    "to": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "121",
-                        "endLines": "6",
-                        "endColumns": "12",
-                        "endOffsets": "289"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.wobbz.module.uienhancer.UIEnhancer-mergeReleaseResources-41:/values-v16/values-v16.xml",
-            "map": [
-                {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/0c1d96c62d573e0a487517b4fc5ff58c/transformed/core-1.9.0/res/values-v16/values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
-                    }
-                },
-                {
-                    "source": "/Users/pentester/.gradle/caches/transforms-3/7638403fb91a256a5fe607e32b34ff97/transformed/appcompat-1.5.0/res/values-v16/values-v16.xml",
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/836ba8730b67f5d5a7a5e421a7ab8eca/transformed/appcompat-1.6.1/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

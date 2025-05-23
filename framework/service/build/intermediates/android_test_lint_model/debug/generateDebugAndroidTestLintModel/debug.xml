@@ -25,6 +25,6 @@
       type="INSTRUMENTATION_TEST"
       applicationId="com.wobbz.framework.service.test"
       generatedResourceFolders="build/generated/res/resValues/androidTest/debug"
-      desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/27b847e8c10c3cc9d8eb1153ef900027/transformed/D8BackportedDesugaredMethods.txt">
+      desugaredMethodsFiles="/Users/pentester/.gradle/caches/transforms-3/0591ede8b1c7c849b6c96a798f0f5b9b/transformed/D8BackportedDesugaredMethods.txt">
   </artifact>
 </variant>

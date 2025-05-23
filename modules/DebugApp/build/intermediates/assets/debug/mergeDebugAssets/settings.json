@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Debug App Settings",
+  "properties": {
+    "enable_for_all": {
+      "type": "boolean",
+      "title": "Enable for all apps",
+      "description": "Enable debug mode for all apps (except excluded apps)",
+      "default": true
+    },
+    "excluded_packages": {
+      "type": "array",
+      "title": "Excluded packages",
+      "description": "Packages to exclude when 'Enable for all apps' is on",
+      "items": {
+        "type": "string"
+      },
+      "default": ["com.android.systemui", "com.android.settings"]
+    },
+    "included_packages": {
+      "type": "array",
+      "title": "Included packages",
+      "description": "Packages to include when 'Enable for all apps' is off",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "log_level": {
+      "type": "string",
+      "title": "Log Level",
+      "description": "The minimum log level to output",
+      "default": "INFO",
+      "enum": ["DEBUG", "INFO", "WARN", "ERROR"]
+    }
+  }
+} 

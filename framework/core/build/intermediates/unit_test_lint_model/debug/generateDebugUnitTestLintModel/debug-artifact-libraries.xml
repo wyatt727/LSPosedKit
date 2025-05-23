@@ -1,9 +1,9 @@
 <libraries>
   <library
       name=":@@:framework:core::debug"
-      jars="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out/jars/classes.jar:/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out/jars/libs/R.jar"
+      jars="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out/jars/classes.jar:/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out/jars/libs/R.jar"
       resolved="LSPosedKit.framework:core:unspecified"
-      folder="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/94599b00ad97f7cce8e3a56b28a28c7a/transformed/out"
+      folder="/Users/pentester/Tools/LSPosedKit/framework/core/build/.transforms/d666978da0097fc0af99e555d349496a/transformed/out"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
@@ -13,10 +13,10 @@
       externalAnnotations="annotations.zip"
       proguardRules="proguard.txt"/>
   <library
-      name=":@@:libxposed-api:api::debug"
-      jars="/Users/pentester/Tools/LSPosedKit/libxposed-api/api/build/.transforms/07c6c4d47bf1720dc1c079c6b894c58c/transformed/out/jars/classes.jar"
-      resolved="io.github.libxposed:api:unspecified"
-      folder="/Users/pentester/Tools/LSPosedKit/libxposed-api/api/build/.transforms/07c6c4d47bf1720dc1c079c6b894c58c/transformed/out"
+      name="io.github.libxposed:api:100@aar"
+      jars="/Users/pentester/.gradle/caches/transforms-3/98210c06914302a3a118c536b15a10a1/transformed/api-100/jars/classes.jar"
+      resolved="io.github.libxposed:api:100"
+      folder="/Users/pentester/.gradle/caches/transforms-3/98210c06914302a3a118c536b15a10a1/transformed/api-100"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"

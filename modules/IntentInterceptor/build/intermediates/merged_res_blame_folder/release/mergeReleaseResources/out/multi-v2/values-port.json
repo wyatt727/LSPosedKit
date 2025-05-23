@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.wobbz.module.intentinterceptor.IntentInterceptor-mergeReleaseResources-47:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/Users/pentester/.gradle/caches/transforms-3/5ecf129a060abb1521e9965a14b4a311/transformed/appcompat-1.5.0/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+com.wobbz.framework.core-pngs-0 /Users/pentester/Tools/LSPosedKit/framework/core/build/generated/res/pngs/release
+com.wobbz.framework.core-resValues-1 /Users/pentester/Tools/LSPosedKit/framework/core/build/generated/res/resValues/release
+com.wobbz.framework.core-mergeReleaseResources-2 /Users/pentester/Tools/LSPosedKit/framework/core/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+com.wobbz.framework.core-mergeReleaseResources-3 /Users/pentester/Tools/LSPosedKit/framework/core/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+com.wobbz.framework.core-release-4 /Users/pentester/Tools/LSPosedKit/framework/core/build/intermediates/merged_res/release/mergeReleaseResources
+com.wobbz.framework.core-main-5 /Users/pentester/Tools/LSPosedKit/framework/core/src/main/res
+com.wobbz.framework.core-release-6 /Users/pentester/Tools/LSPosedKit/framework/core/src/release/res
